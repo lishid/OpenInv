@@ -20,7 +20,7 @@ public class PlayerInventoryChest extends InventoryPlayer
 
 	@Override
 	public String getName() {
-        return ((EntityPlayer)this.d).displayName;
+        return ((EntityPlayer)this.d).displayName + " (" + this.itemInHandIndex + ")";
     }
 
 	@Override

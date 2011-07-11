@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 
 public class OpenInvPluginCommand implements CommandExecutor {
     private final OpenInv plugin;
+    public static HashMap<Player, PlayerInventoryChest> offlineInv = new HashMap<Player, PlayerInventoryChest>();
     public static HashMap<Player, OpenInvHistory> theOpenInvHistory = new HashMap<Player, OpenInvHistory>();
     public OpenInvPluginCommand(OpenInv plugin) {
         this.plugin = plugin;
@@ -30,6 +31,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
             return true;
         }
         
+    	//boolean Offline = false;
 		Player player = (Player)sender;
 		OpenInvHistory history = theOpenInvHistory.get(player);
 		
@@ -60,13 +62,11 @@ public class OpenInvPluginCommand implements CommandExecutor {
 			if(history.lastPlayer != null)
 			{
 				target = this.plugin.getServer().getPlayer(history.lastPlayer);
-				//EntityPlayer entply = new EntityPlayer(((CraftServer)this.plugin.getServer()).getServer(), ((CraftPlayer)player).getHandle().world, "", null);
-				//CraftPlayer ply = new CraftPlayer((CraftServer) this.plugin.getServer(), null);
 			}
 			else
 			{
-				sender.sendMessage("OpenInv history is empty!");
-				return false;
+				sender.sendMessage(ChatColor.RED + "OpenInv history is empty!");
+				return true;
 			}
 		}
 		else
@@ -77,19 +77,44 @@ public class OpenInvPluginCommand implements CommandExecutor {
 
 		if(target == null)
 		{
-			sender.sendMessage("Player not found!");
-			return false;
+			//Offline inv here...
+			/*try{
+				MinecraftServer server = ((CraftServer)this.plugin.getServer()).getServer();
+				EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), args[0], new ItemInWorldManager(server.getWorldServer(0)));
+				target = (entity == null) ? null : (Player) entity.getBukkitEntity();
+				if(target != null)
+				{
+					Offline = true;
+					target.loadData();
+				}
+				else
+				{
+					sender.sendMessage(ChatColor.RED + "Player not found!");
+					return false;
+				}
+			} catch(Exception e)
+			{*/
+				//sender.sendMessage("Error while retrieving offline player data!");
+				sender.sendMessage(ChatColor.RED + "Player '" + args[0] + "' not found!");
+				return true;
+			/*}*/
 		}
 		if(target == player)
 		{
-			sender.sendMessage("Cannot target yourself!");
-			return false;
+			sender.sendMessage(ChatColor.RED + "Cannot OpenInv yourself!");
+			return true;
 		}
 		
 		if (!PermissionRelay.hasPermission(player, "OpenInv.override") && PermissionRelay.hasPermission(target, "OpenInv.exempt")) {
             sender.sendMessage(ChatColor.RED + target.getDisplayName() + "'s inventory is protected!");
             return true;
         }
+		
+		if((!PermissionRelay.hasPermission(player, "OpenInv.crossworld") && !PermissionRelay.hasPermission(player, "OpenInv.override")) && 
+				target.getWorld() != player.getWorld()){
+			sender.sendMessage(ChatColor.RED + target.getDisplayName() + " is not in your world!");
+            return true;
+		}
 
 		history.lastPlayer = target.getName();
 		
@@ -103,7 +128,12 @@ public class OpenInvPluginCommand implements CommandExecutor {
 		{
 			OpenInv.ReplaceInv((CraftPlayer) target);
 		}
-		
+		/*
+		if(Offline && entitytarget.inventory instanceof PlayerInventoryChest)
+		{
+			offlineInv.put(target, (PlayerInventoryChest) entitytarget.inventory);
+		}
+		*/
 		entityplayer.a(entitytarget.inventory);
 
 		return true;
