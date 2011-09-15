@@ -1,6 +1,6 @@
 name: OpenInv
 main: lishid.openinv.OpenInv
-version: 1.3.3
+version: 1.4.1
 author: lishid
 description: >
              This plugin allows you to open another player's inventory as a chest
@@ -14,4 +14,6 @@ commands:
     usage: |
            /<command> <Item> [MinAmount] - Item can be the Item ID or the CraftBukkit Item Name, MinAmount is the minimum amount to be considered.
   toggleopeninv:
-    description: Toggle the stick usage
+    description: Toggle the stick openinv
+    usage: |
+           /<command> [check] - Checks whether stick openinv is enabled

@@ -13,18 +13,18 @@ public class PlayerInventoryChest extends InventoryPlayer
 		this.items = inventory.items;
 		this.itemInHandIndex = inventory.itemInHandIndex;
 		this.e = inventory.e;
-		this.b(inventory.j());
+		this.b(inventory.l());
 		inventory.d.defaultContainer = new ContainerPlayer(this, !inventory.d.world.isStatic);
 		inventory.d.activeContainer = inventory.d.defaultContainer;
 	}
 
 	@Override
 	public String getName() {
-        return ((EntityPlayer)this.d).displayName + " (" + this.itemInHandIndex + ")";
+        return ((EntityPlayer)this.d).displayName;
     }
 
 	@Override
-	public boolean a_(EntityHuman entityhuman)
+	public boolean a(EntityHuman entityhuman)
 	{
 		return true;
 	}

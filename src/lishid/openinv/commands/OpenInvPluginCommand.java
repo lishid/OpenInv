@@ -19,7 +19,7 @@ import org.bukkit.entity.Player;
 
 public class OpenInvPluginCommand implements CommandExecutor {
     private final OpenInv plugin;
-    public static HashMap<Player, PlayerInventoryChest> offlineInv = new HashMap<Player, PlayerInventoryChest>();
+    //public static HashMap<Player, PlayerInventoryChest> offlineInv = new HashMap<Player, PlayerInventoryChest>();
     public static HashMap<Player, OpenInvHistory> theOpenInvHistory = new HashMap<Player, OpenInvHistory>();
     public OpenInvPluginCommand(OpenInv plugin) {
         this.plugin = plugin;
@@ -33,6 +33,8 @@ public class OpenInvPluginCommand implements CommandExecutor {
         
     	//boolean Offline = false;
 		Player player = (Player)sender;
+		
+		//History management
 		OpenInvHistory history = theOpenInvHistory.get(player);
 		
 		if(history == null)
@@ -41,11 +43,22 @@ public class OpenInvPluginCommand implements CommandExecutor {
 			theOpenInvHistory.put(player, history);
 		}
 		
+		//Toggleopeninv command
 		if(command.getName().equalsIgnoreCase("toggleopeninv"))
 		{
-			if(OpenInvToggleState.openInvState.get(player.getName()) != null && OpenInvToggleState.openInvState.get(player.getName()) == 1)
+			if(args.length > 0)
 			{
-				OpenInvToggleState.openInvState.put(player.getName(), 0);
+				if(args[0].equalsIgnoreCase("check"))
+				{
+					if(OpenInvToggleState.openInvState.containsKey(player.getName()))
+						player.sendMessage("OpenInv with stick is ON.");
+					else
+						player.sendMessage("OpenInv with stick is OFF.");
+				}
+			}
+			if(OpenInvToggleState.openInvState.containsKey(player.getName()))
+			{
+				OpenInvToggleState.openInvState.remove(player.getName());
 				player.sendMessage("OpenInv with stick is OFF.");
 			}
 			else
@@ -56,6 +69,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
 			return true;
 		}
 
+		//Target selecting
 		Player target;
 		
 		if (args.length < 1) {
@@ -99,12 +113,15 @@ public class OpenInvPluginCommand implements CommandExecutor {
 				return true;
 			/*}*/
 		}
+		
+		//Check if target is the player him/her self
 		if(target == player)
 		{
 			sender.sendMessage(ChatColor.RED + "Cannot OpenInv yourself!");
 			return true;
 		}
 		
+		//Permissions checks
 		if (!PermissionRelay.hasPermission(player, "OpenInv.override") && PermissionRelay.hasPermission(target, "OpenInv.exempt")) {
             sender.sendMessage(ChatColor.RED + target.getDisplayName() + "'s inventory is protected!");
             return true;
@@ -116,6 +133,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
             return true;
 		}
 
+		//The actual openinv
 		history.lastPlayer = target.getName();
 		
 		// Get the EntityPlayer handle from the sender

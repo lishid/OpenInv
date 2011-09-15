@@ -74,8 +74,8 @@ public class OpenInv extends JavaPlugin {
 	    	player.setHandle(entityplayer);
     	}
     	catch(Exception e)
-    	{}
+    	{
+            System.out.println("[OpenInv] Error while trying to override player inventory, error: " + e.getMessage());
+    	}
     }
-    
-    
 }
