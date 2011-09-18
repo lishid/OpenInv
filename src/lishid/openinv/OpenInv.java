@@ -16,6 +16,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.util.config.Configuration;
 
 /**
  * Open other player's inventory
@@ -27,6 +28,7 @@ public class OpenInv extends JavaPlugin {
 	private final OpenInvEntityListener entityListener = new OpenInvEntityListener(this);
 	//private final OpenInvInventoryListener inventoryListener = new OpenInvInventoryListener(this);
     public static PermissionHandler permissionHandler;
+	public static Configuration config;
     public void onDisable() {
     }
     
@@ -43,6 +45,7 @@ public class OpenInv extends JavaPlugin {
     }
 
     public void onEnable() {
+        config = this.getConfiguration();
 
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Event.Priority.Normal, this);
@@ -77,5 +80,25 @@ public class OpenInv extends JavaPlugin {
     	{
             System.out.println("[OpenInv] Error while trying to override player inventory, error: " + e.getMessage());
     	}
+    }
+    
+    public static Object GetFromConfig(String data, Object defaultValue)
+    {
+    	Object val = config.getProperty(data);
+        if (val == null)
+        {
+            config.setProperty(data, defaultValue);
+            return defaultValue;
+        }
+        else
+        {
+        	return val;
+        }
+    }
+    
+    public static void SaveToConfig(String data, Object value)
+    {
+    	config.setProperty(data, value);
+    	config.save();
     }
 }

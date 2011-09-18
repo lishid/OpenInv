@@ -2,7 +2,6 @@ package lishid.openinv.utils;
 
 import net.minecraft.server.ContainerPlayer;
 import net.minecraft.server.EntityHuman;
-import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.InventoryPlayer;
 
 public class PlayerInventoryChest extends InventoryPlayer
@@ -20,7 +19,7 @@ public class PlayerInventoryChest extends InventoryPlayer
 
 	@Override
 	public String getName() {
-        return ((EntityPlayer)this.d).displayName;
+        return "Player Inventory";
     }
 
 	@Override
