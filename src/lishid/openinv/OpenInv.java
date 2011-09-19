@@ -82,6 +82,22 @@ public class OpenInv extends JavaPlugin {
     	}
     }
     
+    public static boolean GetPlayerItemOpenInvStatus(String name)
+    {
+    	return config.getBoolean("ItemOpenInv." + name.toLowerCase() + ".toggle", false);
+    }
+    
+    public static void SetPlayerItemOpenInvStatus(String name, boolean status)
+    {
+    	config.setProperty("ItemOpenInv." + name.toLowerCase() + ".toggle", status);
+    	config.save();
+    }
+    
+    public static int GetItemOpenInvItem()
+    {
+    	return config.getInt("ItemOpenInvItemID", 280);
+    }
+    
     public static Object GetFromConfig(String data, Object defaultValue)
     {
     	Object val = config.getProperty(data);

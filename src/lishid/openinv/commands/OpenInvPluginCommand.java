@@ -4,13 +4,13 @@ import java.util.HashMap;
 
 import lishid.openinv.PermissionRelay;
 import lishid.openinv.OpenInv;
-import lishid.openinv.utils.OpenInvToggleState;
 import lishid.openinv.utils.PlayerInventoryChest;
 import lishid.openinv.utils.OpenInvHistory;
 
 import net.minecraft.server.EntityPlayer;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -50,21 +50,21 @@ public class OpenInvPluginCommand implements CommandExecutor {
 			{
 				if(args[0].equalsIgnoreCase("check"))
 				{
-					if(OpenInvToggleState.openInvState.containsKey(player.getName()))
-						player.sendMessage("OpenInv with stick is ON.");
+					if(OpenInv.GetPlayerItemOpenInvStatus(player.getName()))
+						player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.GetItemOpenInvItem()).toString() + " is ON.");
 					else
-						player.sendMessage("OpenInv with stick is OFF.");
+						player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.GetItemOpenInvItem()).toString() + " is OFF.");
 				}
 			}
-			if(OpenInvToggleState.openInvState.containsKey(player.getName()))
+			if(OpenInv.GetPlayerItemOpenInvStatus(player.getName()))
 			{
-				OpenInvToggleState.openInvState.remove(player.getName());
-				player.sendMessage("OpenInv with stick is OFF.");
+				OpenInv.SetPlayerItemOpenInvStatus(player.getName(), false);
+				player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.GetItemOpenInvItem()).toString() + " is OFF.");
 			}
 			else
 			{
-				OpenInvToggleState.openInvState.put(player.getName(), 1);
-				player.sendMessage("OpenInv with stick is ON.");
+				OpenInv.SetPlayerItemOpenInvStatus(player.getName(), true);
+				player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.GetItemOpenInvItem()).toString() + " is ON.");
 			}
 			return true;
 		}

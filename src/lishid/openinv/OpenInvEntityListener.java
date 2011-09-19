@@ -1,8 +1,5 @@
 package lishid.openinv;
 
-import lishid.openinv.utils.OpenInvToggleState;
-
-import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
@@ -29,9 +26,8 @@ public class OpenInvEntityListener extends EntityListener{
     		
     		Player player = (Player)attacker;
     		
-    		if(!(player.getItemInHand().getType() == Material.STICK)
-    				|| (OpenInvToggleState.openInvState.get(player.getName()) == null)
-    				|| !(OpenInvToggleState.openInvState.get(player.getName()) == 1)
+    		if(!(player.getItemInHand().getType().getId() == OpenInv.GetItemOpenInvItem())
+    				|| (!OpenInv.GetPlayerItemOpenInvStatus(player.getName()))
     				|| !PermissionRelay.hasPermission(player, "openinv"))
     		{
     			return;

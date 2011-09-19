@@ -1,6 +1,6 @@
 package lishid.openinv;
 
-import lishid.openinv.utils.OpenInvToggleState;
+import net.minecraft.server.Block;
 
 import org.bukkit.Material;
 import org.bukkit.block.Sign;
@@ -35,11 +35,17 @@ public class OpenInvPlayerListener extends PlayerListener{
 	{
 		if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
 		{
+			if(event.getClickedBlock() == Block.CHEST ||
+					event.getClickedBlock() == Block.FURNACE ||
+					event.getClickedBlock() == Block.DISPENSER)
+			{
+				return;
+			}
+			
 			Player player = event.getPlayer();
 			
 			if(!(player.getItemInHand().getType() == Material.STICK)
-					|| (OpenInvToggleState.openInvState.get(player.getName()) == null)
-					|| !(OpenInvToggleState.openInvState.get(player.getName()) == 1)
+    				|| (!OpenInv.GetPlayerItemOpenInvStatus(player.getName()))
 					|| !PermissionRelay.hasPermission(player, "openinv"))
 			{
 				return;
