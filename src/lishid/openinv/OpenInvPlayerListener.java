@@ -13,6 +13,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -40,7 +41,7 @@ public class OpenInvPlayerListener extends PlayerListener{
 	@Override
 	public void onPlayerInteract(PlayerInteractEvent event)
 	{
-		if(event.isCancelled())
+		if(event.useInteractedBlock() == Result.DENY)
 			return;
 		
 		if(event.getAction() == Action.RIGHT_CLICK_BLOCK && 
@@ -87,9 +88,6 @@ public class OpenInvPlayerListener extends PlayerListener{
 				    
 				    //Send a notification
 				    event.getPlayer().sendMessage("You are opening a blocked chest.");
-				    
-				    //Cancel chest open event
-					event.setCancelled(true);
 			    }
 			    /*
 				Chest chest = (Chest)event.getClickedBlock().getState();
