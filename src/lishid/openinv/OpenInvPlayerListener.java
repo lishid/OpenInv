@@ -1,9 +1,12 @@
 package lishid.openinv;
 
+import lishid.openinv.commands.OpenInvPluginCommand;
+import lishid.openinv.utils.PlayerInventoryChest;
 import net.minecraft.server.Block;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.IInventory;
 import net.minecraft.server.InventoryLargeChest;
+import net.minecraft.server.Packet101CloseWindow;
 import net.minecraft.server.TileEntityChest;
 import net.minecraft.server.World;
 
@@ -16,9 +19,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerListener;
-import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 
 public class OpenInvPlayerListener extends PlayerListener{
 	OpenInv plugin;
@@ -27,17 +29,29 @@ public class OpenInvPlayerListener extends PlayerListener{
 	}
 
 	@Override
-	public void onPlayerJoin(PlayerJoinEvent event)
+	public void onPlayerLogin(PlayerLoginEvent event)
 	{
-		OpenInv.ReplaceInv((CraftPlayer) event.getPlayer());
+		try{
+			for(Player target : OpenInvPluginCommand.offlineInv.values())
+			{
+				if(target.getName().equalsIgnoreCase(event.getPlayer().getName()))
+				{
+					System.out.print("[OpenInv] PlayerLogin event triggered closing openinv.");
+					EntityPlayer player = ((CraftPlayer)target).getHandle();
+					if(player.inventory instanceof PlayerInventoryChest)
+					{
+						((CraftPlayer)((PlayerInventoryChest)player.inventory).Opener).getHandle().netServerHandler.sendPacket(new Packet101CloseWindow());
+					}
+					target.saveData();
+					OpenInvPluginCommand.offlineInv.remove(player.inventory);
+					event.getPlayer().loadData();
+					break;
+				}
+			}
+		}
+		catch(Exception e){}
 	}
 
-	@Override
-	public void onPlayerRespawn(PlayerRespawnEvent event)
-	{
-		OpenInv.ReplaceInv((CraftPlayer) event.getPlayer());
-	}
-	
 	@Override
 	public void onPlayerInteract(PlayerInteractEvent event)
 	{
@@ -132,7 +146,9 @@ public class OpenInvPlayerListener extends PlayerListener{
 				{
 					if(plugin.getServer().getPlayer(((Sign)event.getClickedBlock().getState()).getLine(2)) != null)
 					{
-						player.performCommand("openinv " + ((Sign)event.getClickedBlock().getState()).getLine(2));
+						Sign sign = ((Sign)event.getClickedBlock().getState());
+						String text = sign.getLine(2).trim() + sign.getLine(3).trim() + sign.getLine(4).trim();
+						player.performCommand("openinv " + text);
 					}
 					else
 					{

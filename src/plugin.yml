@@ -1,6 +1,6 @@
 name: OpenInv
 main: lishid.openinv.OpenInv
-version: 1.4.6
+version: 1.6.1
 author: lishid
 description: >
              This plugin allows you to open another player's inventory as a chest

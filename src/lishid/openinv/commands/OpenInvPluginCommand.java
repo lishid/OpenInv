@@ -8,18 +8,21 @@ import lishid.openinv.utils.PlayerInventoryChest;
 import lishid.openinv.utils.OpenInvHistory;
 
 import net.minecraft.server.EntityPlayer;
+import net.minecraft.server.ItemInWorldManager;
+import net.minecraft.server.MinecraftServer;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 public class OpenInvPluginCommand implements CommandExecutor {
     private final OpenInv plugin;
-    //public static HashMap<Player, PlayerInventoryChest> offlineInv = new HashMap<Player, PlayerInventoryChest>();
+    public static HashMap<PlayerInventoryChest, Player> offlineInv = new HashMap<PlayerInventoryChest, Player>();
     public static HashMap<Player, OpenInvHistory> theOpenInvHistory = new HashMap<Player, OpenInvHistory>();
     public OpenInvPluginCommand(OpenInv plugin) {
         this.plugin = plugin;
@@ -31,7 +34,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
             return true;
         }
         
-    	//boolean Offline = false;
+    	boolean Offline = false;
 		Player player = (Player)sender;
 		
 		//History management
@@ -72,10 +75,12 @@ public class OpenInvPluginCommand implements CommandExecutor {
 		//Target selecting
 		Player target;
 		
+		String name = "";
+		
 		if (args.length < 1) {
 			if(history.lastPlayer != null)
 			{
-				target = this.plugin.getServer().getPlayer(history.lastPlayer);
+				name = history.lastPlayer;
 			}
 			else
 			{
@@ -85,33 +90,39 @@ public class OpenInvPluginCommand implements CommandExecutor {
 		}
 		else
 		{
-			target = this.plugin.getServer().getPlayer(args[0]);
+			name = args[0];
 		}
+		
+		target = this.plugin.getServer().getPlayer(name);
 
 
 		if(target == null)
 		{
 			//Offline inv here...
-			/*try{
+			try{
 				MinecraftServer server = ((CraftServer)this.plugin.getServer()).getServer();
-				EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), args[0], new ItemInWorldManager(server.getWorldServer(0)));
+				EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), name, new ItemInWorldManager(server.getWorldServer(0)));
 				target = (entity == null) ? null : (Player) entity.getBukkitEntity();
 				if(target != null)
 				{
 					Offline = true;
 					target.loadData();
+					EntityPlayer entityplayer = ((CraftPlayer)target).getHandle();
+			    	entityplayer.inventory = new PlayerInventoryChest(entityplayer.inventory, entityplayer);
 				}
 				else
 				{
 					sender.sendMessage(ChatColor.RED + "Player not found!");
 					return false;
 				}
-			} catch(Exception e)
-			{*/
-				//sender.sendMessage("Error while retrieving offline player data!");
-				sender.sendMessage(ChatColor.RED + "Player '" + args[0] + "' not found!");
+			}
+			catch(Exception e)
+			{
+				sender.sendMessage("Error while retrieving offline player data!");
+				e.printStackTrace();
+				//sender.sendMessage(ChatColor.RED + "Player '" + args[0] + "' not found!");
 				return true;
-			/*}*/
+			}
 		}
 		
 		//Check if target is the player him/her self
@@ -146,12 +157,19 @@ public class OpenInvPluginCommand implements CommandExecutor {
 		{
 			OpenInv.ReplaceInv((CraftPlayer) target);
 		}
-		/*
-		if(Offline && entitytarget.inventory instanceof PlayerInventoryChest)
+		
+		if(entitytarget.inventory instanceof PlayerInventoryChest)
 		{
-			offlineInv.put(target, (PlayerInventoryChest) entitytarget.inventory);
+			((PlayerInventoryChest)entitytarget.inventory).Opener = player;
+			((PlayerInventoryChest)entitytarget.inventory).Target = target;
+			
+			if(Offline)
+			{
+				((PlayerInventoryChest)entitytarget.inventory).Offline = true;
+				offlineInv.put((PlayerInventoryChest) entitytarget.inventory, target);
+			}
 		}
-		*/
+		
 		entityplayer.a(entitytarget.inventory);
 
 		return true;
