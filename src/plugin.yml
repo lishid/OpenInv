@@ -1,6 +1,6 @@
 name: OpenInv
 main: lishid.openinv.OpenInv
-version: 1.6.1
+version: 1.6.2
 author: lishid
 description: >
              This plugin allows you to open another player's inventory as a chest
@@ -17,3 +17,7 @@ commands:
     description: Toggle the stick openinv
     usage: |
            /<command> [check] - Checks whether stick openinv is enabled
+  silentchest:
+    description: Toggle silent chest, which does not animate a chest when opened or closed, and suppresses the sound.
+    usage: |
+           /<command> [check] - Checks whether silent chest is enabled

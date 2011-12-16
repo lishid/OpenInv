@@ -100,6 +100,11 @@ public class OpenInvPluginCommand implements CommandExecutor {
 		{
 			//Offline inv here...
 			try{
+				if(!this.plugin.getServer().getOfflinePlayer(name).hasPlayedBefore())
+				{
+					sender.sendMessage(ChatColor.RED + "Player not found!");
+					return true;
+				}
 				MinecraftServer server = ((CraftServer)this.plugin.getServer()).getServer();
 				EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), name, new ItemInWorldManager(server.getWorldServer(0)));
 				target = (entity == null) ? null : (Player) entity.getBukkitEntity();

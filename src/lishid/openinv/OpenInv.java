@@ -52,8 +52,7 @@ public class OpenInv extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Event.Priority.Lowest, this);
 		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Monitor, this);
 		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.Lowest, this);
-		//pm.registerEvent(Event.Type.CUSTOM_EVENT, inventoryListener, Event.Priority.Monitor, this);
-		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Monitor, this);
+		//pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Monitor, this);
     	setupPermissions();
 
         PluginDescriptionFile pdfFile = this.getDescription();
@@ -62,6 +61,7 @@ public class OpenInv extends JavaPlugin {
         getCommand("openinv").setExecutor(new OpenInvPluginCommand(this));
         getCommand("searchinv").setExecutor(new SearchInvPluginCommand(this));
         getCommand("toggleopeninv").setExecutor(new OpenInvPluginCommand(this));
+        getCommand("silentchest").setExecutor(new SilentChestPluginCommand(this));
     }
     
     public static void ReplaceInv(CraftPlayer player)
@@ -97,9 +97,24 @@ public class OpenInv extends JavaPlugin {
     	mainPlugin.getConfig().set("ItemOpenInv." + name.toLowerCase() + ".toggle", status);
     	mainPlugin.saveConfig();
     }
+
+    public static boolean GetPlayerSilentChestStatus(String name)
+    {
+    	return mainPlugin.getConfig().getBoolean("SilentChest." + name.toLowerCase() + ".toggle", false);
+    }
+    
+    public static void SetPlayerSilentChestStatus(String name, boolean status)
+    {
+    	mainPlugin.getConfig().set("SilentChest." + name.toLowerCase() + ".toggle", status);
+    	mainPlugin.saveConfig();
+    }
     
     public static int GetItemOpenInvItem()
     {
+		if(mainPlugin.getConfig().get("ItemOpenInvItemID") == null)
+		{
+			SaveToConfig("ItemOpenInvItemID", 280);
+		}
     	return mainPlugin.getConfig().getInt("ItemOpenInvItemID", 280);
     }
     

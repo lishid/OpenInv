@@ -21,8 +21,6 @@ public class SearchInvPluginCommand implements CommandExecutor {
             sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
             return true;
         }
-        
-    	;
     	
 		String PlayerList = "";
 		
