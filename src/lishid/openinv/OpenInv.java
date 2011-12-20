@@ -29,7 +29,7 @@ public class OpenInv extends JavaPlugin {
 	public static OpenInv mainPlugin;
     public void onDisable() {
     }
-    
+
     private void setupPermissions() {
         Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
 
@@ -63,7 +63,7 @@ public class OpenInv extends JavaPlugin {
         getCommand("toggleopeninv").setExecutor(new OpenInvPluginCommand(this));
         getCommand("silentchest").setExecutor(new SilentChestPluginCommand(this));
     }
-    
+
     public static void ReplaceInv(CraftPlayer player)
     {
     	try{
@@ -78,7 +78,7 @@ public class OpenInv extends JavaPlugin {
 	    	entityplayer.a(entityplayer.activeContainer, entityplayer.activeContainer.b());
 	    	entityplayer.activeContainer.a();
 	    	entityplayer.defaultContainer.a();
-	        
+
 	    	player.setHandle(entityplayer);
     	}
     	catch(Exception e)
@@ -86,12 +86,12 @@ public class OpenInv extends JavaPlugin {
             System.out.println("[OpenInv] Error while trying to override player inventory, error: " + e.getMessage());
     	}
     }
-    
+
     public static boolean GetPlayerItemOpenInvStatus(String name)
     {
     	return mainPlugin.getConfig().getBoolean("ItemOpenInv." + name.toLowerCase() + ".toggle", false);
     }
-    
+
     public static void SetPlayerItemOpenInvStatus(String name, boolean status)
     {
     	mainPlugin.getConfig().set("ItemOpenInv." + name.toLowerCase() + ".toggle", status);
@@ -102,13 +102,13 @@ public class OpenInv extends JavaPlugin {
     {
     	return mainPlugin.getConfig().getBoolean("SilentChest." + name.toLowerCase() + ".toggle", false);
     }
-    
+
     public static void SetPlayerSilentChestStatus(String name, boolean status)
     {
     	mainPlugin.getConfig().set("SilentChest." + name.toLowerCase() + ".toggle", status);
     	mainPlugin.saveConfig();
     }
-    
+
     public static int GetItemOpenInvItem()
     {
 		if(mainPlugin.getConfig().get("ItemOpenInvItemID") == null)
@@ -117,7 +117,7 @@ public class OpenInv extends JavaPlugin {
 		}
     	return mainPlugin.getConfig().getInt("ItemOpenInvItemID", 280);
     }
-    
+
     public static Object GetFromConfig(String data, Object defaultValue)
     {
     	Object val = mainPlugin.getConfig().get(data);
@@ -131,7 +131,7 @@ public class OpenInv extends JavaPlugin {
         	return val;
         }
     }
-    
+
     public static void SaveToConfig(String data, Object value)
     {
     	mainPlugin.getConfig().set(data, value);

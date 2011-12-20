@@ -15,15 +15,15 @@ public class SearchInvPluginCommand implements CommandExecutor {
     public SearchInvPluginCommand(OpenInv plugin) {
         this.plugin = plugin;
     }
-    
+
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
     	if (!PermissionRelay.hasPermission((Player) sender, "OpenInv.search")) {
             sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
             return true;
         }
-    	
+
 		String PlayerList = "";
-		
+
         Material material = null;
         int count = 1;
 
@@ -40,7 +40,7 @@ public class SearchInvPluginCommand implements CommandExecutor {
                 return false;
             }
         }
-		
+
 		if (material == null) {
             sender.sendMessage(ChatColor.RED + "Unknown item");
             return false;
@@ -53,7 +53,7 @@ public class SearchInvPluginCommand implements CommandExecutor {
 				PlayerList += templayer.getName() + "  ";
 			}
 		}
-		
+
         sender.sendMessage("Players with the item " + material.toString() + ":  " + PlayerList);
         return true;
     }

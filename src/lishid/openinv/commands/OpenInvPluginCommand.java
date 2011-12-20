@@ -27,25 +27,25 @@ public class OpenInvPluginCommand implements CommandExecutor {
     public OpenInvPluginCommand(OpenInv plugin) {
         this.plugin = plugin;
     }
-    
+
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
     	if (!PermissionRelay.hasPermission((Player) sender, "OpenInv.openinv")) {
             sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
             return true;
         }
-        
+
     	boolean Offline = false;
 		Player player = (Player)sender;
-		
+
 		//History management
 		OpenInvHistory history = theOpenInvHistory.get(player);
-		
+
 		if(history == null)
 		{
 			history = new OpenInvHistory(player);
 			theOpenInvHistory.put(player, history);
 		}
-		
+
 		//Toggleopeninv command
 		if(command.getName().equalsIgnoreCase("toggleopeninv"))
 		{
@@ -74,9 +74,9 @@ public class OpenInvPluginCommand implements CommandExecutor {
 
 		//Target selecting
 		Player target;
-		
+
 		String name = "";
-		
+
 		if (args.length < 1) {
 			if(history.lastPlayer != null)
 			{
@@ -92,7 +92,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
 		{
 			name = args[0];
 		}
-		
+
 		target = this.plugin.getServer().getPlayer(name);
 
 
@@ -129,21 +129,21 @@ public class OpenInvPluginCommand implements CommandExecutor {
 				return true;
 			}
 		}
-		
+
 		//Check if target is the player him/her self
 		if(target == player)
 		{
 			sender.sendMessage(ChatColor.RED + "Cannot OpenInv yourself!");
 			return true;
 		}
-		
+
 		//Permissions checks
 		if (!PermissionRelay.hasPermission(player, "OpenInv.override") && PermissionRelay.hasPermission(target, "OpenInv.exempt")) {
             sender.sendMessage(ChatColor.RED + target.getDisplayName() + "'s inventory is protected!");
             return true;
         }
-		
-		if((!PermissionRelay.hasPermission(player, "OpenInv.crossworld") && !PermissionRelay.hasPermission(player, "OpenInv.override")) && 
+
+		if((!PermissionRelay.hasPermission(player, "OpenInv.crossworld") && !PermissionRelay.hasPermission(player, "OpenInv.override")) &&
 				target.getWorld() != player.getWorld()){
 			sender.sendMessage(ChatColor.RED + target.getDisplayName() + " is not in your world!");
             return true;
@@ -151,30 +151,30 @@ public class OpenInvPluginCommand implements CommandExecutor {
 
 		//The actual openinv
 		history.lastPlayer = target.getName();
-		
+
 		// Get the EntityPlayer handle from the sender
 		EntityPlayer entityplayer = ((CraftPlayer) player).getHandle();
 
 		// Get the EntityPlayer from the Target
 		EntityPlayer entitytarget = ((CraftPlayer) target).getHandle();
-		
+
 		if(!(entitytarget.inventory instanceof PlayerInventoryChest))
 		{
 			OpenInv.ReplaceInv((CraftPlayer) target);
 		}
-		
+
 		if(entitytarget.inventory instanceof PlayerInventoryChest)
 		{
 			((PlayerInventoryChest)entitytarget.inventory).Opener = player;
 			((PlayerInventoryChest)entitytarget.inventory).Target = target;
-			
+
 			if(Offline)
 			{
 				((PlayerInventoryChest)entitytarget.inventory).Offline = true;
 				offlineInv.put((PlayerInventoryChest) entitytarget.inventory, target);
 			}
 		}
-		
+
 		entityplayer.a(entitytarget.inventory);
 
 		return true;
