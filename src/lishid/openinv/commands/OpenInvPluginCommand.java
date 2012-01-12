@@ -5,14 +5,12 @@ import java.util.HashMap;
 import lishid.openinv.PermissionRelay;
 import lishid.openinv.OpenInv;
 import lishid.openinv.utils.PlayerInventoryChest;
-import lishid.openinv.utils.OpenInvHistory;
 
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.ItemInWorldManager;
 import net.minecraft.server.MinecraftServer;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -22,54 +20,34 @@ import org.bukkit.entity.Player;
 
 public class OpenInvPluginCommand implements CommandExecutor {
     private final OpenInv plugin;
-    public static HashMap<PlayerInventoryChest, Player> offlineInv = new HashMap<PlayerInventoryChest, Player>();
-    public static HashMap<Player, OpenInvHistory> theOpenInvHistory = new HashMap<Player, OpenInvHistory>();
+    public static HashMap<Player, PlayerInventoryChest> offlineInv = new HashMap<Player, PlayerInventoryChest>();
+    public static HashMap<Player, String> openInvHistory = new HashMap<Player, String>();
     public OpenInvPluginCommand(OpenInv plugin) {
         this.plugin = plugin;
     }
     
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-    	if (!PermissionRelay.hasPermission((Player) sender, "OpenInv.openinv")) {
+    	if (!PermissionRelay.hasPermission((Player)sender, "openinv")) {
             sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
             return true;
         }
+    	
+    	if(args.length > 0 && args[0].equalsIgnoreCase("?"))
+    	{
+    		OpenInv.ShowHelp((Player)sender);
+    		return true;
+    	}
         
-    	boolean Offline = false;
 		Player player = (Player)sender;
-		
+    	boolean Offline = false;
+    	
 		//History management
-		OpenInvHistory history = theOpenInvHistory.get(player);
+		String history = openInvHistory.get(player);
 		
-		if(history == null)
+		if(history == null || history == "")
 		{
-			history = new OpenInvHistory(player);
-			theOpenInvHistory.put(player, history);
-		}
-		
-		//Toggleopeninv command
-		if(command.getName().equalsIgnoreCase("toggleopeninv"))
-		{
-			if(args.length > 0)
-			{
-				if(args[0].equalsIgnoreCase("check"))
-				{
-					if(OpenInv.GetPlayerItemOpenInvStatus(player.getName()))
-						player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.GetItemOpenInvItem()).toString() + " is ON.");
-					else
-						player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.GetItemOpenInvItem()).toString() + " is OFF.");
-				}
-			}
-			if(OpenInv.GetPlayerItemOpenInvStatus(player.getName()))
-			{
-				OpenInv.SetPlayerItemOpenInvStatus(player.getName(), false);
-				player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.GetItemOpenInvItem()).toString() + " is OFF.");
-			}
-			else
-			{
-				OpenInv.SetPlayerItemOpenInvStatus(player.getName(), true);
-				player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.GetItemOpenInvItem()).toString() + " is ON.");
-			}
-			return true;
+			history = player.getName();
+			openInvHistory.put(player, history);
 		}
 
 		//Target selecting
@@ -77,10 +55,11 @@ public class OpenInvPluginCommand implements CommandExecutor {
 		
 		String name = "";
 		
+		//Read from history if target is not named
 		if (args.length < 1) {
-			if(history.lastPlayer != null)
+			if(history != null && history != "")
 			{
-				name = history.lastPlayer;
+				name = history;
 			}
 			else
 			{
@@ -95,16 +74,17 @@ public class OpenInvPluginCommand implements CommandExecutor {
 		
 		target = this.plugin.getServer().getPlayer(name);
 
-
 		if(target == null)
 		{
 			//Offline inv here...
 			try{
+				//See if the player has data files
 				if(!this.plugin.getServer().getOfflinePlayer(name).hasPlayedBefore())
 				{
 					sender.sendMessage(ChatColor.RED + "Player not found!");
 					return true;
 				}
+				//Create an entity to load the player data
 				MinecraftServer server = ((CraftServer)this.plugin.getServer()).getServer();
 				EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), name, new ItemInWorldManager(server.getWorldServer(0)));
 				target = (entity == null) ? null : (Player) entity.getBukkitEntity();
@@ -112,8 +92,6 @@ public class OpenInvPluginCommand implements CommandExecutor {
 				{
 					Offline = true;
 					target.loadData();
-					EntityPlayer entityplayer = ((CraftPlayer)target).getHandle();
-			    	entityplayer.inventory = new PlayerInventoryChest(entityplayer.inventory, entityplayer);
 				}
 				else
 				{
@@ -125,58 +103,49 @@ public class OpenInvPluginCommand implements CommandExecutor {
 			{
 				sender.sendMessage("Error while retrieving offline player data!");
 				e.printStackTrace();
-				//sender.sendMessage(ChatColor.RED + "Player '" + args[0] + "' not found!");
 				return true;
 			}
 		}
 		
-		//Check if target is the player him/her self
-		if(target == player)
-		{
-			sender.sendMessage(ChatColor.RED + "Cannot OpenInv yourself!");
-			return true;
-		}
-		
 		//Permissions checks
-		if (!PermissionRelay.hasPermission(player, "OpenInv.override") && PermissionRelay.hasPermission(target, "OpenInv.exempt")) {
+		if (!PermissionRelay.hasPermission(player, "override") && PermissionRelay.hasPermission(target, "exempt")) {
             sender.sendMessage(ChatColor.RED + target.getDisplayName() + "'s inventory is protected!");
             return true;
         }
 		
-		if((!PermissionRelay.hasPermission(player, "OpenInv.crossworld") && !PermissionRelay.hasPermission(player, "OpenInv.override")) && 
+		if((!PermissionRelay.hasPermission(player, "crossworld") && !PermissionRelay.hasPermission(player, "override")) && 
 				target.getWorld() != player.getWorld()){
 			sender.sendMessage(ChatColor.RED + target.getDisplayName() + " is not in your world!");
             return true;
 		}
 
-		//The actual openinv
-		history.lastPlayer = target.getName();
+		//Record the target
+		history = target.getName();
+		openInvHistory.put(player, history);
 		
-		// Get the EntityPlayer handle from the sender
+		//Get the EntityPlayer handle from the sender
 		EntityPlayer entityplayer = ((CraftPlayer) player).getHandle();
 
-		// Get the EntityPlayer from the Target
+		//Get the EntityPlayer from the Target
 		EntityPlayer entitytarget = ((CraftPlayer) target).getHandle();
 		
-		if(!(entitytarget.inventory instanceof PlayerInventoryChest))
+		//Create the inventory
+		PlayerInventoryChest inv = new PlayerInventoryChest(entitytarget.inventory, entitytarget);
+		
+		//Save data into the inventory for tracking
+		inv.Opener = player;
+		inv.Target = target;
+		
+		//Saves offline openinv
+		if(Offline)
 		{
-			OpenInv.ReplaceInv((CraftPlayer) target);
+			inv.Offline = true;
+			offlineInv.put(target, inv);
 		}
 		
-		if(entitytarget.inventory instanceof PlayerInventoryChest)
-		{
-			((PlayerInventoryChest)entitytarget.inventory).Opener = player;
-			((PlayerInventoryChest)entitytarget.inventory).Target = target;
-			
-			if(Offline)
-			{
-				((PlayerInventoryChest)entitytarget.inventory).Offline = true;
-				offlineInv.put((PlayerInventoryChest) entitytarget.inventory, target);
-			}
-		}
+		//Open the inventory
+		entityplayer.a(inv);
 		
-		entityplayer.a(entitytarget.inventory);
-
 		return true;
     }
 }

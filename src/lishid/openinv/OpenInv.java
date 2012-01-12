@@ -2,12 +2,9 @@
 package lishid.openinv;
 
 import lishid.openinv.commands.*;
-import lishid.openinv.utils.PlayerInventoryChest;
 
-import net.minecraft.server.ContainerPlayer;
-import net.minecraft.server.EntityPlayer;
-
-import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
@@ -60,31 +57,9 @@ public class OpenInv extends JavaPlugin {
 
         getCommand("openinv").setExecutor(new OpenInvPluginCommand(this));
         getCommand("searchinv").setExecutor(new SearchInvPluginCommand(this));
-        getCommand("toggleopeninv").setExecutor(new OpenInvPluginCommand(this));
+        getCommand("toggleopeninv").setExecutor(new ToggleOpenInvPluginCommand());
         getCommand("silentchest").setExecutor(new SilentChestPluginCommand(this));
-    }
-    
-    public static void ReplaceInv(CraftPlayer player)
-    {
-    	try{
-	    	EntityPlayer entityplayer = player.getHandle();
-	    	entityplayer.inventory = new PlayerInventoryChest(entityplayer.inventory, entityplayer);
-	    	entityplayer.defaultContainer = new ContainerPlayer(entityplayer.inventory, !entityplayer.world.isStatic);
-	    	//sync
-	    	try
-	    	{
-	    		entityplayer.syncInventory();
-	    	}catch(Exception e){}
-	    	entityplayer.a(entityplayer.activeContainer, entityplayer.activeContainer.b());
-	    	entityplayer.activeContainer.a();
-	    	entityplayer.defaultContainer.a();
-	        
-	    	player.setHandle(entityplayer);
-    	}
-    	catch(Exception e)
-    	{
-            System.out.println("[OpenInv] Error while trying to override player inventory, error: " + e.getMessage());
-    	}
+        getCommand("anychest").setExecutor(new AnyChestPluginCommand(this));
     }
     
     public static boolean GetPlayerItemOpenInvStatus(String name)
@@ -106,6 +81,17 @@ public class OpenInv extends JavaPlugin {
     public static void SetPlayerSilentChestStatus(String name, boolean status)
     {
     	mainPlugin.getConfig().set("SilentChest." + name.toLowerCase() + ".toggle", status);
+    	mainPlugin.saveConfig();
+    }
+
+    public static boolean GetPlayerAnyChestStatus(String name)
+    {
+    	return mainPlugin.getConfig().getBoolean("AnyChest." + name.toLowerCase() + ".toggle", true);
+    }
+    
+    public static void SetPlayerAnyChestStatus(String name, boolean status)
+    {
+    	mainPlugin.getConfig().set("AnyChest." + name.toLowerCase() + ".toggle", status);
     	mainPlugin.saveConfig();
     }
     
@@ -136,5 +122,20 @@ public class OpenInv extends JavaPlugin {
     {
     	mainPlugin.getConfig().set(data, value);
     	mainPlugin.saveConfig();
+    }
+    
+    public static void ShowHelp(Player player)
+    {
+    	player.sendMessage(ChatColor.GREEN + "/openinv <Player> - Open a player's inventory");
+    	player.sendMessage(ChatColor.GREEN + "   (aliases: oi, inv, open)");
+    	player.sendMessage(ChatColor.GREEN + "/toggleopeninv - Toggle item openinv function");
+    	player.sendMessage(ChatColor.GREEN + "   (aliases: toi, toggleoi, toggleinv)");
+    	player.sendMessage(ChatColor.GREEN + "/searchinv <Item> [MinAmount] - ");
+    	player.sendMessage(ChatColor.GREEN + "   Search and list players having a specific item.");
+    	player.sendMessage(ChatColor.GREEN + "   (aliases: si, search)");
+    	player.sendMessage(ChatColor.GREEN + "/anychest - Toggle anychest function");
+    	player.sendMessage(ChatColor.GREEN + "   (aliases: ac)");
+    	player.sendMessage(ChatColor.GREEN + "/silentchest - Toggle silent chest function");
+    	player.sendMessage(ChatColor.GREEN + "   (aliases: sc, silent)");
     }
 }

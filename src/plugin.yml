@@ -1,23 +1,34 @@
 name: OpenInv
 main: lishid.openinv.OpenInv
-version: 1.6.2
+version: 1.6.6
 author: lishid
+website: http://forums.bukkit.org/threads/15379/
 description: >
-             This plugin allows you to open another player's inventory as a chest
+             This plugin allows you to open a player's inventory as a chest and interact with it in real time.
 commands:
   openinv:
+    aliases: [oi, inv, open]
     description: Open a player's inventory
     usage: |
-           /<command> <Player>
+           /<command> - Open last person's inventory
+           /<command> <Player> - Open a player's inventory
   searchinv:
+    aliases: [si, search]
     description: Search and list players having a specific item
     usage: |
            /<command> <Item> [MinAmount] - Item can be the Item ID or the CraftBukkit Item Name, MinAmount is the minimum amount to be considered.
   toggleopeninv:
-    description: Toggle the stick openinv
+    aliases: [toi, toggleoi, toggleinv]
+    description: Toggle item openinv function
     usage: |
-           /<command> [check] - Checks whether stick openinv is enabled
+           /<command> [Check] - Checks whether item openinv is enabled
   silentchest:
-    description: Toggle silent chest, which does not animate a chest when opened or closed, and suppresses the sound.
+    aliases: [sc, silent]
+    description: Toggle silent chest function, which hides the animation of a chest when opened or closed, and suppresses the sound.
     usage: |
-           /<command> [check] - Checks whether silent chest is enabled
+           /<command> [Check] - Checks whether silent chest is enabled
+  anychest:
+    aliases: [ac]
+    description: Toggle anychest function, which allows opening of blocked chests.
+    usage: |
+           /<command> [Check] - Checks whether anychest is enabled
