@@ -126,14 +126,21 @@ public class OpenInvPlayerListener extends PlayerListener{
 		        else
 		        {
 		        	try{
-			        	Field ciField = player.getClass().getDeclaredField("ci");
-			        	ciField.setAccessible(true);
-			        	int ci = ciField.getInt(player);
-			            ci = ci % 100 + 1;
-			            ciField.setInt(player, ci);
-			            player.netServerHandler.sendPacket(new Packet100OpenWindow(ci, 0, ((IInventory)chest).getName(), ((IInventory)chest).getSize()));
+			        	Field windowID;
+			        	try{
+			        		windowID = player.getClass().getDeclaredField("cl");
+			        	}
+			        	catch(NoSuchFieldException e)
+			        	{
+			        		windowID = player.getClass().getDeclaredField("ci");
+			        	}
+			        	windowID.setAccessible(true);
+			        	int id = windowID.getInt(player);
+			            id = id % 100 + 1;
+			            windowID.setInt(player, id);
+			            player.netServerHandler.sendPacket(new Packet100OpenWindow(id, 0, ((IInventory)chest).getName(), ((IInventory)chest).getSize()));
 			            player.activeContainer = new SilentContainerChest(player.inventory, ((IInventory)chest));
-			            player.activeContainer.windowId = ci;
+			            player.activeContainer.windowId = id;
 			            player.activeContainer.a((ICrafting)player);
 			        	event.getPlayer().sendMessage("You are opening a chest silently.");
 			        	event.setUseInteractedBlock(Result.DENY);

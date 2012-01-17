@@ -2,6 +2,7 @@
 package lishid.openinv;
 
 import lishid.openinv.commands.*;
+import lishid.openinv.utils.Metrics;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -24,6 +25,8 @@ public class OpenInv extends JavaPlugin {
 	//private final OpenInvInventoryListener inventoryListener = new OpenInvInventoryListener(this);
     public static PermissionHandler permissionHandler;
 	public static OpenInv mainPlugin;
+	private static Metrics metrics;
+	
     public void onDisable() {
     }
     
@@ -52,14 +55,23 @@ public class OpenInv extends JavaPlugin {
 		//pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Monitor, this);
     	setupPermissions();
 
-        PluginDescriptionFile pdfFile = this.getDescription();
-        System.out.println("[" + pdfFile.getName() + "] version " + pdfFile.getVersion() + " enabled!" );
 
         getCommand("openinv").setExecutor(new OpenInvPluginCommand(this));
         getCommand("searchinv").setExecutor(new SearchInvPluginCommand(this));
         getCommand("toggleopeninv").setExecutor(new ToggleOpenInvPluginCommand());
         getCommand("silentchest").setExecutor(new SilentChestPluginCommand(this));
         getCommand("anychest").setExecutor(new AnyChestPluginCommand(this));
+        
+		//Metrics
+		try
+		{
+			metrics = new Metrics();
+			metrics.beginMeasuringPlugin(this);
+		}
+		catch(Exception e){ e.printStackTrace(); }
+
+        PluginDescriptionFile pdfFile = this.getDescription();
+        System.out.println("[" + pdfFile.getName() + "] version " + pdfFile.getVersion() + " enabled!" );
     }
     
     public static boolean GetPlayerItemOpenInvStatus(String name)
