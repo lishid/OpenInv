@@ -19,19 +19,21 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Event.Result;
+import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerLoginEvent;
 
-public class OpenInvPlayerListener extends PlayerListener{
+public class OpenInvPlayerListener implements Listener{
 	OpenInv plugin;
 	public OpenInvPlayerListener(OpenInv scrap) {
 		plugin = scrap;
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.LOWEST)
 	public void onPlayerLogin(PlayerLoginEvent event)
 	{
 		try{
@@ -50,7 +52,7 @@ public class OpenInvPlayerListener extends PlayerListener{
 		catch(Exception e){}
 	}
 
-	@Override
+	@EventHandler(priority = EventPriority.MONITOR)
 	public void onPlayerInteract(PlayerInteractEvent event)
 	{
 		if(event.getAction() == Action.RIGHT_CLICK_BLOCK && event.useInteractedBlock() == Result.DENY)

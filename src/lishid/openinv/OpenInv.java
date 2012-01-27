@@ -6,7 +6,6 @@ import lishid.openinv.utils.Metrics;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -49,10 +48,8 @@ public class OpenInv extends JavaPlugin {
     	mainPlugin.saveConfig();
 
 		PluginManager pm = getServer().getPluginManager();
-		pm.registerEvent(Event.Type.PLAYER_LOGIN, playerListener, Event.Priority.Lowest, this);
-		pm.registerEvent(Event.Type.PLAYER_INTERACT, playerListener, Event.Priority.Monitor, this);
-		pm.registerEvent(Event.Type.ENTITY_DAMAGE, entityListener, Event.Priority.Lowest, this);
-		//pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Event.Priority.Monitor, this);
+		pm.registerEvents(playerListener, this);
+		pm.registerEvents(entityListener, this);
     	setupPermissions();
 
 

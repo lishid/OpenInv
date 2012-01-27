@@ -2,11 +2,11 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="D:/Programs/Eclipse/Workspace/bukkit.jar" sourcepath="D:/Programs/Eclipse/Workspace/Bukkit-Source.zip"/>
-	<classpathentry kind="lib" path="D:/Programs/Eclipse/Workspace/craftbukkit.jar" sourcepath="D:/Programs/Eclipse/Workspace/CraftBukkit-Source.zip"/>
-	<classpathentry kind="lib" path="D:/Programs/Eclipse/Workspace/PermissionsEx.jar"/>
-	<classpathentry kind="lib" path="D:/Programs/Eclipse/Workspace/Permissions.jar"/>
-	<classpathentry kind="lib" path="D:/Programs/Eclipse/Workspace/spout.jar" sourcepath="D:/Programs/Eclipse/Workspace/Spout.zip"/>
-	<classpathentry kind="lib" path="D:/Programs/Eclipse/Workspace/spoutapi.jar" sourcepath="D:/Programs/Eclipse/Workspace/SpoutAPI.zip"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Orebfuscator"/>
+	<classpathentry kind="lib" path="D:/Dropbox/Projects/Workspace/bukkit.jar" sourcepath="D:/Dropbox/Projects/Workspace/Bukkit-Source.zip"/>
+	<classpathentry kind="lib" path="D:/Dropbox/Projects/Workspace/craftbukkit.jar" sourcepath="D:/Dropbox/Projects/Workspace/craftbukkit.jar"/>
+	<classpathentry kind="lib" path="D:/Dropbox/Projects/Workspace/FakePermissions.jar"/>
+	<classpathentry kind="lib" path="D:/Dropbox/Projects/Workspace/Spout.jar" sourcepath="D:/Dropbox/Projects/Workspace/Spout.zip"/>
+	<classpathentry kind="lib" path="D:/Dropbox/Projects/Workspace/SpoutAPI.jar" sourcepath="D:/Dropbox/Projects/Workspace/SpoutAPI.zip"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -4,16 +4,18 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.EntityListener;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 
-public class OpenInvEntityListener extends EntityListener{
+public class OpenInvEntityListener implements Listener{
 	OpenInv plugin;
 	public OpenInvEntityListener(OpenInv scrap) {
 		plugin = scrap;
 	}
 	
-	@Override
-    public void onEntityDamage(EntityDamageEvent event) {
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onEntityDamage(EntityDamageEvent event) {
         if (event instanceof EntityDamageByEntityEvent) {
         	EntityDamageByEntityEvent evt = (EntityDamageByEntityEvent) event;
             Entity attacker = evt.getDamager();
