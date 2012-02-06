@@ -1,5 +1,6 @@
 package lishid.openinv.commands;
 
+import java.io.File;
 import java.util.HashMap;
 
 import lishid.openinv.PermissionRelay;
@@ -10,6 +11,7 @@ import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.ItemInWorldManager;
 import net.minecraft.server.MinecraftServer;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -79,24 +81,38 @@ public class OpenInvPluginCommand implements CommandExecutor {
 			//Offline inv here...
 			try{
 				//See if the player has data files
-				if(!this.plugin.getServer().getOfflinePlayer(name).hasPlayedBefore())
+				
+				// Find the player folder
+				File playerfolder = new File(Bukkit.getWorlds().get(0).getWorldFolder(), "players");
+
+				// Find player name
+				for (File playerfile : playerfolder.listFiles())
+				{
+					String filename = playerfile.getName();
+					String playername = filename.substring(0, filename.length() - 4);
+					
+					if(playername.trim().equalsIgnoreCase(name))
+					{
+						//Create an entity to load the player data
+						MinecraftServer server = ((CraftServer)this.plugin.getServer()).getServer();
+						EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), playername, new ItemInWorldManager(server.getWorldServer(0)));
+						target = (entity == null) ? null : (Player) entity.getBukkitEntity();
+						if(target != null)
+						{
+							Offline = true;
+							target.loadData();
+						}
+						else
+						{
+							sender.sendMessage(ChatColor.RED + "Player not found!");
+							return true;
+						}
+					}
+				}
+				if(!Offline)
 				{
 					sender.sendMessage(ChatColor.RED + "Player not found!");
 					return true;
-				}
-				//Create an entity to load the player data
-				MinecraftServer server = ((CraftServer)this.plugin.getServer()).getServer();
-				EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), name, new ItemInWorldManager(server.getWorldServer(0)));
-				target = (entity == null) ? null : (Player) entity.getBukkitEntity();
-				if(target != null)
-				{
-					Offline = true;
-					target.loadData();
-				}
-				else
-				{
-					sender.sendMessage(ChatColor.RED + "Player not found!");
-					return false;
 				}
 			}
 			catch(Exception e)

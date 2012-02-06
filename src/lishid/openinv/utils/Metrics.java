@@ -1,5 +1,4 @@
 package lishid.openinv.utils;
-
 /*
  * Copyright 2011 Tyler Blair. All rights reserved.
  *
@@ -72,6 +71,12 @@ public class Metrics {
          */
         public abstract int getValue();
 
+        /**
+         * Called after the website graphs have been updated
+         */
+        public void reset() {
+        }
+
         @Override
         public int hashCode() {
             return getColumnName().hashCode() + getValue();
@@ -92,7 +97,7 @@ public class Metrics {
     /**
      * The metrics revision number
      */
-    private final static int REVISION = 3;
+    private final static int REVISION = 4;
 
     /**
      * The base url of the metrics domain
@@ -242,6 +247,15 @@ public class Metrics {
 
         if (response.startsWith("ERR")){
             throw new IOException(response); //Throw the exception
+        } else {
+            // Is this the first update this hour?
+            if (response.contains("OK This is your first update this hour")) {
+                if (plotters != null) {
+                    for (Plotter plotter : plotters) {
+                        plotter.reset();
+                    }
+                }
+            }
         }
         //if (response.startsWith("OK")) - We should get "OK" followed by an optional description if everything goes right
     }

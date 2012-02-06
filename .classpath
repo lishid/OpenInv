@@ -4,7 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Orebfuscator"/>
 	<classpathentry kind="lib" path="D:/Dropbox/Projects/Workspace/bukkit.jar" sourcepath="D:/Dropbox/Projects/Workspace/Bukkit-Source.zip"/>
-	<classpathentry kind="lib" path="D:/Dropbox/Projects/Workspace/craftbukkit.jar" sourcepath="D:/Dropbox/Projects/Workspace/craftbukkit.jar"/>
+	<classpathentry kind="lib" path="D:/Dropbox/Projects/Workspace/craftbukkit.jar" sourcepath="D:/Dropbox/Projects/Workspace/CraftBukkit-source.zip"/>
 	<classpathentry kind="lib" path="D:/Dropbox/Projects/Workspace/FakePermissions.jar"/>
 	<classpathentry kind="lib" path="D:/Dropbox/Projects/Workspace/Spout.jar" sourcepath="D:/Dropbox/Projects/Workspace/Spout.zip"/>
 	<classpathentry kind="lib" path="D:/Dropbox/Projects/Workspace/SpoutAPI.jar" sourcepath="D:/Dropbox/Projects/Workspace/SpoutAPI.zip"/>
