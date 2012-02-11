@@ -182,14 +182,18 @@ public class Metrics {
         }
 
         // First tell the server about us
-        postPlugin(plugin, false);
+        try {
+            postPlugin(plugin, false);
+        } catch (Exception e) {
+            System.out.println("[Metrics] " + e.getMessage());
+        }
 
         // Ping the server in intervals
         plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable() {
             public void run() {
                 try {
                     postPlugin(plugin, true);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     System.out.println("[Metrics] " + e.getMessage());
                 }
             }

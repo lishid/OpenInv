@@ -1,6 +1,6 @@
 name: OpenInv
 main: lishid.openinv.OpenInv
-version: 1.7.4
+version: 1.7.5
 author: lishid
 website: http://forums.bukkit.org/threads/15379/
 description: >
@@ -13,7 +13,7 @@ commands:
            /<command> - Open last person's inventory
            /<command> <Player> - Open a player's inventory
   searchinv:
-    aliases: [si, search]
+    aliases: [si]
     description: Search and list players having a specific item
     usage: |
            /<command> <Item> [MinAmount] - Item can be the Item ID or the CraftBukkit Item Name, MinAmount is the minimum amount to be considered.
