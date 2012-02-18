@@ -13,6 +13,11 @@ import org.bukkit.entity.Player;
 public class ToggleOpenInvPluginCommand implements CommandExecutor {
     
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    	if(!(sender instanceof Player))
+    	{
+            sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
+    		return true;
+    	}
     	if (!PermissionRelay.hasPermission((Player)sender, "openinv")) {
             sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
             return true;

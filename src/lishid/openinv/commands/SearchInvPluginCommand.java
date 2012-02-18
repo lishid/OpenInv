@@ -17,10 +17,15 @@ public class SearchInvPluginCommand implements CommandExecutor {
     }
     
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-    	if (!PermissionRelay.hasPermission((Player) sender, "search")) {
-            sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
-            return true;
-        }
+
+    	if(sender instanceof Player)
+    	{
+        	if (!PermissionRelay.hasPermission((Player) sender, "search")) {
+                sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
+                return true;
+            }
+    	}
+    	
     	
 		String PlayerList = "";
 		

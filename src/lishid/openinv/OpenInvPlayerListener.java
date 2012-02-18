@@ -144,7 +144,7 @@ public class OpenInvPlayerListener implements Listener{
 			            player.activeContainer = new SilentContainerChest(player.inventory, ((IInventory)chest));
 			            player.activeContainer.windowId = id;
 			            player.activeContainer.a((ICrafting)player);
-			        	event.getPlayer().sendMessage("You are opening a chest silently.");
+			        	//event.getPlayer().sendMessage("You are opening a chest silently.");
 			        	event.setUseInteractedBlock(Result.DENY);
 			        	event.setCancelled(true);
 		        	}

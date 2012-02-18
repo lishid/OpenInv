@@ -15,6 +15,11 @@ public class AnyChestPluginCommand implements CommandExecutor {
     }
     
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    	if(!(sender instanceof Player))
+    	{
+            sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
+    		return true;
+    	}
     	if (!PermissionRelay.hasPermission((Player) sender, "anychest")) {
             sender.sendMessage(ChatColor.RED + "You do not have permission to use anychest.");
             return true;
