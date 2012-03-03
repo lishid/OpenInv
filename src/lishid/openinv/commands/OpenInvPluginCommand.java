@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 lishid.  All rights reserved.
+ * Copyright (C) 2011-2012 lishid.  All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -181,7 +181,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
 		}
 		
 		//Open the inventory
-		entityplayer.a(inv);
+		entityplayer.openContainer(inv);
 		
 		return true;
     }

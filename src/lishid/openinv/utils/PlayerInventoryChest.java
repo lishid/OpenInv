@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 lishid.  All rights reserved.
+ * Copyright (C) 2011-2012 lishid.  All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,13 @@
 
 package lishid.openinv.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.bukkit.craftbukkit.entity.CraftHumanEntity;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryHolder;
 
 import lishid.openinv.commands.OpenInvPluginCommand;
 import net.minecraft.server.EntityHuman;
@@ -133,6 +139,39 @@ public class PlayerInventoryChest implements IInventory
         }
     }
 
+    public ItemStack splitWithoutUpdate(int i) {
+        ItemStack[] is = this.items;
+
+        if (i >= is.length)
+        {
+            i -= is.length;
+            is = this.armor;
+        }
+        else
+        {
+            i = getReversedItemSlotNum(i);
+        }
+
+        if (i >= is.length)
+        {
+            i -= is.length;
+            is = this.extra;
+        }
+        else if(is == this.armor)
+        {
+            i = getReversedArmorSlotNum(i);
+        }
+        
+        if (is[i] != null) {
+            ItemStack itemstack = is[i];
+
+            is[i] = null;
+            return itemstack;
+        } else {
+            return null;
+        }
+    }
+
     public void setItem(int i, ItemStack itemstack)
     {
         ItemStack[] is = this.items;
@@ -224,4 +263,23 @@ public class PlayerInventoryChest implements IInventory
     {
 
     }
+    
+    public List<HumanEntity> transaction = new ArrayList<HumanEntity>();
+    
+    public void onOpen(CraftHumanEntity who) {
+        transaction.add(who);
+    }
+
+    public void onClose(CraftHumanEntity who) {
+        transaction.remove(who);
+    }
+
+    public List<HumanEntity> getViewers() {
+        return transaction;
+    }
+
+	@Override
+	public InventoryHolder getOwner() {
+		return null;
+	}
 }

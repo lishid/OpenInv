@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 lishid.  All rights reserved.
+ * Copyright (C) 2011-2012 lishid.  All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import lishid.openinv.commands.OpenInvPluginCommand;
 import lishid.openinv.utils.SilentContainerChest;
 import net.minecraft.server.Block;
 import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.ICrafting;
 import net.minecraft.server.IInventory;
 import net.minecraft.server.InventoryLargeChest;
 import net.minecraft.server.Packet100OpenWindow;
@@ -139,27 +138,26 @@ public class OpenInvPlayerListener implements Listener{
 		        
 		        if(!silentchest)
 		        {
-		        	player.a((IInventory)chest);
+		        	player.openContainer((IInventory)chest);
 		        }
 		        else
 		        {
 		        	try{
-			        	Field windowID;
+			        	int id = 0;
 			        	try{
-			        		windowID = player.getClass().getDeclaredField("cl");
+			        		Field windowID = player.getClass().getDeclaredField("containerCounter");
+				        	windowID.setAccessible(true);
+				        	id = windowID.getInt(player);
+				            id = id % 100 + 1;
+				            windowID.setInt(player, id);
 			        	}
 			        	catch(NoSuchFieldException e)
-			        	{
-			        		windowID = player.getClass().getDeclaredField("ci");
-			        	}
-			        	windowID.setAccessible(true);
-			        	int id = windowID.getInt(player);
-			            id = id % 100 + 1;
-			            windowID.setInt(player, id);
+			        	{ }
+			            
 			            player.netServerHandler.sendPacket(new Packet100OpenWindow(id, 0, ((IInventory)chest).getName(), ((IInventory)chest).getSize()));
 			            player.activeContainer = new SilentContainerChest(player.inventory, ((IInventory)chest));
 			            player.activeContainer.windowId = id;
-			            player.activeContainer.a((ICrafting)player);
+			            player.activeContainer.addSlotListener(player);
 			        	//event.getPlayer().sendMessage("You are opening a chest silently.");
 			        	event.setUseInteractedBlock(Result.DENY);
 			        	event.setCancelled(true);
