@@ -19,7 +19,6 @@ package lishid.openinv.commands;
 import java.io.File;
 import java.util.HashMap;
 
-import lishid.openinv.PermissionRelay;
 import lishid.openinv.OpenInv;
 import lishid.openinv.utils.PlayerInventoryChest;
 
@@ -50,7 +49,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
     		return true;
     	}
-    	if (!PermissionRelay.hasPermission((Player)sender, "openinv")) {
+    	if (!sender.hasPermission("OpenInv.openinv")) {
             sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
             return true;
         }
@@ -145,12 +144,12 @@ public class OpenInvPluginCommand implements CommandExecutor {
 		}
 		
 		//Permissions checks
-		if (!PermissionRelay.hasPermission(player, "override") && PermissionRelay.hasPermission(target, "exempt")) {
+		if (!player.hasPermission("OpenInv.override") && target.hasPermission("OpenInv.exempt")) {
             sender.sendMessage(ChatColor.RED + target.getDisplayName() + "'s inventory is protected!");
             return true;
         }
 		
-		if((!PermissionRelay.hasPermission(player, "crossworld") && !PermissionRelay.hasPermission(player, "override")) && 
+		if((!player.hasPermission("OpenInv.crossworld") && !player.hasPermission("OpenInv.override")) && 
 				target.getWorld() != player.getWorld()){
 			sender.sendMessage(ChatColor.RED + target.getDisplayName() + " is not in your world!");
             return true;

@@ -40,6 +40,7 @@ public class PlayerInventoryChest implements IInventory
     private ItemStack[] items = new ItemStack[36];
     private ItemStack[] armor = new ItemStack[4];
     private ItemStack[] extra = new ItemStack[5];
+    private int maxStack = MAX_STACK;
 
     public PlayerInventoryChest(PlayerInventory inventory, EntityPlayer entityplayer)
     {
@@ -196,6 +197,8 @@ public class PlayerInventoryChest implements IInventory
             i = getReversedArmorSlotNum(i);
         }
         
+        /*
+        
         //Effects
         if(is == this.extra)
         {
@@ -203,7 +206,7 @@ public class PlayerInventoryChest implements IInventory
         	{
         		itemstack.setData(0);
         	}
-        }
+        }*/
 
         is[i] = itemstack;
     }
@@ -231,7 +234,7 @@ public class PlayerInventoryChest implements IInventory
 
     public int getMaxStackSize()
     {
-        return 64;
+        return maxStack;
     }
 
     public boolean a(EntityHuman entityhuman)
@@ -282,4 +285,9 @@ public class PlayerInventoryChest implements IInventory
 	public InventoryHolder getOwner() {
 		return null;
 	}
+
+	@Override
+    public void setMaxStackSize(int size) {
+        maxStack = size;
+    }
 }

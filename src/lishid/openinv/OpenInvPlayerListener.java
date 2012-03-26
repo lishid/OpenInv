@@ -81,12 +81,12 @@ public class OpenInvPlayerListener implements Listener{
 			int y = event.getClickedBlock().getY();
 			int z = event.getClickedBlock().getZ();
 	
-			if(PermissionRelay.hasPermission(event.getPlayer(), "silent") && OpenInv.GetPlayerSilentChestStatus(event.getPlayer().getName()))
+			if(event.getPlayer().hasPermission("OpenInv.silent") && OpenInv.GetPlayerSilentChestStatus(event.getPlayer().getName()))
 			{
 				silentchest = true;
 			}
 	
-			if(PermissionRelay.hasPermission(event.getPlayer(), "anychest") && OpenInv.GetPlayerAnyChestStatus(event.getPlayer().getName()))
+			if(event.getPlayer().hasPermission("OpenInv.anychest") && OpenInv.GetPlayerAnyChestStatus(event.getPlayer().getName()))
 			{
 				try
 				{
@@ -179,7 +179,7 @@ public class OpenInvPlayerListener implements Listener{
 			Player player = event.getPlayer();
 			try{
 				Sign sign = ((Sign)event.getClickedBlock().getState());
-				if (PermissionRelay.hasPermission(player, "openinv") && sign.getLine(0).equalsIgnoreCase("[openinv]"))
+				if (player.hasPermission("OpenInv.openinv") && sign.getLine(0).equalsIgnoreCase("[openinv]"))
 				{
 					String text = sign.getLine(1).trim() + sign.getLine(2).trim() + sign.getLine(3).trim();
 					player.performCommand("openinv " + text);
@@ -198,7 +198,7 @@ public class OpenInvPlayerListener implements Listener{
 
 			if(!(player.getItemInHand().getType().getId() == OpenInv.GetItemOpenInvItem())
     				|| (!OpenInv.GetPlayerItemOpenInvStatus(player.getName()))
-					|| !PermissionRelay.hasPermission(player, "openinv"))
+					|| !player.hasPermission("OpenInv.openinv"))
 			{
 				return;
 			}

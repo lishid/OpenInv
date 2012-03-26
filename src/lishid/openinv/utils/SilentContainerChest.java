@@ -16,7 +16,9 @@
 
 package lishid.openinv.utils;
 
-import net.minecraft.server.* ;
+import net.minecraft.server.ContainerChest;
+import net.minecraft.server.EntityHuman;
+import net.minecraft.server.IInventory;
 
 public class SilentContainerChest extends ContainerChest {
 	public IInventory inv;

@@ -16,7 +16,6 @@
 
 package lishid.openinv.commands;
 
-import lishid.openinv.PermissionRelay;
 import lishid.openinv.OpenInv;
 
 import org.bukkit.ChatColor;
@@ -36,7 +35,7 @@ public class SilentChestPluginCommand implements CommandExecutor {
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
     		return true;
     	}
-    	if (!PermissionRelay.hasPermission((Player) sender, "silent")) {
+    	if (!sender.hasPermission("OpenInv.silent")) {
             sender.sendMessage(ChatColor.RED + "You do not have permission to use silent chest.");
             return true;
         }

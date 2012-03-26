@@ -24,9 +24,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
-import org.bukkit.plugin.Plugin;
 
 /**
  * Open other player's inventory
@@ -36,24 +33,10 @@ import org.bukkit.plugin.Plugin;
 public class OpenInv extends JavaPlugin {
 	private final OpenInvPlayerListener playerListener = new OpenInvPlayerListener(this);
 	private final OpenInvEntityListener entityListener = new OpenInvEntityListener(this);
-	//private final OpenInvInventoryListener inventoryListener = new OpenInvInventoryListener(this);
-    public static PermissionHandler permissionHandler;
 	public static OpenInv mainPlugin;
 	private static Metrics metrics;
 	
     public void onDisable() {
-    }
-    
-    private void setupPermissions() {
-        Plugin permissionsPlugin = this.getServer().getPluginManager().getPlugin("Permissions");
-
-        if (permissionHandler == null) {
-            if (permissionsPlugin != null) {
-                permissionHandler = ((Permissions) permissionsPlugin).getHandler();
-            } else {
-                //log.info("Permission system not detected, defaulting to OP");
-            }
-        }
     }
 
     public void onEnable() {
@@ -65,7 +48,6 @@ public class OpenInv extends JavaPlugin {
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(playerListener, this);
 		pm.registerEvents(entityListener, this);
-    	setupPermissions();
 
 
         getCommand("openinv").setExecutor(new OpenInvPluginCommand(this));
@@ -77,8 +59,8 @@ public class OpenInv extends JavaPlugin {
 		//Metrics
 		try
 		{
-			metrics = new Metrics();
-			metrics.beginMeasuringPlugin(this);
+			metrics = new Metrics(this);
+			metrics.start();
 		}
 		catch(Exception e){ e.printStackTrace(); }
 

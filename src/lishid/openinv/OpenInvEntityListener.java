@@ -46,7 +46,7 @@ public class OpenInvEntityListener implements Listener{
     		
     		if(!(player.getItemInHand().getType().getId() == OpenInv.GetItemOpenInvItem())
     				|| (!OpenInv.GetPlayerItemOpenInvStatus(player.getName()))
-    				|| !PermissionRelay.hasPermission(player, "openinv"))
+    				|| !player.hasPermission("OpenInv.openinv"))
     		{
     			return;
     		}
