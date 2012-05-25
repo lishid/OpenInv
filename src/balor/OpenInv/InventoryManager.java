@@ -127,6 +127,17 @@ public class InventoryManager {
 	}
 
 	private void openInv(final Player sender, final Player target, final boolean offline) {
+		//Permissions checks
+		if (!sender.hasPermission("OpenInv.override") && target.hasPermission("OpenInv.exempt")) {
+            sender.sendMessage(ChatColor.RED + target.getDisplayName() + "'s inventory is protected!");
+            return ;
+        }
+		
+		if((!sender.hasPermission("OpenInv.crossworld") && !sender.hasPermission("OpenInv.override")) && 
+				target.getWorld() != sender.getWorld()){
+			sender.sendMessage(ChatColor.RED + target.getDisplayName() + " is not in your world!");
+            return ;
+		}
 		final ACPlayerInventory inventory = getInventory(target, offline);
 		final EntityPlayer eh = ((CraftPlayer) sender).getHandle();
 		eh.openContainer(inventory);
