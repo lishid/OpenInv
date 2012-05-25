@@ -75,7 +75,7 @@ public class InventoryManager {
 	 *         /openinv/commands/OpenInvPluginCommand.java}
 	 * @throws WorldNotFoundException 
 	 */
-	public void openOfflineInv(final Player sender, final String name, final String world)
+	public Player openOfflineInv(final Player sender, final String name, final String world)
 			throws PlayerNotFound, WorldNotFoundException {
 		Player target = null;
 		final HashMap<String, String> replace = new HashMap<String, String>();
@@ -112,6 +112,7 @@ public class InventoryManager {
 					+ ChatColor.RED + " can't be found.");
 		}
 		openInv(sender, target, true);
+		return target;
 	}
 
 	/**

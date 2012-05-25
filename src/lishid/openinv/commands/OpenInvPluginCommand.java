@@ -84,7 +84,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
 		target = this.plugin.getServer().getPlayer(name);
 		if (target == null) {
 			try {
-				InventoryManager.INSTANCE.openOfflineInv(player, name, player.getWorld().getName());
+				target = InventoryManager.INSTANCE.openOfflineInv(player, name, player.getWorld().getName());
 			} catch (PlayerNotFound e) {
 				sender.sendMessage(e.getMessage());
 			} catch (WorldNotFoundException e) {
