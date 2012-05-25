@@ -16,22 +16,14 @@
 
 package lishid.openinv.commands;
 
-import java.io.File;
 import java.util.HashMap;
 
 import lishid.openinv.OpenInv;
 
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.ItemInWorldManager;
-import net.minecraft.server.MinecraftServer;
-
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.CraftServer;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import balor.OpenInv.InventoryManager;
@@ -63,7 +55,6 @@ public class OpenInvPluginCommand implements CommandExecutor {
 		}
 
 		Player player = (Player) sender;
-		boolean Offline = false;
 
 		// History management
 		String history = openInvHistory.get(player);

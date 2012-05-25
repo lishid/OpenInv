@@ -16,7 +16,11 @@
 
 package lishid.openinv;
 
-import lishid.openinv.commands.*;
+import lishid.openinv.commands.AnyChestPluginCommand;
+import lishid.openinv.commands.OpenInvPluginCommand;
+import lishid.openinv.commands.SearchInvPluginCommand;
+import lishid.openinv.commands.SilentChestPluginCommand;
+import lishid.openinv.commands.ToggleOpenInvPluginCommand;
 import lishid.openinv.utils.Metrics;
 
 import org.bukkit.ChatColor;

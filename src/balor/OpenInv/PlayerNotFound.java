@@ -16,7 +16,6 @@
  ************************************************************************/
 package balor.OpenInv;
 
-import org.bukkit.command.CommandSender;
 
 /**
  * @author Balor (aka Antoine Aflalo)
