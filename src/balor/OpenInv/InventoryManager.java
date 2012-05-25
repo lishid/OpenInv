@@ -25,12 +25,14 @@ import java.util.Map;
 import net.minecraft.server.EntityPlayer;
 import net.minecraft.server.ItemInWorldManager;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.PlayerInventory;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
+import org.bukkit.craftbukkit.inventory.CraftInventoryPlayer;
 import org.bukkit.entity.Player;
 
 import com.google.common.collect.MapMaker;
@@ -42,6 +44,7 @@ import com.google.common.collect.MapMaker;
 public class InventoryManager {
 	public static InventoryManager INSTANCE;
 	private final Map<Player, ACPlayerInventory> replacedInv = new MapMaker().makeMap();
+	private final Map<String, ACPlayerInventory> offlineInv = new MapMaker().makeMap();
 
 	/**
  * 
@@ -61,7 +64,21 @@ public class InventoryManager {
 
 	void closeOfflineInv(final Player p) {
 		onQuit(p);
-		p.saveData();
+		offlineInv.remove(p.getName());
+		p.saveData();		
+	}
+
+	public void onJoin(Player p) {
+		ACPlayerInventory inv = offlineInv.get(p.getName());
+		if (inv == null) {
+			return;
+		}
+		if (inv instanceof ACOfflinePlayerInventory) {
+			CraftPlayer cp = (CraftPlayer) p;
+			PlayerInventory mcInv = ((CraftInventoryPlayer) cp.getInventory()).getInventory();
+			mcInv.items = inv.items;
+			mcInv.armor = inv.armor;
+		}
 	}
 
 	/**
@@ -73,7 +90,7 @@ public class InventoryManager {
 	 * @author lishd {@link https
 	 *         ://github.com/lishd/OpenInv/blob/master/src/lishid
 	 *         /openinv/commands/OpenInvPluginCommand.java}
-	 * @throws WorldNotFoundException 
+	 * @throws WorldNotFoundException
 	 */
 	public Player openOfflineInv(final Player sender, final String name, final String world)
 			throws PlayerNotFound, WorldNotFoundException {
@@ -128,16 +145,17 @@ public class InventoryManager {
 	}
 
 	private void openInv(final Player sender, final Player target, final boolean offline) {
-		//Permissions checks
+		// Permissions checks
 		if (!sender.hasPermission("OpenInv.override") && target.hasPermission("OpenInv.exempt")) {
-            sender.sendMessage(ChatColor.RED + target.getDisplayName() + "'s inventory is protected!");
-            return ;
-        }
-		
-		if((!sender.hasPermission("OpenInv.crossworld") && !sender.hasPermission("OpenInv.override")) && 
-				target.getWorld() != sender.getWorld()){
+			sender.sendMessage(ChatColor.RED + target.getDisplayName()
+					+ "'s inventory is protected!");
+			return;
+		}
+
+		if ((!sender.hasPermission("OpenInv.crossworld") && !sender
+				.hasPermission("OpenInv.override")) && target.getWorld() != sender.getWorld()) {
 			sender.sendMessage(ChatColor.RED + target.getDisplayName() + " is not in your world!");
-            return ;
+			return;
 		}
 		final ACPlayerInventory inventory = getInventory(target, offline);
 		final EntityPlayer eh = ((CraftPlayer) sender).getHandle();
@@ -149,6 +167,7 @@ public class InventoryManager {
 		if (inventory == null) {
 			if (offline) {
 				inventory = new ACOfflinePlayerInventory(player);
+				offlineInv.put(player.getName(), inventory);
 			} else {
 				inventory = new ACPlayerInventory(player);
 			}

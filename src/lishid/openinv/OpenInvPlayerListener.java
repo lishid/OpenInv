@@ -38,6 +38,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import balor.OpenInv.InventoryManager;
@@ -47,6 +48,11 @@ public class OpenInvPlayerListener implements Listener {
 
 	public OpenInvPlayerListener(OpenInv scrap) {
 		plugin = scrap;
+	}
+
+	@EventHandler(priority = EventPriority.LOWEST)
+	public void onJoin(PlayerJoinEvent event) {
+		InventoryManager.INSTANCE.onJoin(event.getPlayer());
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
