@@ -16,7 +16,11 @@
 
 package lishid.openinv;
 
-import lishid.openinv.commands.*;
+import lishid.openinv.commands.AnyChestPluginCommand;
+import lishid.openinv.commands.OpenInvPluginCommand;
+import lishid.openinv.commands.SearchInvPluginCommand;
+import lishid.openinv.commands.SilentChestPluginCommand;
+import lishid.openinv.commands.ToggleOpenInvPluginCommand;
 import lishid.openinv.utils.Metrics;
 
 import org.bukkit.ChatColor;
@@ -24,6 +28,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import balor.OpenInv.InventoryManager;
 
 /**
  * Open other player's inventory
@@ -45,6 +51,7 @@ public class OpenInv extends JavaPlugin {
     	mainPlugin.getConfig().options().copyDefaults(true);
     	mainPlugin.saveConfig();
 
+    	InventoryManager.createInstance();
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvents(playerListener, this);
 		pm.registerEvents(entityListener, this);
