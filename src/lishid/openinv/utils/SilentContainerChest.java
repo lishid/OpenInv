@@ -20,17 +20,23 @@ import net.minecraft.server.ContainerChest;
 import net.minecraft.server.EntityHuman;
 import net.minecraft.server.IInventory;
 
-public class SilentContainerChest extends ContainerChest {
-	public IInventory inv;
-    public SilentContainerChest(IInventory i1, IInventory i2) {
-    	super(i1, i2);
-    	inv = i2;
-    	inv.g();//close signal
+public class SilentContainerChest extends ContainerChest
+{
+    public IInventory inv;
+    
+    public SilentContainerChest(IInventory i1, IInventory i2)
+    {
+        super(i1, i2);
+        inv = i2;
+        // close signal
+        inv.g();
     }
     
     @Override
-    public void a(EntityHuman paramEntityHuman) {
+    public void a(EntityHuman paramEntityHuman)
+    {
         super.a(paramEntityHuman);
-        inv.f();//open signal
+        // open signal
+        inv.f();
     }
 }

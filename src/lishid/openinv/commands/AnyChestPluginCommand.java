@@ -24,36 +24,40 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class AnyChestPluginCommand implements CommandExecutor {
-    public AnyChestPluginCommand(OpenInv plugin) {
-    	
+public class AnyChestPluginCommand implements CommandExecutor
+{
+    public AnyChestPluginCommand(OpenInv plugin)
+    {
+        
     }
     
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-    	if(!(sender instanceof Player))
-    	{
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
+    {
+        if (!(sender instanceof Player))
+        {
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
-    		return true;
-    	}
-    	if (!sender.hasPermission("OpenInv.anychest")) {
+            return true;
+        }
+        if (!sender.hasPermission("OpenInv.anychest"))
+        {
             sender.sendMessage(ChatColor.RED + "You do not have permission to use anychest.");
             return true;
         }
-    	
-    	if(args.length > 0)
-		{
-			if(args[0].equalsIgnoreCase("check"))
-			{
-				if(OpenInv.GetPlayerAnyChestStatus(sender.getName()))
-					sender.sendMessage("AnyChest is ON.");
-				else
-					sender.sendMessage("AnyChest is OFF.");
-			}
-		}
-    	
-    	OpenInv.SetPlayerAnyChestStatus(sender.getName(), !OpenInv.GetPlayerAnyChestStatus(sender.getName()));
-        sender.sendMessage("AnyChest is now " + (OpenInv.GetPlayerAnyChestStatus(sender.getName())?"On":"Off") + ".");
-    	
+        
+        if (args.length > 0)
+        {
+            if (args[0].equalsIgnoreCase("check"))
+            {
+                if (OpenInv.GetPlayerAnyChestStatus(sender.getName()))
+                    sender.sendMessage("AnyChest is ON.");
+                else
+                    sender.sendMessage("AnyChest is OFF.");
+            }
+        }
+        
+        OpenInv.SetPlayerAnyChestStatus(sender.getName(), !OpenInv.GetPlayerAnyChestStatus(sender.getName()));
+        sender.sendMessage("AnyChest is now " + (OpenInv.GetPlayerAnyChestStatus(sender.getName()) ? "On" : "Off") + ".");
+        
         return true;
     }
 }
