@@ -29,7 +29,7 @@ public class SilentContainerChest extends ContainerChest
         super(i1, i2);
         inv = i2;
         // close signal
-        inv.g();
+        inv.f();
     }
     
     @Override
@@ -37,6 +37,6 @@ public class SilentContainerChest extends ContainerChest
     {
         super.a(paramEntityHuman);
         // open signal
-        inv.f();
+        inv.startOpen();
     }
 }

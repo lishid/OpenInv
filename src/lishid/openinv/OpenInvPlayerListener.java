@@ -96,21 +96,25 @@ public class OpenInvPlayerListener implements Listener
             {
                 try
                 {
+                    
+                    
+                    
+                    
                     // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
                     EntityPlayer player = ((CraftPlayer) event.getPlayer()).getHandle();
                     World world = player.world;
                     // If block on top
-                    if (world.e(x, y + 1, z))
+                    if (world.s(x, y + 1, z))
                         anychest = true;
                     
                     // If block next to chest is chest and has a block on top
-                    if ((world.getTypeId(x - 1, y, z) == Block.CHEST.id) && (world.e(x - 1, y + 1, z)))
+                    if ((world.getTypeId(x - 1, y, z) == Block.CHEST.id) && (world.s(x - 1, y + 1, z)))
                         anychest = true;
-                    if ((world.getTypeId(x + 1, y, z) == Block.CHEST.id) && (world.e(x + 1, y + 1, z)))
+                    if ((world.getTypeId(x + 1, y, z) == Block.CHEST.id) && (world.s(x + 1, y + 1, z)))
                         anychest = true;
-                    if ((world.getTypeId(x, y, z - 1) == Block.CHEST.id) && (world.e(x, y + 1, z - 1)))
+                    if ((world.getTypeId(x, y, z - 1) == Block.CHEST.id) && (world.s(x, y + 1, z - 1)))
                         anychest = true;
-                    if ((world.getTypeId(x, y, z + 1) == Block.CHEST.id) && (world.e(x, y + 1, z + 1)))
+                    if ((world.getTypeId(x, y, z + 1) == Block.CHEST.id) && (world.s(x, y + 1, z + 1)))
                         anychest = true;
                 }
                 catch (Exception e)
@@ -131,15 +135,15 @@ public class OpenInvPlayerListener implements Listener
                 
                 if (!anychest)
                 {
-                    if (world.e(x, y + 1, z))
+                    if (world.s(x, y + 1, z))
                         return;
-                    if ((world.getTypeId(x - 1, y, z) == Block.CHEST.id) && (world.e(x - 1, y + 1, z)))
+                    if ((world.getTypeId(x - 1, y, z) == Block.CHEST.id) && (world.s(x - 1, y + 1, z)))
                         return;
-                    if ((world.getTypeId(x + 1, y, z) == Block.CHEST.id) && (world.e(x + 1, y + 1, z)))
+                    if ((world.getTypeId(x + 1, y, z) == Block.CHEST.id) && (world.s(x + 1, y + 1, z)))
                         return;
-                    if ((world.getTypeId(x, y, z - 1) == Block.CHEST.id) && (world.e(x, y + 1, z - 1)))
+                    if ((world.getTypeId(x, y, z - 1) == Block.CHEST.id) && (world.s(x, y + 1, z - 1)))
                         return;
-                    if ((world.getTypeId(x, y, z + 1) == Block.CHEST.id) && (world.e(x, y + 1, z + 1)))
+                    if ((world.getTypeId(x, y, z + 1) == Block.CHEST.id) && (world.s(x, y + 1, z + 1)))
                         return;
                 }
                 
