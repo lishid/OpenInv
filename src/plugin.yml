@@ -1,6 +1,6 @@
 name: OpenInv
 main: lishid.openinv.OpenInv
-version: 1.8.6
+version: 1.8.7
 author: lishid
 website: http://forums.bukkit.org/threads/15379/
 description: >
@@ -12,6 +12,11 @@ commands:
     usage: |
            /<command> - Open last person's inventory
            /<command> <Player> - Open a player's inventory
+  openender:
+    aliases: [oe, enderchest]
+    description: Opens the enderchest of a player
+    usage: |
+           /<command> <Player> - Opens a player's enderchest
   searchinv:
     aliases: [si]
     description: Search and list players having a specific item

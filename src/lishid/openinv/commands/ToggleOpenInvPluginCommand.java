@@ -17,6 +17,7 @@
 package lishid.openinv.commands;
 
 import lishid.openinv.OpenInv;
+import lishid.openinv.Permissions;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -35,7 +36,7 @@ public class ToggleOpenInvPluginCommand implements CommandExecutor
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
             return true;
         }
-        if (!sender.hasPermission("OpenInv.openinv"))
+        if (!sender.hasPermission(Permissions.PERM_OPENINV))
         {
             sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
             return true;

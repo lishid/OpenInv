@@ -26,13 +26,6 @@ import org.bukkit.event.Listener;
 
 public class OpenInvEntityListener implements Listener
 {
-    OpenInv plugin;
-    
-    public OpenInvEntityListener(OpenInv scrap)
-    {
-        plugin = scrap;
-    }
-    
     @EventHandler(priority = EventPriority.LOWEST)
     public void onEntityDamage(EntityDamageEvent event)
     {

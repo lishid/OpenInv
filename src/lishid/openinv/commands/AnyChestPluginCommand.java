@@ -17,6 +17,7 @@
 package lishid.openinv.commands;
 
 import lishid.openinv.OpenInv;
+import lishid.openinv.Permissions;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -38,7 +39,7 @@ public class AnyChestPluginCommand implements CommandExecutor
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
             return true;
         }
-        if (!sender.hasPermission("OpenInv.anychest"))
+        if (!sender.hasPermission(Permissions.PERM_ANYCHEST))
         {
             sender.sendMessage(ChatColor.RED + "You do not have permission to use anychest.");
             return true;

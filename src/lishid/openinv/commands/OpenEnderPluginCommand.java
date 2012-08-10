@@ -18,11 +18,11 @@ package lishid.openinv.commands;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 
 import lishid.openinv.OpenInv;
 import lishid.openinv.Permissions;
+import lishid.openinv.utils.OpenInvEnderChest;
 import lishid.openinv.utils.OpenInvPlayerInventory;
 
 import net.minecraft.server.EntityPlayer;
@@ -38,13 +38,13 @@ import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
-public class OpenInvPluginCommand implements CommandExecutor
+public class OpenEnderPluginCommand implements CommandExecutor
 {
     private final OpenInv plugin;
-    public static HashMap<Player, OpenInvPlayerInventory> offlineInv = new HashMap<Player, OpenInvPlayerInventory>();
-    public static HashMap<Player, String> openInvHistory = new HashMap<Player, String>();
+    public static HashMap<Player, OpenInvPlayerInventory> offlineEnder = new HashMap<Player, OpenInvPlayerInventory>();
+    public static HashMap<Player, String> openEnderHistory = new HashMap<Player, String>();
     
-    public OpenInvPluginCommand(OpenInv plugin)
+    public OpenEnderPluginCommand(OpenInv plugin)
     {
         this.plugin = plugin;
     }
@@ -56,9 +56,10 @@ public class OpenInvPluginCommand implements CommandExecutor
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
             return true;
         }
-        if (!sender.hasPermission(Permissions.PERM_OPENINV))
+        
+        if (!sender.hasPermission(Permissions.PERM_ENDERCHEST))
         {
-            sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
+            sender.sendMessage(ChatColor.RED + "You do not have permission to access player enderchest");
             return true;
         }
         
@@ -72,12 +73,12 @@ public class OpenInvPluginCommand implements CommandExecutor
         boolean offline = false;
         
         // History management
-        String history = openInvHistory.get(player);
+        String history = openEnderHistory.get(player);
         
         if (history == null || history == "")
         {
             history = player.getName();
-            openInvHistory.put(player, history);
+            openEnderHistory.put(player, history);
         }
         
         // Target selecting
@@ -94,7 +95,7 @@ public class OpenInvPluginCommand implements CommandExecutor
             }
             else
             {
-                sender.sendMessage(ChatColor.RED + "OpenInv history is empty!");
+                sender.sendMessage(ChatColor.RED + "OpenEnder history is empty!");
                 return true;
             }
         }
@@ -107,20 +108,9 @@ public class OpenInvPluginCommand implements CommandExecutor
         
         if (target == null)
         {
-            // Offline inv here...
+            // Offline ender here...
             try
             {
-                // See if the player has data files
-                
-                // Go through current world first, if not found then go through default world.
-                /*
-                 * World worldFound = matchWorld(Bukkit.getWorlds(), player.getWorld().getName());
-                 * if (worldFound != null)
-                 * {
-                 * 
-                 * }
-                 */
-                
                 // Default player folder
                 File playerfolder = new File(Bukkit.getWorlds().get(0).getWorldFolder(), "players");
                 if (!playerfolder.exists())
@@ -129,7 +119,7 @@ public class OpenInvPluginCommand implements CommandExecutor
                     return true;
                 }
                 
-                String playername = matchUser(Arrays.asList(playerfolder.listFiles()), name);
+                String playername = OpenInvPluginCommand.matchUser(Arrays.asList(playerfolder.listFiles()), name);
                 if (playername == null)
                 {
                     sender.sendMessage(ChatColor.RED + "Player " + name + " not found!");
@@ -159,70 +149,22 @@ public class OpenInvPluginCommand implements CommandExecutor
             }
         }
         
-        // Permissions checks
-        if (!player.hasPermission(Permissions.PERM_OVERRIDE) && target.hasPermission(Permissions.PERM_EXEMPT))
-        {
-            sender.sendMessage(ChatColor.RED + target.getDisplayName() + "'s inventory is protected!");
-            return true;
-        }
-        
-        if ((!player.hasPermission(Permissions.PERM_CROSSWORLD) && !player.hasPermission(Permissions.PERM_OVERRIDE)) && target.getWorld() != player.getWorld())
-        {
-            sender.sendMessage(ChatColor.RED + target.getDisplayName() + " is not in your world!");
-            return true;
-        }
-        
         // Record the target
         history = target.getName();
-        openInvHistory.put(player, history);
+        openEnderHistory.put(player, history);
         
         // Create the inventory
-        OpenInvPlayerInventory inv = OpenInv.inventories.get(target.getName().toLowerCase());
-        if (inv == null)
+        OpenInvEnderChest chest = OpenInv.enderChests.get(target.getName().toLowerCase());
+        if (chest == null)
         {
-            inv = new OpenInvPlayerInventory((CraftPlayer) target, !offline);
+            chest = new OpenInvEnderChest((CraftPlayer) target, !offline);
             
-            OpenInv.inventories.put(target.getName().toLowerCase(), inv);
+            OpenInv.enderChests.put(target.getName().toLowerCase(), chest);
         }
         
         // Open the inventory
-        (((CraftPlayer) player).getHandle()).openContainer(inv);
+        (((CraftPlayer) player).getHandle()).openContainer(chest);
         
         return true;
-    }
-    
-    /**
-     * @author Balor (aka Antoine Aflalo)
-     */
-    public static String matchUser(final Collection<File> container, final String search)
-    {
-        String found = null;
-        if (search == null)
-        {
-            return found;
-        }
-        final String lowerSearch = search.toLowerCase();
-        int delta = Integer.MAX_VALUE;
-        for (final File file : container)
-        {
-            final String filename = file.getName();
-            final String str = filename.substring(0, filename.length() - 4);
-            if (!str.toLowerCase().startsWith(lowerSearch))
-            {
-                continue;
-            }
-            final int curDelta = str.length() - lowerSearch.length();
-            if (curDelta < delta)
-            {
-                found = str;
-                delta = curDelta;
-            }
-            if (curDelta == 0)
-            {
-                break;
-            }
-            
-        }
-        return found;
     }
 }

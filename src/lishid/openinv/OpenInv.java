@@ -20,6 +20,7 @@ import java.util.HashMap;
 
 import lishid.openinv.commands.*;
 import lishid.openinv.utils.Metrics;
+import lishid.openinv.utils.OpenInvEnderChest;
 import lishid.openinv.utils.OpenInvPlayerInventory;
 
 import org.bukkit.ChatColor;
@@ -35,9 +36,8 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class OpenInv extends JavaPlugin
 {
-    private final OpenInvPlayerListener playerListener = new OpenInvPlayerListener(this);
-    private final OpenInvEntityListener entityListener = new OpenInvEntityListener(this);
     public static HashMap<String, OpenInvPlayerInventory> inventories = new HashMap<String, OpenInvPlayerInventory>();
+    public static HashMap<String, OpenInvEnderChest> enderChests = new HashMap<String, OpenInvEnderChest>();
     public static OpenInv mainPlugin;
     private static Metrics metrics;
     
@@ -55,14 +55,16 @@ public class OpenInv extends JavaPlugin
         mainPlugin.saveConfig();
         
         PluginManager pm = getServer().getPluginManager();
-        pm.registerEvents(playerListener, this);
-        pm.registerEvents(entityListener, this);
+        pm.registerEvents(new OpenInvPlayerListener(), this);
+        pm.registerEvents(new OpenInvEntityListener(), this);
+        pm.registerEvents(new OpenInvInventoryListener(), this);
         
         getCommand("openinv").setExecutor(new OpenInvPluginCommand(this));
         getCommand("searchinv").setExecutor(new SearchInvPluginCommand(this));
         getCommand("toggleopeninv").setExecutor(new ToggleOpenInvPluginCommand());
         getCommand("silentchest").setExecutor(new SilentChestPluginCommand(this));
         getCommand("anychest").setExecutor(new AnyChestPluginCommand(this));
+        getCommand("openender").setExecutor(new OpenEnderPluginCommand(this));
         
         // Metrics
         try
@@ -145,6 +147,8 @@ public class OpenInv extends JavaPlugin
     {
         player.sendMessage(ChatColor.GREEN + "/openinv <Player> - Open a player's inventory");
         player.sendMessage(ChatColor.GREEN + "   (aliases: oi, inv, open)");
+        player.sendMessage(ChatColor.GREEN + "/openender <Player> - Open a player's enderchest");
+        player.sendMessage(ChatColor.GREEN + "   (aliases: oe, enderchest)");
         player.sendMessage(ChatColor.GREEN + "/toggleopeninv - Toggle item openinv function");
         player.sendMessage(ChatColor.GREEN + "   (aliases: toi, toggleoi, toggleinv)");
         player.sendMessage(ChatColor.GREEN + "/searchinv <Item> [MinAmount] - ");

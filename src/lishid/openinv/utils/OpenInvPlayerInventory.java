@@ -35,6 +35,7 @@ public class OpenInvPlayerInventory extends PlayerInventory
     {
         super(p.getHandle());
         this.owner = p;
+        this.playerOnline = online;
         this.items = player.inventory.items;
         this.armor = player.inventory.armor;
     }

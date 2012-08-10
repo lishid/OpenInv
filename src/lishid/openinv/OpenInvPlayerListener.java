@@ -18,6 +18,7 @@ package lishid.openinv;
 
 import java.lang.reflect.Field;
 
+import lishid.openinv.utils.OpenInvEnderChest;
 import lishid.openinv.utils.OpenInvPlayerInventory;
 import lishid.openinv.utils.SilentContainerChest;
 import net.minecraft.server.Block;
@@ -44,13 +45,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public class OpenInvPlayerListener implements Listener
 {
-    OpenInv plugin;
-    
-    public OpenInvPlayerListener(OpenInv plugin)
-    {
-        this.plugin = plugin;
-    }
-    
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event)
     {
@@ -60,16 +54,29 @@ public class OpenInvPlayerListener implements Listener
         {
             inventory.PlayerGoOnline((CraftPlayer) event.getPlayer());
         }
+        
+        OpenInvEnderChest chest = OpenInv.enderChests.get(event.getPlayer().getName().toLowerCase());
+        
+        if (chest != null)
+        {
+            chest.PlayerGoOnline((CraftPlayer) event.getPlayer());
+        }
     }
     
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event)
     {
         OpenInvPlayerInventory inventory = OpenInv.inventories.get(event.getPlayer().getName().toLowerCase());
-        if(inventory != null)
+        if (inventory != null)
         {
             inventory.PlayerGoOffline();
             inventory.InventoryRemovalCheck();
+        }
+        OpenInvEnderChest chest = OpenInv.enderChests.get(event.getPlayer().getName().toLowerCase());
+        if (chest != null)
+        {
+            chest.PlayerGoOffline();
+            chest.InventoryRemovalCheck();
         }
     }
     
@@ -87,19 +94,15 @@ public class OpenInvPlayerListener implements Listener
             int y = event.getClickedBlock().getY();
             int z = event.getClickedBlock().getZ();
             
-            if (event.getPlayer().hasPermission("OpenInv.silent") && OpenInv.GetPlayerSilentChestStatus(event.getPlayer().getName()))
+            if (event.getPlayer().hasPermission(Permissions.PERM_SILENT) && OpenInv.GetPlayerSilentChestStatus(event.getPlayer().getName()))
             {
                 silentchest = true;
             }
             
-            if (event.getPlayer().hasPermission("OpenInv.anychest") && OpenInv.GetPlayerAnyChestStatus(event.getPlayer().getName()))
+            if (event.getPlayer().hasPermission(Permissions.PERM_ANYCHEST) && OpenInv.GetPlayerAnyChestStatus(event.getPlayer().getName()))
             {
                 try
                 {
-                    
-                    
-                    
-                    
                     // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
                     EntityPlayer player = ((CraftPlayer) event.getPlayer()).getHandle();
                     World world = player.world;
@@ -203,7 +206,7 @@ public class OpenInvPlayerListener implements Listener
             try
             {
                 Sign sign = ((Sign) event.getClickedBlock().getState());
-                if (player.hasPermission("OpenInv.openinv") && sign.getLine(0).equalsIgnoreCase("[openinv]"))
+                if (player.hasPermission(Permissions.PERM_OPENINV) && sign.getLine(0).equalsIgnoreCase("[openinv]"))
                 {
                     String text = sign.getLine(1).trim() + sign.getLine(2).trim() + sign.getLine(3).trim();
                     player.performCommand("openinv " + text);
@@ -220,7 +223,7 @@ public class OpenInvPlayerListener implements Listener
         {
             Player player = event.getPlayer();
             
-            if (!(player.getItemInHand().getType().getId() == OpenInv.GetItemOpenInvItem()) || (!OpenInv.GetPlayerItemOpenInvStatus(player.getName())) || !player.hasPermission("OpenInv.openinv"))
+            if (!(player.getItemInHand().getType().getId() == OpenInv.GetItemOpenInvItem()) || (!OpenInv.GetPlayerItemOpenInvStatus(player.getName())) || !player.hasPermission(Permissions.PERM_OPENINV))
             {
                 return;
             }

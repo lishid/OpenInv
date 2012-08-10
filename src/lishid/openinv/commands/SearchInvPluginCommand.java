@@ -17,6 +17,7 @@
 package lishid.openinv.commands;
 
 import lishid.openinv.OpenInv;
+import lishid.openinv.Permissions;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -38,7 +39,7 @@ public class SearchInvPluginCommand implements CommandExecutor
     {
         if (sender instanceof Player)
         {
-            if (!sender.hasPermission("OpenInv.search"))
+            if (!sender.hasPermission(Permissions.PERM_SEARCH))
             {
                 sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
                 return true;
