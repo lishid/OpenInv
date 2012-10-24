@@ -57,7 +57,7 @@ public class OpenInvPlayerInventory extends PlayerInventory
     
     public void PlayerGoOnline(CraftPlayer p)
     {
-        if(!playerOnline)
+        if (!playerOnline)
         {
             p.getHandle().inventory.items = this.items;
             p.getHandle().inventory.armor = this.armor;

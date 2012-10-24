@@ -166,9 +166,17 @@ public class OpenInvPluginCommand implements CommandExecutor
             return true;
         }
         
+        // Crosswork check
         if ((!player.hasPermission(Permissions.PERM_CROSSWORLD) && !player.hasPermission(Permissions.PERM_OVERRIDE)) && target.getWorld() != player.getWorld())
         {
             sender.sendMessage(ChatColor.RED + target.getDisplayName() + " is not in your world!");
+            return true;
+        }
+        
+        // Self-open check
+        if (!player.hasPermission(Permissions.PERM_OPENSELF) && target.equals(player))
+        {
+            sender.sendMessage(ChatColor.RED + "You're not allowed to openinv yourself.");
             return true;
         }
         

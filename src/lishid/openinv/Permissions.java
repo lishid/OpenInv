@@ -12,4 +12,5 @@ public class Permissions
     public static final String PERM_SEARCH = "OpenInv.search";
     public static final String PERM_EDITINV = "OpenInv.editinv";
     public static final String PERM_EDITENDER = "OpenInv.editender";
+    public static final String PERM_OPENSELF = "OpenInv.openself";
 }
