@@ -60,7 +60,7 @@ public class OpenInv extends JavaPlugin
         pm.registerEvents(new OpenInvInventoryListener(), this);
         
         getCommand("openinv").setExecutor(new OpenInvPluginCommand(this));
-        getCommand("searchinv").setExecutor(new SearchInvPluginCommand(this));
+        getCommand("searchinv").setExecutor(new SearchInvPluginCommand());
         getCommand("toggleopeninv").setExecutor(new ToggleOpenInvPluginCommand());
         getCommand("silentchest").setExecutor(new SilentChestPluginCommand(this));
         getCommand("anychest").setExecutor(new AnyChestPluginCommand(this));

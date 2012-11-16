@@ -33,10 +33,8 @@ public class SilentContainerChest extends ContainerChest
     }
     
     @Override
-    public void a(EntityHuman paramEntityHuman)
+    public void b(EntityHuman paramEntityHuman)
     {
-        super.a(paramEntityHuman);
-        // open signal
-        inv.startOpen();
+        
     }
 }

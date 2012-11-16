@@ -39,7 +39,8 @@ public class OpenInvPlayerInventory extends PlayerInventory
         this.items = player.inventory.items;
         this.armor = player.inventory.armor;
     }
-    
+
+    @Override
     public void onClose(CraftHumanEntity who)
     {
         super.onClose(who);
@@ -70,7 +71,8 @@ public class OpenInvPlayerInventory extends PlayerInventory
     {
         playerOnline = false;
     }
-    
+
+    @Override
     public ItemStack[] getContents()
     {
         ItemStack[] C = new ItemStack[getSize()];
@@ -78,12 +80,14 @@ public class OpenInvPlayerInventory extends PlayerInventory
         System.arraycopy(items, 0, C, items.length, armor.length);
         return C;
     }
-    
+
+    @Override
     public int getSize()
     {
         return super.getSize() + 5;
     }
-    
+
+    @Override
     public ItemStack getItem(int i)
     {
         ItemStack[] is = this.items;
@@ -110,7 +114,8 @@ public class OpenInvPlayerInventory extends PlayerInventory
         
         return is[i];
     }
-    
+
+    @Override
     public ItemStack splitStack(int i, int j)
     {
         ItemStack[] is = this.items;
@@ -161,7 +166,8 @@ public class OpenInvPlayerInventory extends PlayerInventory
             return null;
         }
     }
-    
+
+    @Override
     public ItemStack splitWithoutUpdate(int i)
     {
         ItemStack[] is = this.items;
@@ -198,7 +204,8 @@ public class OpenInvPlayerInventory extends PlayerInventory
             return null;
         }
     }
-    
+
+    @Override
     public void setItem(int i, ItemStack itemstack)
     {
         ItemStack[] is = this.items;
@@ -259,7 +266,8 @@ public class OpenInvPlayerInventory extends PlayerInventory
         else
             return i;
     }
-    
+
+    @Override
     public String getName()
     {
         if (player.name.length() > 16)
@@ -269,7 +277,8 @@ public class OpenInvPlayerInventory extends PlayerInventory
         return player.name;
     }
     
-    public boolean a(EntityHuman entityhuman)
+    @Override
+    public boolean a_(EntityHuman entityhuman)
     {
         return true;
     }

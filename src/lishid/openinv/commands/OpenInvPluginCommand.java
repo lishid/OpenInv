@@ -88,15 +88,7 @@ public class OpenInvPluginCommand implements CommandExecutor
         // Read from history if target is not named
         if (args.length < 1)
         {
-            if (history != null && history != "")
-            {
-                name = history;
-            }
-            else
-            {
-                sender.sendMessage(ChatColor.RED + "OpenInv history is empty!");
-                return true;
-            }
+            name = history;
         }
         else
         {
@@ -104,7 +96,7 @@ public class OpenInvPluginCommand implements CommandExecutor
         }
         
         target = this.plugin.getServer().getPlayer(name);
-        
+
         if (target == null)
         {
             // Offline inv here...
@@ -135,7 +127,7 @@ public class OpenInvPluginCommand implements CommandExecutor
                     sender.sendMessage(ChatColor.RED + "Player " + name + " not found!");
                     return true;
                 }
-                
+
                 // Create an entity to load the player data
                 final MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
                 final EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), playername, new ItemInWorldManager(server.getWorldServer(0)));
@@ -183,7 +175,7 @@ public class OpenInvPluginCommand implements CommandExecutor
         // Record the target
         history = target.getName();
         openInvHistory.put(player, history);
-        
+
         // Create the inventory
         OpenInvPlayerInventory inv = OpenInv.inventories.get(target.getName().toLowerCase());
         if (inv == null)
@@ -192,7 +184,7 @@ public class OpenInvPluginCommand implements CommandExecutor
             
             OpenInv.inventories.put(target.getName().toLowerCase(), inv);
         }
-        
+
         // Open the inventory
         (((CraftPlayer) player).getHandle()).openContainer(inv);
         
