@@ -1,8 +1,7 @@
 name: OpenInv
-main: lishid.openinv.OpenInv
-version: 1.9.0
+main: com.lishid.openinv.OpenInv
+version: 1.9.2
 author: lishid
-website: http://forums.bukkit.org/threads/15379/
 description: >
              This plugin allows you to open a player's inventory as a chest and interact with it in real time.
 commands:

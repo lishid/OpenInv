@@ -14,14 +14,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lishid.openinv;
+package com.lishid.openinv;
 
-import lishid.openinv.utils.OpenInvEnderChest;
-import lishid.openinv.utils.OpenInvPlayerInventory;
-import net.minecraft.server.IInventory;
-
-import org.bukkit.craftbukkit.inventory.CraftInventory;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -32,18 +26,10 @@ public class OpenInvInventoryListener implements Listener
     @EventHandler(priority = EventPriority.NORMAL)
     public void onInventoryClick(InventoryClickEvent event)
     {
-        IInventory inv = ((CraftInventory) event.getInventory()).getInventory();
-        HumanEntity player = event.getWhoClicked();
-        if (inv instanceof OpenInvPlayerInventory && event.getView().convertSlot(event.getRawSlot()) == event.getRawSlot())
+        // If this is the top inventory
+        if (event.getView().convertSlot(event.getRawSlot()) == event.getRawSlot())
         {
-            if (!player.hasPermission(Permissions.PERM_EDITINV))
-            {
-                event.setCancelled(true);
-            }
-        }
-        else if (inv instanceof OpenInvEnderChest && event.getView().convertSlot(event.getRawSlot()) == event.getRawSlot())
-        {
-            if (!player.hasPermission(Permissions.PERM_EDITENDER))
+            if (!OpenInv.inventoryAccess.check(event.getInventory(), event.getWhoClicked()))
             {
                 event.setCancelled(true);
             }

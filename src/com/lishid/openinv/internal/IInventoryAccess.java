@@ -14,27 +14,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lishid.openinv.utils;
+package com.lishid.openinv.internal;
 
-import net.minecraft.server.ContainerChest;
-import net.minecraft.server.EntityHuman;
-import net.minecraft.server.IInventory;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.Inventory;
 
-public class SilentContainerChest extends ContainerChest
+public interface IInventoryAccess
 {
-    public IInventory inv;
-    
-    public SilentContainerChest(IInventory i1, IInventory i2)
-    {
-        super(i1, i2);
-        inv = i2;
-        // close signal
-        inv.f();
-    }
-    
-    @Override
-    public void b(EntityHuman paramEntityHuman)
-    {
-        
-    }
+    public boolean check(Inventory inventory, HumanEntity player);
 }

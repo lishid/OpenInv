@@ -14,40 +14,46 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lishid.openinv.utils;
+package com.lishid.openinv.internal.craftbukkit;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import lishid.openinv.OpenInv;
+import com.lishid.openinv.OpenInv;
+import com.lishid.openinv.internal.ISpecialEnderChest;
 
-import org.bukkit.craftbukkit.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-import net.minecraft.server.EntityHuman;
-import net.minecraft.server.IInventory;
-import net.minecraft.server.InventoryEnderChest;
-import net.minecraft.server.InventorySubcontainer;
-import net.minecraft.server.ItemStack;
+//Volatile
+import net.minecraft.server.*;
+import org.bukkit.craftbukkit.entity.*;
+import org.bukkit.craftbukkit.inventory.*;
 
-public class OpenInvEnderChest extends InventorySubcontainer implements IInventory
+public class SpecialEnderChest extends InventorySubcontainer implements IInventory, ISpecialEnderChest
 {
     public List<HumanEntity> transaction = new ArrayList<HumanEntity>();
     public boolean playerOnline = false;
     private CraftPlayer owner;
     private InventoryEnderChest enderChest;
     private int maxStack = MAX_STACK;
+    private CraftInventory inventory = new CraftInventory(this);
     
-    public OpenInvEnderChest(CraftPlayer player, boolean online)
+    public SpecialEnderChest(Player p, Boolean online)
     {
-        super(player.getHandle().getEnderChest().getName(), player.getHandle().getEnderChest().getSize());
+        super(((CraftPlayer) p).getHandle().getEnderChest().getName(), ((CraftPlayer) p).getHandle().getEnderChest().getSize());
+        CraftPlayer player = (CraftPlayer) p;
         this.enderChest = player.getHandle().getEnderChest();
         this.owner = player;
         this.items = enderChest.getContents();
-        this.InventoryRemovalCheck();
+    }
+    
+    public Inventory getBukkitInventory()
+    {
+        return inventory;
     }
     
     public void InventoryRemovalCheck()
@@ -59,13 +65,13 @@ public class OpenInvEnderChest extends InventorySubcontainer implements IInvento
         }
     }
     
-    public void PlayerGoOnline(CraftPlayer p)
+    public void PlayerGoOnline(Player p)
     {
         if (!playerOnline)
         {
             try
             {
-                InventoryEnderChest playerEnderChest = p.getHandle().getEnderChest();
+                InventoryEnderChest playerEnderChest = ((CraftPlayer) p).getHandle().getEnderChest();
                 Field field = playerEnderChest.getClass().getField("items");
                 field.setAccessible(true);
                 field.set(playerEnderChest, this.items);

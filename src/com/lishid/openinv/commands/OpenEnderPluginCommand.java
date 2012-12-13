@@ -14,34 +14,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lishid.openinv.commands;
+package com.lishid.openinv.commands;
 
-import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 
-import lishid.openinv.OpenInv;
-import lishid.openinv.Permissions;
-import lishid.openinv.utils.OpenInvEnderChest;
-import lishid.openinv.utils.OpenInvPlayerInventory;
-
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.ItemInWorldManager;
-import net.minecraft.server.MinecraftServer;
-
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.CraftServer;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+
+import com.lishid.openinv.OpenInv;
+import com.lishid.openinv.Permissions;
+import com.lishid.openinv.internal.ISpecialEnderChest;
+import com.lishid.openinv.internal.InternalAccessor;
 
 public class OpenEnderPluginCommand implements CommandExecutor
 {
     private final OpenInv plugin;
-    public static HashMap<Player, OpenInvPlayerInventory> offlineEnder = new HashMap<Player, OpenInvPlayerInventory>();
     public static HashMap<Player, String> openEnderHistory = new HashMap<Player, String>();
     
     public OpenEnderPluginCommand(OpenInv plugin)
@@ -108,43 +98,12 @@ public class OpenEnderPluginCommand implements CommandExecutor
         
         if (target == null)
         {
-            // Offline ender here...
-            try
+            // Try loading the player's data
+            target = OpenInv.playerLoader.loadPlayer(name);
+            
+            if (target == null)
             {
-                // Default player folder
-                File playerfolder = new File(Bukkit.getWorlds().get(0).getWorldFolder(), "players");
-                if (!playerfolder.exists())
-                {
-                    sender.sendMessage(ChatColor.RED + "Player " + name + " not found!");
-                    return true;
-                }
-                
-                String playername = OpenInvPluginCommand.matchUser(Arrays.asList(playerfolder.listFiles()), name);
-                if (playername == null)
-                {
-                    sender.sendMessage(ChatColor.RED + "Player " + name + " not found!");
-                    return true;
-                }
-                
-                // Create an entity to load the player data
-                final MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
-                final EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), playername, new ItemInWorldManager(server.getWorldServer(0)));
-                target = (entity == null) ? null : (Player) entity.getBukkitEntity();
-                if (target != null)
-                {
-                    target.loadData();
-                    offline = true;
-                }
-                else
-                {
-                    sender.sendMessage(ChatColor.RED + "Player " + name + " not found!");
-                    return true;
-                }
-            }
-            catch (Exception e)
-            {
-                sender.sendMessage("Error while retrieving offline player data!");
-                e.printStackTrace();
+                sender.sendMessage(ChatColor.RED + "Player " + name + " not found!");
                 return true;
             }
         }
@@ -154,16 +113,16 @@ public class OpenEnderPluginCommand implements CommandExecutor
         openEnderHistory.put(player, history);
         
         // Create the inventory
-        OpenInvEnderChest chest = OpenInv.enderChests.get(target.getName().toLowerCase());
+        ISpecialEnderChest chest = OpenInv.enderChests.get(target.getName().toLowerCase());
         if (chest == null)
         {
-            chest = new OpenInvEnderChest((CraftPlayer) target, !offline);
+            chest = InternalAccessor.Instance.newSpecialEnderChest(target, !offline);
             
             OpenInv.enderChests.put(target.getName().toLowerCase(), chest);
         }
         
         // Open the inventory
-        (((CraftPlayer) player).getHandle()).openContainer(chest);
+        player.openInventory(chest.getBukkitInventory());
         
         return true;
     }

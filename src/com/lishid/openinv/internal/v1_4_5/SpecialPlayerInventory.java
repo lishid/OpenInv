@@ -14,39 +14,42 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lishid.openinv.utils;
+package com.lishid.openinv.internal.v1_4_5;
 
-import lishid.openinv.OpenInv;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 
-import org.bukkit.craftbukkit.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
+import com.lishid.openinv.OpenInv;
+import com.lishid.openinv.internal.ISpecialPlayerInventory;
 
-import net.minecraft.server.EntityHuman;
-import net.minecraft.server.ItemStack;
-import net.minecraft.server.PlayerInventory;
+//Volatile
+import net.minecraft.server.v1_4_5.*;
+import org.bukkit.craftbukkit.v1_4_5.entity.*;
+import org.bukkit.craftbukkit.v1_4_5.inventory.*;
 
-public class OpenInvPlayerInventory extends PlayerInventory
+public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory
 {
     CraftPlayer owner;
     public boolean playerOnline = false;
     private ItemStack[] extra = new ItemStack[5];
+    private CraftInventory inventory = new CraftInventory(this);
     
-    public OpenInvPlayerInventory(CraftPlayer p, boolean online)
+    public SpecialPlayerInventory(Player p, Boolean online)
     {
-        super(p.getHandle());
-        this.owner = p;
+        super(((CraftPlayer) p).getHandle());
+        this.owner = ((CraftPlayer) p);
         this.playerOnline = online;
         this.items = player.inventory.items;
         this.armor = player.inventory.armor;
     }
-
+    
     @Override
-    public void onClose(CraftHumanEntity who)
+    public Inventory getBukkitInventory()
     {
-        super.onClose(who);
-        this.InventoryRemovalCheck();
+        return inventory;
     }
     
+    @Override
     public void InventoryRemovalCheck()
     {
         if (transaction.isEmpty() && !playerOnline)
@@ -56,10 +59,12 @@ public class OpenInvPlayerInventory extends PlayerInventory
         }
     }
     
-    public void PlayerGoOnline(CraftPlayer p)
+    @Override
+    public void PlayerGoOnline(Player player)
     {
         if (!playerOnline)
         {
+            CraftPlayer p = (CraftPlayer) player;
             p.getHandle().inventory.items = this.items;
             p.getHandle().inventory.armor = this.armor;
             p.saveData();
@@ -67,11 +72,19 @@ public class OpenInvPlayerInventory extends PlayerInventory
         }
     }
     
+    @Override
     public void PlayerGoOffline()
     {
         playerOnline = false;
     }
-
+    
+    @Override
+    public void onClose(CraftHumanEntity who)
+    {
+        super.onClose(who);
+        this.InventoryRemovalCheck();
+    }
+    
     @Override
     public ItemStack[] getContents()
     {
@@ -80,13 +93,13 @@ public class OpenInvPlayerInventory extends PlayerInventory
         System.arraycopy(items, 0, C, items.length, armor.length);
         return C;
     }
-
+    
     @Override
     public int getSize()
     {
         return super.getSize() + 5;
     }
-
+    
     @Override
     public ItemStack getItem(int i)
     {
@@ -114,7 +127,7 @@ public class OpenInvPlayerInventory extends PlayerInventory
         
         return is[i];
     }
-
+    
     @Override
     public ItemStack splitStack(int i, int j)
     {
@@ -166,7 +179,7 @@ public class OpenInvPlayerInventory extends PlayerInventory
             return null;
         }
     }
-
+    
     @Override
     public ItemStack splitWithoutUpdate(int i)
     {
@@ -204,7 +217,7 @@ public class OpenInvPlayerInventory extends PlayerInventory
             return null;
         }
     }
-
+    
     @Override
     public void setItem(int i, ItemStack itemstack)
     {
@@ -266,7 +279,7 @@ public class OpenInvPlayerInventory extends PlayerInventory
         else
             return i;
     }
-
+    
     @Override
     public String getName()
     {

@@ -14,10 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lishid.openinv.commands;
-
-import lishid.openinv.OpenInv;
-import lishid.openinv.Permissions;
+package com.lishid.openinv.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -25,6 +22,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.lishid.openinv.OpenInv;
+import com.lishid.openinv.Permissions;
 
 public class ToggleOpenInvPluginCommand implements CommandExecutor
 {

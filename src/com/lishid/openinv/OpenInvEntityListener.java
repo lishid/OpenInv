@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lishid.openinv;
+package com.lishid.openinv;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

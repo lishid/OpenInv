@@ -1,4 +1,4 @@
-package lishid.openinv;
+package com.lishid.openinv;
 
 public class Permissions
 {

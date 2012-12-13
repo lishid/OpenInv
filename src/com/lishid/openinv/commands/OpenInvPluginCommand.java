@@ -14,34 +14,24 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lishid.openinv.commands;
+package com.lishid.openinv.commands;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 
-import lishid.openinv.OpenInv;
-import lishid.openinv.Permissions;
-import lishid.openinv.utils.OpenInvPlayerInventory;
-
-import net.minecraft.server.EntityPlayer;
-import net.minecraft.server.ItemInWorldManager;
-import net.minecraft.server.MinecraftServer;
-
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.CraftServer;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+
+import com.lishid.openinv.OpenInv;
+import com.lishid.openinv.Permissions;
+import com.lishid.openinv.internal.ISpecialPlayerInventory;
+import com.lishid.openinv.internal.InternalAccessor;
 
 public class OpenInvPluginCommand implements CommandExecutor
 {
     private final OpenInv plugin;
-    public static HashMap<Player, OpenInvPlayerInventory> offlineInv = new HashMap<Player, OpenInvPlayerInventory>();
     public static HashMap<Player, String> openInvHistory = new HashMap<Player, String>();
     
     public OpenInvPluginCommand(OpenInv plugin)
@@ -96,58 +86,19 @@ public class OpenInvPluginCommand implements CommandExecutor
         }
         
         target = this.plugin.getServer().getPlayer(name);
-
+        
         if (target == null)
         {
-            // Offline inv here...
-            try
+            if (target == null)
             {
-                // See if the player has data files
+                // Try loading the player's data
+                target = OpenInv.playerLoader.loadPlayer(name);
                 
-                // Go through current world first, if not found then go through default world.
-                /*
-                 * World worldFound = matchWorld(Bukkit.getWorlds(), player.getWorld().getName());
-                 * if (worldFound != null)
-                 * {
-                 * 
-                 * }
-                 */
-                
-                // Default player folder
-                File playerfolder = new File(Bukkit.getWorlds().get(0).getWorldFolder(), "players");
-                if (!playerfolder.exists())
+                if (target == null)
                 {
                     sender.sendMessage(ChatColor.RED + "Player " + name + " not found!");
                     return true;
                 }
-                
-                String playername = matchUser(Arrays.asList(playerfolder.listFiles()), name);
-                if (playername == null)
-                {
-                    sender.sendMessage(ChatColor.RED + "Player " + name + " not found!");
-                    return true;
-                }
-
-                // Create an entity to load the player data
-                final MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
-                final EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), playername, new ItemInWorldManager(server.getWorldServer(0)));
-                target = (entity == null) ? null : (Player) entity.getBukkitEntity();
-                if (target != null)
-                {
-                    target.loadData();
-                    offline = true;
-                }
-                else
-                {
-                    sender.sendMessage(ChatColor.RED + "Player " + name + " not found!");
-                    return true;
-                }
-            }
-            catch (Exception e)
-            {
-                sender.sendMessage("Error while retrieving offline player data!");
-                e.printStackTrace();
-                return true;
             }
         }
         
@@ -175,54 +126,19 @@ public class OpenInvPluginCommand implements CommandExecutor
         // Record the target
         history = target.getName();
         openInvHistory.put(player, history);
-
+        
         // Create the inventory
-        OpenInvPlayerInventory inv = OpenInv.inventories.get(target.getName().toLowerCase());
+        ISpecialPlayerInventory inv = OpenInv.inventories.get(target.getName().toLowerCase());
         if (inv == null)
         {
-            inv = new OpenInvPlayerInventory((CraftPlayer) target, !offline);
+            inv = InternalAccessor.Instance.newSpecialPlayerInventory(target, !offline);
             
             OpenInv.inventories.put(target.getName().toLowerCase(), inv);
         }
-
+        
         // Open the inventory
-        (((CraftPlayer) player).getHandle()).openContainer(inv);
+        player.openInventory(inv.getBukkitInventory());
         
         return true;
-    }
-    
-    /**
-     * @author Balor (aka Antoine Aflalo)
-     */
-    public static String matchUser(final Collection<File> container, final String search)
-    {
-        String found = null;
-        if (search == null)
-        {
-            return found;
-        }
-        final String lowerSearch = search.toLowerCase();
-        int delta = Integer.MAX_VALUE;
-        for (final File file : container)
-        {
-            final String filename = file.getName();
-            final String str = filename.substring(0, filename.length() - 4);
-            if (!str.toLowerCase().startsWith(lowerSearch))
-            {
-                continue;
-            }
-            final int curDelta = str.length() - lowerSearch.length();
-            if (curDelta < delta)
-            {
-                found = str;
-                delta = curDelta;
-            }
-            if (curDelta == 0)
-            {
-                break;
-            }
-            
-        }
-        return found;
     }
 }

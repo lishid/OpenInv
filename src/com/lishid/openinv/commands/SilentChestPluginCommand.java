@@ -14,10 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lishid.openinv.commands;
-
-import lishid.openinv.OpenInv;
-import lishid.openinv.Permissions;
+package com.lishid.openinv.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -25,9 +22,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class AnyChestPluginCommand implements CommandExecutor
+import com.lishid.openinv.OpenInv;
+import com.lishid.openinv.Permissions;
+
+public class SilentChestPluginCommand implements CommandExecutor
 {
-    public AnyChestPluginCommand(OpenInv plugin)
+    public SilentChestPluginCommand(OpenInv plugin)
     {
         
     }
@@ -39,9 +39,9 @@ public class AnyChestPluginCommand implements CommandExecutor
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
             return true;
         }
-        if (!sender.hasPermission(Permissions.PERM_ANYCHEST))
+        if (!sender.hasPermission(Permissions.PERM_SILENT))
         {
-            sender.sendMessage(ChatColor.RED + "You do not have permission to use anychest.");
+            sender.sendMessage(ChatColor.RED + "You do not have permission to use silent chest.");
             return true;
         }
         
@@ -49,15 +49,15 @@ public class AnyChestPluginCommand implements CommandExecutor
         {
             if (args[0].equalsIgnoreCase("check"))
             {
-                if (OpenInv.GetPlayerAnyChestStatus(sender.getName()))
-                    sender.sendMessage("AnyChest is ON.");
+                if (OpenInv.GetPlayerSilentChestStatus(sender.getName()))
+                    sender.sendMessage("SilentChest is ON.");
                 else
-                    sender.sendMessage("AnyChest is OFF.");
+                    sender.sendMessage("SilentChest is OFF.");
             }
         }
         
-        OpenInv.SetPlayerAnyChestStatus(sender.getName(), !OpenInv.GetPlayerAnyChestStatus(sender.getName()));
-        sender.sendMessage("AnyChest is now " + (OpenInv.GetPlayerAnyChestStatus(sender.getName()) ? "On" : "Off") + ".");
+        OpenInv.SetPlayerSilentChestStatus(sender.getName(), !OpenInv.GetPlayerSilentChestStatus(sender.getName()));
+        sender.sendMessage("SilentChest is now " + (OpenInv.GetPlayerSilentChestStatus(sender.getName()) ? "On" : "Off") + ".");
         
         return true;
     }

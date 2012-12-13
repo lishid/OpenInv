@@ -1,4 +1,4 @@
-package lishid.openinv.utils;
+package com.lishid.openinv.utils;
 
 /*
  * Copyright 2011 Tyler Blair. All rights reserved.

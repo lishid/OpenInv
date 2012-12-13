@@ -14,20 +14,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package lishid.openinv;
+package com.lishid.openinv;
 
 import java.util.HashMap;
+import java.util.logging.Logger;
 
-import lishid.openinv.commands.*;
-import lishid.openinv.utils.Metrics;
-import lishid.openinv.utils.OpenInvEnderChest;
-import lishid.openinv.utils.OpenInvPlayerInventory;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import com.lishid.openinv.commands.*;
+import com.lishid.openinv.internal.IAnySilentChest;
+import com.lishid.openinv.internal.IInventoryAccess;
+import com.lishid.openinv.internal.IPlayerDataManager;
+import com.lishid.openinv.internal.ISpecialEnderChest;
+import com.lishid.openinv.internal.ISpecialPlayerInventory;
+import com.lishid.openinv.internal.InternalAccessor;
+import com.lishid.openinv.utils.Metrics;
+import com.lishid.openinv.utils.UpdateManager;
 
 /**
  * Open other player's inventory
@@ -36,25 +42,46 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class OpenInv extends JavaPlugin
 {
-    public static HashMap<String, OpenInvPlayerInventory> inventories = new HashMap<String, OpenInvPlayerInventory>();
-    public static HashMap<String, OpenInvEnderChest> enderChests = new HashMap<String, OpenInvEnderChest>();
-    public static OpenInv mainPlugin;
+    public static final Logger logger = Logger.getLogger("Minecraft.OpenInv");
+    
+    public static HashMap<String, ISpecialPlayerInventory> inventories = new HashMap<String, ISpecialPlayerInventory>();
+    public static HashMap<String, ISpecialEnderChest> enderChests = new HashMap<String, ISpecialEnderChest>();
     private static Metrics metrics;
     
-    public void onDisable()
-    {
-        PluginDescriptionFile pdfFile = this.getDescription();
-        System.out.println("[" + pdfFile.getName() + "] version " + pdfFile.getVersion() + " disabled!");
-    }
+    private UpdateManager updater = new UpdateManager();
+    
+    public static OpenInv mainPlugin;
+
+    public static IPlayerDataManager playerLoader;
+    public static IInventoryAccess inventoryAccess;
+    public static IAnySilentChest anySilentChest;
     
     public void onEnable()
     {
+        // Get plugin manager
+        PluginManager pm = getServer().getPluginManager();
+        
+        // Version check
+        boolean success = InternalAccessor.Initialize(this.getServer());
+        
+        if(!success)
+        {
+            OpenInv.log("Your version of CraftBukkit is not supported.");
+            OpenInv.log("Please look for an updated version of Orebfuscator.");
+            pm.disablePlugin(this);
+            return;
+        }
+        
+        playerLoader = InternalAccessor.Instance.newPlayerDataManager();
+        inventoryAccess = InternalAccessor.Instance.newInventoryAccess();
+        anySilentChest = InternalAccessor.Instance.newAnySilentChest();
+        
         mainPlugin = this;
         mainPlugin.getConfig().addDefault("ItemOpenInvItemID", 280);
+        mainPlugin.getConfig().addDefault("CheckForUpdates", true);
         mainPlugin.getConfig().options().copyDefaults(true);
         mainPlugin.saveConfig();
         
-        PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new OpenInvPlayerListener(), this);
         pm.registerEvents(new OpenInvEntityListener(), this);
         pm.registerEvents(new OpenInvInventoryListener(), this);
@@ -66,6 +93,8 @@ public class OpenInv extends JavaPlugin
         getCommand("anychest").setExecutor(new AnyChestPluginCommand(this));
         getCommand("openender").setExecutor(new OpenEnderPluginCommand(this));
         
+        updater.Initialize(this, getFile());
+        
         // Metrics
         try
         {
@@ -74,11 +103,13 @@ public class OpenInv extends JavaPlugin
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            OpenInv.log(e);
         }
-        
-        PluginDescriptionFile pdfFile = this.getDescription();
-        System.out.println("[" + pdfFile.getName() + "] version " + pdfFile.getVersion() + " enabled!");
+    }
+    
+    public static boolean GetCheckForUpdates()
+    {
+        return mainPlugin.getConfig().getBoolean("CheckForUpdates", true);
     }
     
     public static boolean GetPlayerItemOpenInvStatus(String name)
@@ -141,6 +172,23 @@ public class OpenInv extends JavaPlugin
     {
         mainPlugin.getConfig().set(data, value);
         mainPlugin.saveConfig();
+    }
+    
+    /**
+     * Log an information
+     */
+    public static void log(String text)
+    {
+        logger.info("[OpenInv] " + text);
+    }
+    
+    /**
+     * Log an error
+     */
+    public static void log(Throwable e)
+    {
+        logger.severe("[OpenInv] " + e.toString());
+        e.printStackTrace();
     }
     
     public static void ShowHelp(Player player)
