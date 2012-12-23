@@ -67,7 +67,7 @@ public class OpenInv extends JavaPlugin
         if(!success)
         {
             OpenInv.log("Your version of CraftBukkit is not supported.");
-            OpenInv.log("Please look for an updated version of Orebfuscator.");
+            OpenInv.log("Please look for an updated version of OpenInv.");
             pm.disablePlugin(this);
             return;
         }

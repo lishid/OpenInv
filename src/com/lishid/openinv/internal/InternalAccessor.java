@@ -37,7 +37,7 @@ public class InternalAccessor
         
         try
         {
-            Class.forName("com.lishid.orebfuscator.internal." + Instance.version + ".PlayerHook");
+            Class.forName("com.lishid.openinv.internal." + Instance.version + ".AnySilentChest");
             return true;
         }
         catch (Exception e)
