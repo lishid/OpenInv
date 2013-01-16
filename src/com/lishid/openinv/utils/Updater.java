@@ -10,7 +10,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -247,7 +246,7 @@ public class Updater
         {
             // Obtain the results of the project's file feed
             readFeed();
-            if (!versionTitle.equals(versionDownloaded) && versionCheck(versionTitle))
+            if (versionTitle != null && !versionTitle.equals(versionDownloaded) && versionCheck(versionTitle))
             {
                 String fileLink = getFile(versionLink);
                 if (fileLink != null && type != UpdateType.NO_DOWNLOAD)
@@ -548,9 +547,9 @@ public class Updater
                 }
             }
         }
-        catch (XMLStreamException e)
+        catch (Exception e)
         {
-            throw new RuntimeException(e);
+            //throw new RuntimeException(e);
         }
     }
     

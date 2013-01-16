@@ -243,19 +243,16 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             i = getReversedArmorSlotNum(i);
         }
         
-        /*
-         * 
-         * //Effects
-         * if(is == this.extra)
-         * {
-         * if(i == 0)
-         * {
-         * itemstack.setData(0);
-         * }
-         * }
-         */
+        // Effects
+        if (is == this.extra)
+        {
+            owner.getHandle().drop(itemstack);
+            itemstack = null;
+        }
         
         is[i] = itemstack;
+        
+        owner.getHandle().defaultContainer.b();
     }
     
     private int getReversedItemSlotNum(int i)
