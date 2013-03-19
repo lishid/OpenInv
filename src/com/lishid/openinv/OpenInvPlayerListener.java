@@ -59,13 +59,11 @@ public class OpenInvPlayerListener implements Listener
         if (inventory != null)
         {
             inventory.PlayerGoOffline();
-            inventory.InventoryRemovalCheck();
         }
         ISpecialEnderChest chest = OpenInv.enderChests.get(event.getPlayer().getName().toLowerCase());
         if (chest != null)
         {
             chest.PlayerGoOffline();
-            chest.InventoryRemovalCheck();
         }
     }
     

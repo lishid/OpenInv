@@ -41,6 +41,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         this.playerOnline = online;
         this.items = player.inventory.items;
         this.armor = player.inventory.armor;
+        OpenInv.inventories.put(owner.getName().toLowerCase(), this);
     }
     
     @Override
@@ -52,9 +53,9 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     @Override
     public void InventoryRemovalCheck()
     {
+        owner.saveData();
         if (transaction.isEmpty() && !playerOnline)
         {
-            owner.saveData();
             OpenInv.inventories.remove(owner.getName().toLowerCase());
         }
     }
@@ -76,6 +77,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     public void PlayerGoOffline()
     {
         playerOnline = false;
+        this.InventoryRemovalCheck();
     }
     
     @Override

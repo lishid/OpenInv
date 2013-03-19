@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_4_5;
+package com.lishid.openinv.internal.v1_5_R1;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -29,9 +29,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 //Volatile
-import net.minecraft.server.v1_4_5.*;
-import org.bukkit.craftbukkit.v1_4_5.entity.*;
-import org.bukkit.craftbukkit.v1_4_5.inventory.*;
+import net.minecraft.server.v1_5_R1.*;
+import org.bukkit.craftbukkit.v1_5_R1.entity.*;
+import org.bukkit.craftbukkit.v1_5_R1.inventory.*;
 
 public class SpecialEnderChest extends InventorySubcontainer implements IInventory, ISpecialEnderChest
 {
@@ -44,7 +44,7 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     
     public SpecialEnderChest(Player p, Boolean online)
     {
-        super(((CraftPlayer) p).getHandle().getEnderChest().getName(), ((CraftPlayer) p).getHandle().getEnderChest().getSize());
+        super(((CraftPlayer) p).getHandle().getEnderChest().getName(), ((CraftPlayer) p).getHandle().getEnderChest().c(), ((CraftPlayer) p).getHandle().getEnderChest().getSize());
         CraftPlayer player = (CraftPlayer) p;
         this.enderChest = player.getHandle().getEnderChest();
         this.owner = player;

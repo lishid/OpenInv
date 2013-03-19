@@ -49,6 +49,7 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
         this.enderChest = player.getHandle().getEnderChest();
         this.owner = player;
         this.items = enderChest.getContents();
+        OpenInv.enderChests.put(owner.getName().toLowerCase(), this);
     }
     
     public Inventory getBukkitInventory()
@@ -58,9 +59,9 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     
     public void InventoryRemovalCheck()
     {
+        owner.saveData();
         if (transaction.isEmpty() && !playerOnline)
         {
-            owner.saveData();
             OpenInv.enderChests.remove(owner.getName().toLowerCase());
         }
     }
@@ -102,6 +103,7 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     public void onClose(CraftHumanEntity who)
     {
         transaction.remove(who);
+        this.InventoryRemovalCheck();
     }
     
     public List<HumanEntity> getViewers()

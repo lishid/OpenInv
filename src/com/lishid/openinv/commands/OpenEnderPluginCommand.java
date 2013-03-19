@@ -117,8 +117,6 @@ public class OpenEnderPluginCommand implements CommandExecutor
         if (chest == null)
         {
             chest = InternalAccessor.Instance.newSpecialEnderChest(target, !offline);
-            
-            OpenInv.enderChests.put(target.getName().toLowerCase(), chest);
         }
         
         // Open the inventory

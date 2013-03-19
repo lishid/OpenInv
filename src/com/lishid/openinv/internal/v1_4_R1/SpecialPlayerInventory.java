@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.craftbukkit;
+package com.lishid.openinv.internal.v1_4_R1;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -23,9 +23,9 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 
 //Volatile
-import net.minecraft.server.*;
-import org.bukkit.craftbukkit.entity.*;
-import org.bukkit.craftbukkit.inventory.*;
+import net.minecraft.server.v1_4_R1.*;
+import org.bukkit.craftbukkit.v1_4_R1.entity.*;
+import org.bukkit.craftbukkit.v1_4_R1.inventory.*;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory
 {

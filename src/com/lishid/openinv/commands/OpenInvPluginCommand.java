@@ -132,8 +132,6 @@ public class OpenInvPluginCommand implements CommandExecutor
         if (inv == null)
         {
             inv = InternalAccessor.Instance.newSpecialPlayerInventory(target, !offline);
-            
-            OpenInv.inventories.put(target.getName().toLowerCase(), inv);
         }
         
         // Open the inventory

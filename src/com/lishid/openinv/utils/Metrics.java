@@ -33,6 +33,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -137,7 +138,7 @@ public class Metrics
     /**
      * Id of the scheduled task
      */
-    private volatile int taskId = -1;
+    private volatile BukkitTask taskId;
     
     public Metrics(final Plugin plugin) throws IOException
     {
@@ -243,13 +244,13 @@ public class Metrics
             }
             
             // Is metrics already running?
-            if (taskId >= 0)
+            if (taskId != null)
             {
                 return true;
             }
             
             // Begin hitting the server with glorious data
-            taskId = plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(plugin, new Runnable()
+            taskId = plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, new Runnable()
             {
                 
                 private boolean firstPost = true;
@@ -262,10 +263,10 @@ public class Metrics
                         synchronized (optOutLock)
                         {
                             // Disable Task, if it is running and the server owner decided to opt-out
-                            if (isOptOut() && taskId > 0)
+                            if (isOptOut() && taskId != null)
                             {
-                                plugin.getServer().getScheduler().cancelTask(taskId);
-                                taskId = -1;
+                                taskId.cancel();
+                                taskId = null;
                                 // Tell all plotters to stop gathering information.
                                 for (Graph graph : graphs)
                                 {
@@ -340,7 +341,7 @@ public class Metrics
             }
             
             // Enable Task, if it is not running
-            if (taskId < 0)
+            if (taskId == null)
             {
                 start();
             }
@@ -365,10 +366,10 @@ public class Metrics
             }
             
             // Disable Task, if it is running
-            if (taskId > 0)
+            if (taskId != null)
             {
-                this.plugin.getServer().getScheduler().cancelTask(taskId);
-                taskId = -1;
+                taskId.cancel();
+                taskId = null;
             }
         }
     }
