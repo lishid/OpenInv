@@ -14,10 +14,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_5_R1;
+package com.lishid.openinv.internal.v1_5_R2;
 
 //Volatile
-import net.minecraft.server.v1_5_R1.*;
+import net.minecraft.server.v1_5_R2.*;
 
 public class SilentContainerChest extends ContainerChest
 {

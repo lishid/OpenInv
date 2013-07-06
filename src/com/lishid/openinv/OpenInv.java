@@ -19,8 +19,8 @@ package com.lishid.openinv;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
-
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -77,10 +77,17 @@ public class OpenInv extends JavaPlugin
         anySilentChest = InternalAccessor.Instance.newAnySilentChest();
         
         mainPlugin = this;
-        mainPlugin.getConfig().addDefault("ItemOpenInvItemID", 280);
-        mainPlugin.getConfig().addDefault("CheckForUpdates", true);
-        mainPlugin.getConfig().options().copyDefaults(true);
-        mainPlugin.saveConfig();
+        FileConfiguration config = getConfig();
+        config.set("CheckForUpdates", config.getBoolean("CheckForUpdates", true));
+        config.set("NotifySilentChest", config.getBoolean("NotifySilentChest", true));
+        config.set("NotifyAnyChest", config.getBoolean("NotifyAnyChest", true));
+        config.set("ItemOpenInvItemID", config.getInt("ItemOpenInvItemID", 280));
+        config.addDefault("ItemOpenInvItemID", 280);
+        config.addDefault("CheckForUpdates", true);
+        config.addDefault("NotifySilentChest", true);
+        config.addDefault("NotifyAnyChest", true);
+        config.options().copyDefaults(true);
+        saveConfig();
         
         pm.registerEvents(new OpenInvPlayerListener(), this);
         pm.registerEvents(new OpenInvEntityListener(), this);
@@ -105,6 +112,16 @@ public class OpenInv extends JavaPlugin
         {
             OpenInv.log(e);
         }
+    }
+    
+    public static boolean NotifySilentChest()
+    {
+        return mainPlugin.getConfig().getBoolean("NotifySilentChest", true);
+    }
+    
+    public static boolean NotifyAnyChest()
+    {
+        return mainPlugin.getConfig().getBoolean("NotifyAnyChest", true);
     }
     
     public static boolean GetCheckForUpdates()

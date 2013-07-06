@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_5_R1;
+package com.lishid.openinv.internal.v1_6_R1;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -23,9 +23,9 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 
 //Volatile
-import net.minecraft.server.v1_5_R1.*;
-import org.bukkit.craftbukkit.v1_5_R1.entity.*;
-import org.bukkit.craftbukkit.v1_5_R1.inventory.*;
+import net.minecraft.server.v1_6_R1.*;
+import org.bukkit.craftbukkit.v1_6_R1.entity.*;
+import org.bukkit.craftbukkit.v1_6_R1.inventory.*;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory
 {
@@ -282,11 +282,11 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     @Override
     public String getName()
     {
-        if (player.name.length() > 16)
+        if (player.getName().length() > 16)
         {
-            return player.name.substring(0, 16);
+            return player.getName().substring(0, 16);
         }
-        return player.name;
+        return player.getName();
     }
     
     @Override

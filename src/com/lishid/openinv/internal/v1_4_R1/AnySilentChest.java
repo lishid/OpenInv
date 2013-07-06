@@ -21,10 +21,12 @@ import java.lang.reflect.Field;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
+import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IAnySilentChest;
 
 //Volatile
 import net.minecraft.server.v1_4_R1.*;
+
 import org.bukkit.craftbukkit.v1_4_R1.entity.*;
 
 public class AnySilentChest implements IAnySilentChest
@@ -82,6 +84,7 @@ public class AnySilentChest implements IAnySilentChest
         if (world.getTypeId(x, y, z + 1) == Block.CHEST.id)
             chest = new InventoryLargeChest("Large chest", (IInventory) chest, (TileEntityChest) world.getTileEntity(x, y, z + 1));
         
+        boolean returnValue = true;
         if (!silentchest)
         {
             player.openContainer((IInventory) chest);
@@ -100,15 +103,17 @@ public class AnySilentChest implements IAnySilentChest
                     windowID.setInt(player, id);
                 }
                 catch (NoSuchFieldException e)
-                {
-                }
+                {}
                 
                 player.playerConnection.sendPacket(new Packet100OpenWindow(id, 0, ((IInventory) chest).getName(), ((IInventory) chest).getSize()));
                 player.activeContainer = new SilentContainerChest(player.inventory, ((IInventory) chest));
                 player.activeContainer.windowId = id;
                 player.activeContainer.addSlotListener(player);
-                // event.getPlayer().sendMessage("You are opening a chest silently.");
-                return false;
+                if (OpenInv.NotifySilentChest())
+                {
+                    p.sendMessage("You are opening a chest silently.");
+                }
+                returnValue = false;
             }
             catch (Exception e)
             {
@@ -117,9 +122,11 @@ public class AnySilentChest implements IAnySilentChest
             }
         }
         
-        if (anychest)
+        if (anychest && OpenInv.NotifyAnyChest())
+        {
             p.sendMessage("You are opening a blocked chest.");
+        }
         
-        return true;
+        return returnValue;
     }
 }

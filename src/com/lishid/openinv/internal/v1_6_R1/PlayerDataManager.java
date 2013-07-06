@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_5_R1;
+package com.lishid.openinv.internal.v1_6_R1;
 
 import java.io.File;
 import java.util.Arrays;
@@ -27,8 +27,8 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IPlayerDataManager;
 
 //Volatile
-import net.minecraft.server.v1_5_R1.*;
-import org.bukkit.craftbukkit.v1_5_R1.*;
+import net.minecraft.server.v1_6_R1.*;
+import org.bukkit.craftbukkit.v1_6_R1.*;
 
 public class PlayerDataManager implements IPlayerDataManager
 {
@@ -53,7 +53,7 @@ public class PlayerDataManager implements IPlayerDataManager
             MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
             
             // Create an entity to load the player data
-            EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), playername, new PlayerInteractManager(server.getWorldServer(0)));
+            EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), playername, new PlayerInteractManager((World) server.getWorldServer(0)));
             
             // Get the bukkit entity
             Player target = (entity == null) ? null : entity.getBukkitEntity();

@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_5_R1;
+package com.lishid.openinv.internal.v1_5_R3;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -29,9 +29,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 //Volatile
-import net.minecraft.server.v1_5_R1.*;
-import org.bukkit.craftbukkit.v1_5_R1.entity.*;
-import org.bukkit.craftbukkit.v1_5_R1.inventory.*;
+import net.minecraft.server.v1_5_R3.*;
+import org.bukkit.craftbukkit.v1_5_R3.entity.*;
+import org.bukkit.craftbukkit.v1_5_R3.inventory.*;
 
 public class SpecialEnderChest extends InventorySubcontainer implements IInventory, ISpecialEnderChest
 {
