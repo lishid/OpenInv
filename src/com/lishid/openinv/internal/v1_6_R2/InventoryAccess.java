@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.craftbukkit;
+package com.lishid.openinv.internal.v1_6_R2;
 
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
@@ -24,8 +24,8 @@ import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.IInventoryAccess;
 
 //Volatile
-import net.minecraft.server.*;
-import org.bukkit.craftbukkit.inventory.*;
+import net.minecraft.server.v1_6_R2.*;
+import org.bukkit.craftbukkit.v1_6_R2.inventory.*;
 
 public class InventoryAccess implements IInventoryAccess
 {

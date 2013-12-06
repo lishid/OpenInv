@@ -19,6 +19,7 @@ package com.lishid.openinv.internal.v1_5_R2;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 
+import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.IInventoryAccess;
 
@@ -34,7 +35,7 @@ public class InventoryAccess implements IInventoryAccess
         
         if (inv instanceof SpecialPlayerInventory)
         {
-            if (!player.hasPermission(Permissions.PERM_EDITINV))
+            if (!OpenInv.hasPermission(player, Permissions.PERM_EDITINV))
             {
                 return false;
             }
@@ -42,7 +43,7 @@ public class InventoryAccess implements IInventoryAccess
         
         else if (inv instanceof SpecialEnderChest)
         {
-            if (!player.hasPermission(Permissions.PERM_EDITENDER))
+            if (!OpenInv.hasPermission(player, Permissions.PERM_EDITENDER))
             {
                 return false;
             }

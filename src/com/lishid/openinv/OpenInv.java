@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -223,5 +224,17 @@ public class OpenInv extends JavaPlugin
         player.sendMessage(ChatColor.GREEN + "   (aliases: ac)");
         player.sendMessage(ChatColor.GREEN + "/silentchest - Toggle silent chest function");
         player.sendMessage(ChatColor.GREEN + "   (aliases: sc, silent)");
+    }
+    
+    public static boolean hasPermission(Permissible player, String permission) {
+        String[] parts = permission.split("\\.");
+        String perm = "";
+        for(int i = 0; i < parts.length; i++) {
+            if(player.hasPermission(perm + "*")) {
+                return true;
+            }
+            perm += parts[i] + ".";
+        }
+        return player.hasPermission(permission);
     }
 }

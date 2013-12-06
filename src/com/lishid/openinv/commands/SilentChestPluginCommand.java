@@ -39,7 +39,7 @@ public class SilentChestPluginCommand implements CommandExecutor
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
             return true;
         }
-        if (!sender.hasPermission(Permissions.PERM_SILENT))
+        if (!OpenInv.hasPermission(sender, Permissions.PERM_SILENT))
         {
             sender.sendMessage(ChatColor.RED + "You do not have permission to use silent chest.");
             return true;

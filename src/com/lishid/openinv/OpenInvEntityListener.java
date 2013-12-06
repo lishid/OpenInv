@@ -24,32 +24,27 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
-public class OpenInvEntityListener implements Listener
-{
+public class OpenInvEntityListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onEntityDamage(EntityDamageEvent event)
-    {
-        if (event instanceof EntityDamageByEntityEvent)
-        {
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (event instanceof EntityDamageByEntityEvent) {
             EntityDamageByEntityEvent evt = (EntityDamageByEntityEvent) event;
             Entity attacker = evt.getDamager();
             Entity defender = evt.getEntity();
-            
-            if (!(attacker instanceof Player) || !(defender instanceof Player))
-            {
+
+            if (!(attacker instanceof Player) || !(defender instanceof Player)) {
                 return;
             }
-            
+
             Player player = (Player) attacker;
-            
-            if (!(player.getItemInHand().getType().getId() == OpenInv.GetItemOpenInvItem()) || (!OpenInv.GetPlayerItemOpenInvStatus(player.getName())) || !player.hasPermission("OpenInv.openinv"))
-            {
+
+            if (!(player.getItemInHand().getType().getId() == OpenInv.GetItemOpenInvItem()) || (!OpenInv.GetPlayerItemOpenInvStatus(player.getName())) || !OpenInv.hasPermission(player, "OpenInv.openinv")) {
                 return;
             }
-            
+
             Player target = (Player) defender;
             player.performCommand("openinv " + target.getName());
-            
+
             evt.setDamage(0);
             evt.setCancelled(true);
         }

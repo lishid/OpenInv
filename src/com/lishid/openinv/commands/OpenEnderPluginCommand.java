@@ -47,7 +47,7 @@ public class OpenEnderPluginCommand implements CommandExecutor
             return true;
         }
         
-        if (!sender.hasPermission(Permissions.PERM_ENDERCHEST))
+        if (!OpenInv.hasPermission(sender, Permissions.PERM_ENDERCHEST))
         {
             sender.sendMessage(ChatColor.RED + "You do not have permission to access player enderchest");
             return true;
@@ -106,6 +106,12 @@ public class OpenEnderPluginCommand implements CommandExecutor
                 sender.sendMessage(ChatColor.RED + "Player " + name + " not found!");
                 return true;
             }
+        }
+        
+        if (target != sender && !OpenInv.hasPermission(sender, Permissions.PERM_ENDERCHEST_ALL))
+        {
+            sender.sendMessage(ChatColor.RED + "You do not have permission to access other player's enderchest");
+            return true;
         }
         
         // Record the target

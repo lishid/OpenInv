@@ -46,7 +46,7 @@ public class OpenInvPluginCommand implements CommandExecutor
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
             return true;
         }
-        if (!sender.hasPermission(Permissions.PERM_OPENINV))
+        if (!OpenInv.hasPermission(sender, Permissions.PERM_OPENINV))
         {
             sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
             return true;
@@ -103,21 +103,21 @@ public class OpenInvPluginCommand implements CommandExecutor
         }
         
         // Permissions checks
-        if (!player.hasPermission(Permissions.PERM_OVERRIDE) && target.hasPermission(Permissions.PERM_EXEMPT))
+        if (!OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE) && OpenInv.hasPermission(target, Permissions.PERM_EXEMPT))
         {
             sender.sendMessage(ChatColor.RED + target.getDisplayName() + "'s inventory is protected!");
             return true;
         }
         
         // Crosswork check
-        if ((!player.hasPermission(Permissions.PERM_CROSSWORLD) && !player.hasPermission(Permissions.PERM_OVERRIDE)) && target.getWorld() != player.getWorld())
+        if ((!OpenInv.hasPermission(player, Permissions.PERM_CROSSWORLD) && !OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE)) && target.getWorld() != player.getWorld())
         {
             sender.sendMessage(ChatColor.RED + target.getDisplayName() + " is not in your world!");
             return true;
         }
         
         // Self-open check
-        if (!player.hasPermission(Permissions.PERM_OPENSELF) && target.equals(player))
+        if (!OpenInv.hasPermission(player, Permissions.PERM_OPENSELF) && target.equals(player))
         {
             sender.sendMessage(ChatColor.RED + "You're not allowed to openinv yourself.");
             return true;

@@ -20,9 +20,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Event.Result;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -70,15 +70,17 @@ public class OpenInvPlayerListener implements Listener
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerInteract(PlayerInteractEvent event)
     {
+        Player player = event.getPlayer();
+        
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.useInteractedBlock() == Result.DENY)
             return;
         
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == org.bukkit.Material.ENDER_CHEST)
         {
-            if (event.getPlayer().hasPermission(Permissions.PERM_SILENT) && OpenInv.GetPlayerSilentChestStatus(event.getPlayer().getName()))
+            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.GetPlayerSilentChestStatus(player.getName()))
             {
                 event.setCancelled(true);
-                event.getPlayer().openInventory(event.getPlayer().getEnderChest());
+                player.openInventory(player.getEnderChest());
             }
         }
         
@@ -90,20 +92,20 @@ public class OpenInvPlayerListener implements Listener
             int y = event.getClickedBlock().getY();
             int z = event.getClickedBlock().getZ();
             
-            if (event.getPlayer().hasPermission(Permissions.PERM_SILENT) && OpenInv.GetPlayerSilentChestStatus(event.getPlayer().getName()))
+            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.GetPlayerSilentChestStatus(player.getName()))
             {
                 silentchest = true;
             }
             
-            if (event.getPlayer().hasPermission(Permissions.PERM_ANYCHEST) && OpenInv.GetPlayerAnyChestStatus(event.getPlayer().getName()))
+            if (OpenInv.hasPermission(player, Permissions.PERM_ANYCHEST) && OpenInv.GetPlayerAnyChestStatus(player.getName()))
             {
                 try
                 {
-                    anychest = OpenInv.anySilentChest.IsAnyChestNeeded(event.getPlayer(), x, y, z);
+                    anychest = OpenInv.anySilentChest.IsAnyChestNeeded(player, x, y, z);
                 }
                 catch (Exception e)
                 {
-                    event.getPlayer().sendMessage(ChatColor.RED + "Error while executing openinv. Unsupported CraftBukkit.");
+                    player.sendMessage(ChatColor.RED + "Error while executing openinv. Unsupported CraftBukkit.");
                     e.printStackTrace();
                 }
             }
@@ -111,7 +113,7 @@ public class OpenInvPlayerListener implements Listener
             // If the anychest or silentchest is active
             if (anychest || silentchest)
             {
-                if (!OpenInv.anySilentChest.ActivateChest(event.getPlayer(), anychest, silentchest, x, y, z))
+                if (!OpenInv.anySilentChest.ActivateChest(player, anychest, silentchest, x, y, z))
                 {
                     event.setCancelled(true);
                 }
@@ -120,11 +122,10 @@ public class OpenInvPlayerListener implements Listener
         
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getState() instanceof Sign)
         {
-            Player player = event.getPlayer();
             try
             {
                 Sign sign = ((Sign) event.getClickedBlock().getState());
-                if (player.hasPermission(Permissions.PERM_OPENINV) && sign.getLine(0).equalsIgnoreCase("[openinv]"))
+                if (OpenInv.hasPermission(player, Permissions.PERM_OPENINV) && sign.getLine(0).equalsIgnoreCase("[openinv]"))
                 {
                     String text = sign.getLine(1).trim() + sign.getLine(2).trim() + sign.getLine(3).trim();
                     player.performCommand("openinv " + text);
@@ -139,10 +140,8 @@ public class OpenInvPlayerListener implements Listener
         
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK)
         {
-            Player player = event.getPlayer();
-            
             if (!(player.getItemInHand().getType().getId() == OpenInv.GetItemOpenInvItem()) || (!OpenInv.GetPlayerItemOpenInvStatus(player.getName()))
-                    || !player.hasPermission(Permissions.PERM_OPENINV))
+                    || !OpenInv.hasPermission(player, Permissions.PERM_OPENINV))
             {
                 return;
             }

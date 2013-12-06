@@ -39,7 +39,7 @@ public class AnyChestPluginCommand implements CommandExecutor
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
             return true;
         }
-        if (!sender.hasPermission(Permissions.PERM_ANYCHEST))
+        if (!OpenInv.hasPermission(sender, Permissions.PERM_ANYCHEST))
         {
             sender.sendMessage(ChatColor.RED + "You do not have permission to use anychest.");
             return true;

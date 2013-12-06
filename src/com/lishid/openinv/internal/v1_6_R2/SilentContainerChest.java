@@ -14,25 +14,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv;
+package com.lishid.openinv.internal.v1_6_R2;
 
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
+//Volatile
+import net.minecraft.server.v1_6_R2.*;
 
-public class OpenInvInventoryListener implements Listener
+public class SilentContainerChest extends ContainerChest
 {
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onInventoryClick(InventoryClickEvent event)
+    public IInventory inv;
+    
+    public SilentContainerChest(IInventory i1, IInventory i2)
     {
-        // If this is the top inventory
-        // if (event.getView().convertSlot(event.getRawSlot()) == event.getRawSlot())
-        // {
-        if (!OpenInv.inventoryAccess.check(event.getInventory(), event.getWhoClicked()))
-        {
-            event.setCancelled(true);
-        }
-        // }
+        super(i1, i2);
+        inv = i2;
+        // close signal
+        inv.g();
+    }
+    
+    @Override
+    public void b(EntityHuman paramEntityHuman)
+    {
+        // Don't send close signal twice, might screw up
     }
 }

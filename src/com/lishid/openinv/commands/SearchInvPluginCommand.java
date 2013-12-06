@@ -24,6 +24,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 
 public class SearchInvPluginCommand implements CommandExecutor
@@ -37,7 +38,7 @@ public class SearchInvPluginCommand implements CommandExecutor
     {
         if (sender instanceof Player)
         {
-            if (!sender.hasPermission(Permissions.PERM_SEARCH))
+            if (!OpenInv.hasPermission(sender, Permissions.PERM_SEARCH))
             {
                 sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
                 return true;

@@ -36,7 +36,7 @@ public class ToggleOpenInvPluginCommand implements CommandExecutor
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
             return true;
         }
-        if (!sender.hasPermission(Permissions.PERM_OPENINV))
+        if (!OpenInv.hasPermission(sender, Permissions.PERM_OPENINV))
         {
             sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
             return true;
