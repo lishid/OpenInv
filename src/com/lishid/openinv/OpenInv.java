@@ -41,42 +41,39 @@ import com.lishid.openinv.utils.UpdateManager;
  * 
  * @author lishid
  */
-public class OpenInv extends JavaPlugin
-{
+public class OpenInv extends JavaPlugin {
     public static final Logger logger = Logger.getLogger("Minecraft.OpenInv");
-    
+
     public static HashMap<String, ISpecialPlayerInventory> inventories = new HashMap<String, ISpecialPlayerInventory>();
     public static HashMap<String, ISpecialEnderChest> enderChests = new HashMap<String, ISpecialEnderChest>();
     private static Metrics metrics;
-    
+
     private UpdateManager updater = new UpdateManager();
-    
+
     public static OpenInv mainPlugin;
 
     public static IPlayerDataManager playerLoader;
     public static IInventoryAccess inventoryAccess;
     public static IAnySilentChest anySilentChest;
-    
-    public void onEnable()
-    {
+
+    public void onEnable() {
         // Get plugin manager
         PluginManager pm = getServer().getPluginManager();
-        
+
         // Version check
         boolean success = InternalAccessor.Initialize(this.getServer());
-        
-        if(!success)
-        {
+
+        if (!success) {
             OpenInv.log("Your version of CraftBukkit is not supported.");
             OpenInv.log("Please look for an updated version of OpenInv.");
             pm.disablePlugin(this);
             return;
         }
-        
+
         playerLoader = InternalAccessor.Instance.newPlayerDataManager();
         inventoryAccess = InternalAccessor.Instance.newInventoryAccess();
         anySilentChest = InternalAccessor.Instance.newAnySilentChest();
-        
+
         mainPlugin = this;
         FileConfiguration config = getConfig();
         config.set("CheckForUpdates", config.getBoolean("CheckForUpdates", true));
@@ -89,128 +86,108 @@ public class OpenInv extends JavaPlugin
         config.addDefault("NotifyAnyChest", true);
         config.options().copyDefaults(true);
         saveConfig();
-        
+
         pm.registerEvents(new OpenInvPlayerListener(), this);
         pm.registerEvents(new OpenInvEntityListener(), this);
         pm.registerEvents(new OpenInvInventoryListener(), this);
-        
+
         getCommand("openinv").setExecutor(new OpenInvPluginCommand(this));
         getCommand("searchinv").setExecutor(new SearchInvPluginCommand());
         getCommand("toggleopeninv").setExecutor(new ToggleOpenInvPluginCommand());
         getCommand("silentchest").setExecutor(new SilentChestPluginCommand(this));
         getCommand("anychest").setExecutor(new AnyChestPluginCommand(this));
         getCommand("openender").setExecutor(new OpenEnderPluginCommand(this));
-        
+
         updater.Initialize(this, getFile());
-        
+
         // Metrics
-        try
-        {
+        try {
             metrics = new Metrics(this);
             metrics.start();
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             OpenInv.log(e);
         }
     }
-    
-    public static boolean NotifySilentChest()
-    {
+
+    public static boolean NotifySilentChest() {
         return mainPlugin.getConfig().getBoolean("NotifySilentChest", true);
     }
-    
-    public static boolean NotifyAnyChest()
-    {
+
+    public static boolean NotifyAnyChest() {
         return mainPlugin.getConfig().getBoolean("NotifyAnyChest", true);
     }
-    
-    public static boolean GetCheckForUpdates()
-    {
+
+    public static boolean GetCheckForUpdates() {
         return mainPlugin.getConfig().getBoolean("CheckForUpdates", true);
     }
-    
-    public static boolean GetPlayerItemOpenInvStatus(String name)
-    {
+
+    public static boolean GetPlayerItemOpenInvStatus(String name) {
         return mainPlugin.getConfig().getBoolean("ItemOpenInv." + name.toLowerCase() + ".toggle", false);
     }
-    
-    public static void SetPlayerItemOpenInvStatus(String name, boolean status)
-    {
+
+    public static void SetPlayerItemOpenInvStatus(String name, boolean status) {
         mainPlugin.getConfig().set("ItemOpenInv." + name.toLowerCase() + ".toggle", status);
         mainPlugin.saveConfig();
     }
-    
-    public static boolean GetPlayerSilentChestStatus(String name)
-    {
+
+    public static boolean GetPlayerSilentChestStatus(String name) {
         return mainPlugin.getConfig().getBoolean("SilentChest." + name.toLowerCase() + ".toggle", false);
     }
-    
-    public static void SetPlayerSilentChestStatus(String name, boolean status)
-    {
+
+    public static void SetPlayerSilentChestStatus(String name, boolean status) {
         mainPlugin.getConfig().set("SilentChest." + name.toLowerCase() + ".toggle", status);
         mainPlugin.saveConfig();
     }
-    
-    public static boolean GetPlayerAnyChestStatus(String name)
-    {
+
+    public static boolean GetPlayerAnyChestStatus(String name) {
         return mainPlugin.getConfig().getBoolean("AnyChest." + name.toLowerCase() + ".toggle", true);
     }
-    
-    public static void SetPlayerAnyChestStatus(String name, boolean status)
-    {
+
+    public static void SetPlayerAnyChestStatus(String name, boolean status) {
         mainPlugin.getConfig().set("AnyChest." + name.toLowerCase() + ".toggle", status);
         mainPlugin.saveConfig();
     }
-    
-    public static int GetItemOpenInvItem()
-    {
-        if (mainPlugin.getConfig().get("ItemOpenInvItemID") == null)
-        {
+
+    public static int GetItemOpenInvItem() {
+        if (mainPlugin.getConfig().get("ItemOpenInvItemID") == null) {
             SaveToConfig("ItemOpenInvItemID", 280);
         }
         return mainPlugin.getConfig().getInt("ItemOpenInvItemID", 280);
     }
-    
-    public static Object GetFromConfig(String data, Object defaultValue)
-    {
+
+    public static Object GetFromConfig(String data, Object defaultValue) {
         Object val = mainPlugin.getConfig().get(data);
-        if (val == null)
-        {
+        if (val == null) {
             mainPlugin.getConfig().set(data, defaultValue);
             return defaultValue;
         }
-        else
-        {
+        else {
             return val;
         }
     }
-    
-    public static void SaveToConfig(String data, Object value)
-    {
+
+    public static void SaveToConfig(String data, Object value) {
         mainPlugin.getConfig().set(data, value);
         mainPlugin.saveConfig();
     }
-    
+
     /**
      * Log an information
      */
-    public static void log(String text)
-    {
+    public static void log(String text) {
         logger.info("[OpenInv] " + text);
     }
-    
+
     /**
      * Log an error
      */
-    public static void log(Throwable e)
-    {
+    public static void log(Throwable e) {
         logger.severe("[OpenInv] " + e.toString());
         e.printStackTrace();
     }
-    
-    public static void ShowHelp(Player player)
-    {
+
+    public static void ShowHelp(Player player) {
         player.sendMessage(ChatColor.GREEN + "/openinv <Player> - Open a player's inventory");
         player.sendMessage(ChatColor.GREEN + "   (aliases: oi, inv, open)");
         player.sendMessage(ChatColor.GREEN + "/openender <Player> - Open a player's enderchest");
@@ -225,12 +202,12 @@ public class OpenInv extends JavaPlugin
         player.sendMessage(ChatColor.GREEN + "/silentchest - Toggle silent chest function");
         player.sendMessage(ChatColor.GREEN + "   (aliases: sc, silent)");
     }
-    
+
     public static boolean hasPermission(Permissible player, String permission) {
         String[] parts = permission.split("\\.");
         String perm = "";
-        for(int i = 0; i < parts.length; i++) {
-            if(player.hasPermission(perm + "*")) {
+        for (int i = 0; i < parts.length; i++) {
+            if (player.hasPermission(perm + "*")) {
                 return true;
             }
             perm += parts[i] + ".";

@@ -21,16 +21,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
-public class OpenInvInventoryListener implements Listener
-{
+public class OpenInvInventoryListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
-    public void onInventoryClick(InventoryClickEvent event)
-    {
+    public void onInventoryClick(InventoryClickEvent event) {
         // If this is the top inventory
         // if (event.getView().convertSlot(event.getRawSlot()) == event.getRawSlot())
         // {
-        if (!OpenInv.inventoryAccess.check(event.getInventory(), event.getWhoClicked()))
-        {
+        if (!OpenInv.inventoryAccess.check(event.getInventory(), event.getWhoClicked())) {
             event.setCancelled(true);
         }
         // }
