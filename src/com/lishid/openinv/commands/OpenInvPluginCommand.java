@@ -29,114 +29,98 @@ import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import com.lishid.openinv.internal.InternalAccessor;
 
-public class OpenInvPluginCommand implements CommandExecutor
-{
+public class OpenInvPluginCommand implements CommandExecutor {
     private final OpenInv plugin;
     public static HashMap<Player, String> openInvHistory = new HashMap<Player, String>();
-    
-    public OpenInvPluginCommand(OpenInv plugin)
-    {
+
+    public OpenInvPluginCommand(OpenInv plugin) {
         this.plugin = plugin;
     }
-    
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
-    {
-        if (!(sender instanceof Player))
-        {
+
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
             return true;
         }
-        if (!OpenInv.hasPermission(sender, Permissions.PERM_OPENINV))
-        {
+        if (!OpenInv.hasPermission(sender, Permissions.PERM_OPENINV)) {
             sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
             return true;
         }
-        
-        if (args.length > 0 && args[0].equalsIgnoreCase("?"))
-        {
+
+        if (args.length > 0 && args[0].equalsIgnoreCase("?")) {
             OpenInv.ShowHelp((Player) sender);
             return true;
         }
-        
+
         Player player = (Player) sender;
         boolean offline = false;
-        
+
         // History management
         String history = openInvHistory.get(player);
-        
-        if (history == null || history == "")
-        {
+
+        if (history == null || history == "") {
             history = player.getName();
             openInvHistory.put(player, history);
         }
-        
+
         // Target selecting
         Player target;
-        
+
         String name = "";
-        
+
         // Read from history if target is not named
-        if (args.length < 1)
-        {
+        if (args.length < 1) {
             name = history;
         }
-        else
-        {
+        else {
             name = args[0];
         }
-        
+
         target = this.plugin.getServer().getPlayer(name);
-        
-        if (target == null)
-        {
-            if (target == null)
-            {
+
+        if (target == null) {
+            if (target == null) {
                 // Try loading the player's data
                 target = OpenInv.playerLoader.loadPlayer(name);
-                
-                if (target == null)
-                {
+
+                if (target == null) {
                     sender.sendMessage(ChatColor.RED + "Player " + name + " not found!");
                     return true;
                 }
             }
         }
-        
+
         // Permissions checks
-        if (!OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE) && OpenInv.hasPermission(target, Permissions.PERM_EXEMPT))
-        {
+        if (!OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE) && OpenInv.hasPermission(target, Permissions.PERM_EXEMPT)) {
             sender.sendMessage(ChatColor.RED + target.getDisplayName() + "'s inventory is protected!");
             return true;
         }
-        
+
         // Crosswork check
-        if ((!OpenInv.hasPermission(player, Permissions.PERM_CROSSWORLD) && !OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE)) && target.getWorld() != player.getWorld())
-        {
+        if ((!OpenInv.hasPermission(player, Permissions.PERM_CROSSWORLD) && !OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE)) && target.getWorld() != player.getWorld()) {
             sender.sendMessage(ChatColor.RED + target.getDisplayName() + " is not in your world!");
             return true;
         }
-        
+
         // Self-open check
-        if (!OpenInv.hasPermission(player, Permissions.PERM_OPENSELF) && target.equals(player))
-        {
+        if (!OpenInv.hasPermission(player, Permissions.PERM_OPENSELF) && target.equals(player)) {
             sender.sendMessage(ChatColor.RED + "You're not allowed to openinv yourself.");
             return true;
         }
-        
+
         // Record the target
         history = target.getName();
         openInvHistory.put(player, history);
-        
+
         // Create the inventory
         ISpecialPlayerInventory inv = OpenInv.inventories.get(target.getName().toLowerCase());
-        if (inv == null)
-        {
+        if (inv == null) {
             inv = InternalAccessor.Instance.newSpecialPlayerInventory(target, !offline);
         }
-        
+
         // Open the inventory
         player.openInventory(inv.getBukkitInventory());
-        
+
         return true;
     }
 }

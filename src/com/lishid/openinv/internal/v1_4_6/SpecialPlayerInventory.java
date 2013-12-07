@@ -27,15 +27,13 @@ import net.minecraft.server.v1_4_6.*;
 import org.bukkit.craftbukkit.v1_4_6.entity.*;
 import org.bukkit.craftbukkit.v1_4_6.inventory.*;
 
-public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory
-{
+public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
     CraftPlayer owner;
     public boolean playerOnline = false;
     private ItemStack[] extra = new ItemStack[5];
     private CraftInventory inventory = new CraftInventory(this);
-    
-    public SpecialPlayerInventory(Player p, Boolean online)
-    {
+
+    public SpecialPlayerInventory(Player p, Boolean online) {
         super(((CraftPlayer) p).getHandle());
         this.owner = ((CraftPlayer) p);
         this.playerOnline = online;
@@ -43,28 +41,23 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         this.armor = player.inventory.armor;
         OpenInv.inventories.put(owner.getName().toLowerCase(), this);
     }
-    
+
     @Override
-    public Inventory getBukkitInventory()
-    {
+    public Inventory getBukkitInventory() {
         return inventory;
     }
-    
+
     @Override
-    public void InventoryRemovalCheck()
-    {
+    public void InventoryRemovalCheck() {
         owner.saveData();
-        if (transaction.isEmpty() && !playerOnline)
-        {
+        if (transaction.isEmpty() && !playerOnline) {
             OpenInv.inventories.remove(owner.getName().toLowerCase());
         }
     }
-    
+
     @Override
-    public void PlayerGoOnline(Player player)
-    {
-        if (!playerOnline)
-        {
+    public void PlayerGoOnline(Player player) {
+        if (!playerOnline) {
             CraftPlayer p = (CraftPlayer) player;
             p.getHandle().inventory.items = this.items;
             p.getHandle().inventory.armor = this.armor;
@@ -72,201 +65,167 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             playerOnline = true;
         }
     }
-    
+
     @Override
-    public void PlayerGoOffline()
-    {
+    public void PlayerGoOffline() {
         playerOnline = false;
         this.InventoryRemovalCheck();
     }
-    
+
     @Override
-    public void onClose(CraftHumanEntity who)
-    {
+    public void onClose(CraftHumanEntity who) {
         super.onClose(who);
         this.InventoryRemovalCheck();
     }
-    
+
     @Override
-    public ItemStack[] getContents()
-    {
+    public ItemStack[] getContents() {
         ItemStack[] C = new ItemStack[getSize()];
         System.arraycopy(items, 0, C, 0, items.length);
         System.arraycopy(items, 0, C, items.length, armor.length);
         return C;
     }
-    
+
     @Override
-    public int getSize()
-    {
+    public int getSize() {
         return super.getSize() + 5;
     }
-    
+
     @Override
-    public ItemStack getItem(int i)
-    {
+    public ItemStack getItem(int i) {
         ItemStack[] is = this.items;
-        
-        if (i >= is.length)
-        {
+
+        if (i >= is.length) {
             i -= is.length;
             is = this.armor;
         }
-        else
-        {
+        else {
             i = getReversedItemSlotNum(i);
         }
-        
-        if (i >= is.length)
-        {
+
+        if (i >= is.length) {
             i -= is.length;
             is = this.extra;
         }
-        else if (is == this.armor)
-        {
+        else if (is == this.armor) {
             i = getReversedArmorSlotNum(i);
         }
-        
+
         return is[i];
     }
-    
+
     @Override
-    public ItemStack splitStack(int i, int j)
-    {
+    public ItemStack splitStack(int i, int j) {
         ItemStack[] is = this.items;
-        
-        if (i >= is.length)
-        {
+
+        if (i >= is.length) {
             i -= is.length;
             is = this.armor;
         }
-        else
-        {
+        else {
             i = getReversedItemSlotNum(i);
         }
-        
-        if (i >= is.length)
-        {
+
+        if (i >= is.length) {
             i -= is.length;
             is = this.extra;
         }
-        else if (is == this.armor)
-        {
+        else if (is == this.armor) {
             i = getReversedArmorSlotNum(i);
         }
-        
-        if (is[i] != null)
-        {
+
+        if (is[i] != null) {
             ItemStack itemstack;
-            
-            if (is[i].count <= j)
-            {
+
+            if (is[i].count <= j) {
                 itemstack = is[i];
                 is[i] = null;
                 return itemstack;
             }
-            else
-            {
+            else {
                 itemstack = is[i].a(j);
-                if (is[i].count == 0)
-                {
+                if (is[i].count == 0) {
                     is[i] = null;
                 }
-                
+
                 return itemstack;
             }
         }
-        else
-        {
+        else {
             return null;
         }
     }
-    
+
     @Override
-    public ItemStack splitWithoutUpdate(int i)
-    {
+    public ItemStack splitWithoutUpdate(int i) {
         ItemStack[] is = this.items;
-        
-        if (i >= is.length)
-        {
+
+        if (i >= is.length) {
             i -= is.length;
             is = this.armor;
         }
-        else
-        {
+        else {
             i = getReversedItemSlotNum(i);
         }
-        
-        if (i >= is.length)
-        {
+
+        if (i >= is.length) {
             i -= is.length;
             is = this.extra;
         }
-        else if (is == this.armor)
-        {
+        else if (is == this.armor) {
             i = getReversedArmorSlotNum(i);
         }
-        
-        if (is[i] != null)
-        {
+
+        if (is[i] != null) {
             ItemStack itemstack = is[i];
-            
+
             is[i] = null;
             return itemstack;
         }
-        else
-        {
+        else {
             return null;
         }
     }
-    
+
     @Override
-    public void setItem(int i, ItemStack itemstack)
-    {
+    public void setItem(int i, ItemStack itemstack) {
         ItemStack[] is = this.items;
-        
-        if (i >= is.length)
-        {
+
+        if (i >= is.length) {
             i -= is.length;
             is = this.armor;
         }
-        else
-        {
+        else {
             i = getReversedItemSlotNum(i);
         }
-        
-        if (i >= is.length)
-        {
+
+        if (i >= is.length) {
             i -= is.length;
             is = this.extra;
         }
-        else if (is == this.armor)
-        {
+        else if (is == this.armor) {
             i = getReversedArmorSlotNum(i);
         }
-        
+
         // Effects
-        if (is == this.extra)
-        {
+        if (is == this.extra) {
             owner.getHandle().drop(itemstack);
             itemstack = null;
         }
-        
+
         is[i] = itemstack;
-        
+
         owner.getHandle().defaultContainer.b();
     }
-    
-    private int getReversedItemSlotNum(int i)
-    {
+
+    private int getReversedItemSlotNum(int i) {
         if (i >= 27)
             return i - 27;
         else
             return i + 9;
     }
-    
-    private int getReversedArmorSlotNum(int i)
-    {
+
+    private int getReversedArmorSlotNum(int i) {
         if (i == 0)
             return 3;
         if (i == 1)
@@ -278,20 +237,17 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         else
             return i;
     }
-    
+
     @Override
-    public String getName()
-    {
-        if (player.name.length() > 16)
-        {
+    public String getName() {
+        if (player.name.length() > 16) {
             return player.name.substring(0, 16);
         }
         return player.name;
     }
-    
+
     @Override
-    public boolean a_(EntityHuman entityhuman)
-    {
+    public boolean a_(EntityHuman entityhuman) {
         return true;
     }
 }

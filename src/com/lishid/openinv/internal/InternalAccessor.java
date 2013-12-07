@@ -21,105 +21,85 @@ import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
 
-public class InternalAccessor
-{
+public class InternalAccessor {
     public static InternalAccessor Instance;
     private String version;
-    
+
     /*
      * Returns false if version not supported
      */
-    public static boolean Initialize(Server server)
-    {
+    public static boolean Initialize(Server server) {
         Instance = new InternalAccessor();
         String packageName = server.getClass().getPackage().getName();
         Instance.version = packageName.substring(packageName.lastIndexOf('.') + 1);
-        
-        try
-        {
+
+        try {
             Class.forName("com.lishid.openinv.internal." + Instance.version + ".AnySilentChest");
             return true;
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             return false;
         }
     }
-    
-    public void PrintError()
-    {
+
+    public void PrintError() {
         OpenInv.log("OpenInv encountered an error with the CraftBukkit version \"" + Instance.version + "\". Please look for an updated version of OpenInv.");
     }
-    
-    public IPlayerDataManager newPlayerDataManager()
-    {
+
+    public IPlayerDataManager newPlayerDataManager() {
         return (IPlayerDataManager) createObject(IPlayerDataManager.class, "PlayerDataManager");
     }
-    
-    public IInventoryAccess newInventoryAccess()
-    {
+
+    public IInventoryAccess newInventoryAccess() {
         return (IInventoryAccess) createObject(IInventoryAccess.class, "InventoryAccess");
     }
-    
-    public IAnySilentChest newAnySilentChest()
-    {
+
+    public IAnySilentChest newAnySilentChest() {
         return (IAnySilentChest) createObject(IAnySilentChest.class, "AnySilentChest");
     }
-    
-    public ISpecialPlayerInventory newSpecialPlayerInventory(Player player, boolean offline)
-    {
-        try
-        {
+
+    public ISpecialPlayerInventory newSpecialPlayerInventory(Player player, boolean offline) {
+        try {
             Class<?> internalClass = Class.forName("com.lishid.openinv.internal." + version + ".SpecialPlayerInventory");
-            if (ISpecialPlayerInventory.class.isAssignableFrom(internalClass))
-            {
+            if (ISpecialPlayerInventory.class.isAssignableFrom(internalClass)) {
                 return (ISpecialPlayerInventory) internalClass.getConstructor(Player.class, Boolean.class).newInstance(player, offline);
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             PrintError();
             OpenInv.log(e);
         }
-        
+
         return null;
     }
-    
-    public ISpecialEnderChest newSpecialEnderChest(Player player, boolean offline)
-    {
-        try
-        {
+
+    public ISpecialEnderChest newSpecialEnderChest(Player player, boolean offline) {
+        try {
             Class<?> internalClass = Class.forName("com.lishid.openinv.internal." + version + ".SpecialEnderChest");
-            if (ISpecialEnderChest.class.isAssignableFrom(internalClass))
-            {
+            if (ISpecialEnderChest.class.isAssignableFrom(internalClass)) {
                 return (ISpecialEnderChest) internalClass.getConstructor(Player.class, Boolean.class).newInstance(player, offline);
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             PrintError();
             OpenInv.log(e);
         }
-        
+
         return null;
     }
-    
-    private Object createObject(Class<? extends Object> assignableClass, String className)
-    {
-        try
-        {
+
+    private Object createObject(Class<? extends Object> assignableClass, String className) {
+        try {
             Class<?> internalClass = Class.forName("com.lishid.openinv.internal." + version + "." + className);
-            if (assignableClass.isAssignableFrom(internalClass))
-            {
+            if (assignableClass.isAssignableFrom(internalClass)) {
                 return internalClass.getConstructor().newInstance();
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             PrintError();
             OpenInv.log(e);
         }
-        
+
         return null;
     }
 }

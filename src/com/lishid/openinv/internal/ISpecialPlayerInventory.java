@@ -19,13 +19,12 @@ package com.lishid.openinv.internal;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-public interface ISpecialPlayerInventory
-{
+public interface ISpecialPlayerInventory {
     public Inventory getBukkitInventory();
-    
+
     public void InventoryRemovalCheck();
-    
+
     public void PlayerGoOnline(Player p);
-    
+
     public void PlayerGoOffline();
 }

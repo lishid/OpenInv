@@ -19,21 +19,18 @@ package com.lishid.openinv.internal.craftbukkit;
 //Volatile
 import net.minecraft.server.*;
 
-public class SilentContainerChest extends ContainerChest
-{
+public class SilentContainerChest extends ContainerChest {
     public IInventory inv;
-    
-    public SilentContainerChest(IInventory i1, IInventory i2)
-    {
+
+    public SilentContainerChest(IInventory i1, IInventory i2) {
         super(i1, i2);
         inv = i2;
         // close signal
         inv.f();
     }
-    
+
     @Override
-    public void b(EntityHuman paramEntityHuman)
-    {
+    public void b(EntityHuman paramEntityHuman) {
         // Don't send close signal twice, might screw up
     }
 }

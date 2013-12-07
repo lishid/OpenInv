@@ -19,7 +19,6 @@ package com.lishid.openinv.internal;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 
-public interface IInventoryAccess
-{
+public interface IInventoryAccess {
     public boolean check(Inventory inventory, HumanEntity player);
 }

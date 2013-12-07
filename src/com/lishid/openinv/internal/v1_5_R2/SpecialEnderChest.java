@@ -33,17 +33,15 @@ import net.minecraft.server.v1_5_R2.*;
 import org.bukkit.craftbukkit.v1_5_R2.entity.*;
 import org.bukkit.craftbukkit.v1_5_R2.inventory.*;
 
-public class SpecialEnderChest extends InventorySubcontainer implements IInventory, ISpecialEnderChest
-{
+public class SpecialEnderChest extends InventorySubcontainer implements IInventory, ISpecialEnderChest {
     public List<HumanEntity> transaction = new ArrayList<HumanEntity>();
     public boolean playerOnline = false;
     private CraftPlayer owner;
     private InventoryEnderChest enderChest;
     private int maxStack = MAX_STACK;
     private CraftInventory inventory = new CraftInventory(this);
-    
-    public SpecialEnderChest(Player p, Boolean online)
-    {
+
+    public SpecialEnderChest(Player p, Boolean online) {
         super(((CraftPlayer) p).getHandle().getEnderChest().getName(), ((CraftPlayer) p).getHandle().getEnderChest().c(), ((CraftPlayer) p).getHandle().getEnderChest().getSize());
         CraftPlayer player = (CraftPlayer) p;
         this.enderChest = player.getHandle().getEnderChest();
@@ -51,98 +49,78 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
         this.items = enderChest.getContents();
         OpenInv.enderChests.put(owner.getName().toLowerCase(), this);
     }
-    
-    public Inventory getBukkitInventory()
-    {
+
+    public Inventory getBukkitInventory() {
         return inventory;
     }
-    
-    public void InventoryRemovalCheck()
-    {
+
+    public void InventoryRemovalCheck() {
         owner.saveData();
-        if (transaction.isEmpty() && !playerOnline)
-        {
+        if (transaction.isEmpty() && !playerOnline) {
             OpenInv.enderChests.remove(owner.getName().toLowerCase());
         }
     }
-    
-    public void PlayerGoOnline(Player p)
-    {
-        if (!playerOnline)
-        {
-            try
-            {
+
+    public void PlayerGoOnline(Player p) {
+        if (!playerOnline) {
+            try {
                 InventoryEnderChest playerEnderChest = ((CraftPlayer) p).getHandle().getEnderChest();
                 Field field = playerEnderChest.getClass().getField("items");
                 field.setAccessible(true);
                 field.set(playerEnderChest, this.items);
             }
-            catch (Exception e)
-            {
-            }
+            catch (Exception e) {}
             p.saveData();
             playerOnline = true;
         }
     }
-    
-    public void PlayerGoOffline()
-    {
+
+    public void PlayerGoOffline() {
         playerOnline = false;
     }
-    
-    public ItemStack[] getContents()
-    {
+
+    public ItemStack[] getContents() {
         return this.items;
     }
-    
-    public void onOpen(CraftHumanEntity who)
-    {
+
+    public void onOpen(CraftHumanEntity who) {
         transaction.add(who);
     }
-    
-    public void onClose(CraftHumanEntity who)
-    {
+
+    public void onClose(CraftHumanEntity who) {
         transaction.remove(who);
         this.InventoryRemovalCheck();
     }
-    
-    public List<HumanEntity> getViewers()
-    {
+
+    public List<HumanEntity> getViewers() {
         return transaction;
     }
-    
-    public InventoryHolder getOwner()
-    {
+
+    public InventoryHolder getOwner() {
         return this.owner;
     }
-    
-    public void setMaxStackSize(int size)
-    {
+
+    public void setMaxStackSize(int size) {
         maxStack = size;
     }
-    
-    public int getMaxStackSize()
-    {
+
+    public int getMaxStackSize() {
         return maxStack;
     }
-    
-    public boolean a(EntityHuman entityhuman)
-    {
+
+    public boolean a(EntityHuman entityhuman) {
         return true;
     }
-    
-    public void startOpen()
-    {
-        
+
+    public void startOpen() {
+
     }
-    
-    public void f()
-    {
-        
+
+    public void f() {
+
     }
-    
-    public void update()
-    {
+
+    public void update() {
         enderChest.update();
     }
 }

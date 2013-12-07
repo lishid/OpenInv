@@ -30,80 +30,67 @@ import com.lishid.openinv.internal.IPlayerDataManager;
 import net.minecraft.server.v1_5_R2.*;
 import org.bukkit.craftbukkit.v1_5_R2.*;
 
-public class PlayerDataManager implements IPlayerDataManager
-{
-    public Player loadPlayer(String name)
-    {
-        try
-        {
+public class PlayerDataManager implements IPlayerDataManager {
+    public Player loadPlayer(String name) {
+        try {
             // Default player folder
             File playerfolder = new File(Bukkit.getWorlds().get(0).getWorldFolder(), "players");
-            if (!playerfolder.exists())
-            {
+            if (!playerfolder.exists()) {
                 return null;
             }
-            
+
             String playername = matchUser(Arrays.asList(playerfolder.listFiles()), name);
-            
-            if (playername == null)
-            {
+
+            if (playername == null) {
                 return null;
             }
-            
+
             MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
-            
+
             // Create an entity to load the player data
             EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), playername, new PlayerInteractManager((World) server.getWorldServer(0)));
-            
+
             // Get the bukkit entity
             Player target = (entity == null) ? null : entity.getBukkitEntity();
-            if (target != null)
-            {
+            if (target != null) {
                 // Load data
                 target.loadData();
                 // Return the entity
                 return target;
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             OpenInv.log(e);
         }
-        
+
         return null;
     }
-    
+
     /**
      * @author Balor (aka Antoine Aflalo)
      */
-    private static String matchUser(final Collection<File> container, final String search)
-    {
+    private static String matchUser(final Collection<File> container, final String search) {
         String found = null;
-        if (search == null)
-        {
+        if (search == null) {
             return found;
         }
         final String lowerSearch = search.toLowerCase();
         int delta = Integer.MAX_VALUE;
-        for (final File file : container)
-        {
+        for (final File file : container) {
             final String filename = file.getName();
             final String str = filename.substring(0, filename.length() - 4);
-            if (!str.toLowerCase().startsWith(lowerSearch))
-            {
+            if (!str.toLowerCase().startsWith(lowerSearch)) {
                 continue;
             }
             final int curDelta = str.length() - lowerSearch.length();
-            if (curDelta < delta)
-            {
+            if (curDelta < delta) {
                 found = str;
                 delta = curDelta;
             }
-            if (curDelta == 0)
-            {
+            if (curDelta == 0) {
                 break;
             }
-            
+
         }
         return found;
     }

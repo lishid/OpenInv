@@ -27,62 +27,50 @@ import org.bukkit.entity.Player;
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 
-public class SearchInvPluginCommand implements CommandExecutor
-{
-    public SearchInvPluginCommand()
-    {
-        
+public class SearchInvPluginCommand implements CommandExecutor {
+    public SearchInvPluginCommand() {
+
     }
-    
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
-    {
-        if (sender instanceof Player)
-        {
-            if (!OpenInv.hasPermission(sender, Permissions.PERM_SEARCH))
-            {
+
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (sender instanceof Player) {
+            if (!OpenInv.hasPermission(sender, Permissions.PERM_SEARCH)) {
                 sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
                 return true;
             }
         }
-        
+
         String PlayerList = "";
-        
+
         Material material = null;
         int count = 1;
-        
-        if (args.length >= 1)
-        {
+
+        if (args.length >= 1) {
             String[] gData = null;
             gData = args[0].split(":");
             material = Material.matchMaterial(gData[0]);
         }
-        if (args.length >= 2)
-        {
-            try
-            {
+        if (args.length >= 2) {
+            try {
                 count = Integer.parseInt(args[1]);
             }
-            catch (NumberFormatException ex)
-            {
+            catch (NumberFormatException ex) {
                 sender.sendMessage(ChatColor.RED + "'" + args[1] + "' is not a number!");
                 return false;
             }
         }
-        
-        if (material == null)
-        {
+
+        if (material == null) {
             sender.sendMessage(ChatColor.RED + "Unknown item");
             return false;
         }
-        
-        for (Player templayer : Bukkit.getServer().getOnlinePlayers())
-        {
-            if (templayer.getInventory().contains(material, count))
-            {
+
+        for (Player templayer : Bukkit.getServer().getOnlinePlayers()) {
+            if (templayer.getInventory().contains(material, count)) {
                 PlayerList += templayer.getName() + "  ";
             }
         }
-        
+
         sender.sendMessage("Players with the item " + material.toString() + ":  " + PlayerList);
         return true;
     }

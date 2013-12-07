@@ -29,17 +29,15 @@ import net.minecraft.server.v1_4_R1.*;
 
 import org.bukkit.craftbukkit.v1_4_R1.entity.*;
 
-public class AnySilentChest implements IAnySilentChest
-{
-    public boolean IsAnyChestNeeded(Player p, int x, int y, int z)
-    {
+public class AnySilentChest implements IAnySilentChest {
+    public boolean IsAnyChestNeeded(Player p, int x, int y, int z) {
         // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
         // If block on top
         if (world.s(x, y + 1, z))
             return true;
-        
+
         // If block next to chest is chest and has a block on top
         if ((world.getTypeId(x - 1, y, z) == Block.CHEST.id) && (world.s(x - 1, y + 1, z)))
             return true;
@@ -49,20 +47,18 @@ public class AnySilentChest implements IAnySilentChest
             return true;
         if ((world.getTypeId(x, y, z + 1) == Block.CHEST.id) && (world.s(x, y + 1, z + 1)))
             return true;
-        
+
         return false;
     }
-    
-    public boolean ActivateChest(Player p, boolean anychest, boolean silentchest, int x, int y, int z)
-    {
+
+    public boolean ActivateChest(Player p, boolean anychest, boolean silentchest, int x, int y, int z) {
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
         Object chest = (TileEntityChest) world.getTileEntity(x, y, z);
         if (chest == null)
             return true;
-        
-        if (!anychest)
-        {
+
+        if (!anychest) {
             if (world.s(x, y + 1, z))
                 return true;
             if ((world.getTypeId(x - 1, y, z) == Block.CHEST.id) && (world.s(x - 1, y + 1, z)))
@@ -74,7 +70,7 @@ public class AnySilentChest implements IAnySilentChest
             if ((world.getTypeId(x, y, z + 1) == Block.CHEST.id) && (world.s(x, y + 1, z + 1)))
                 return true;
         }
-        
+
         if (world.getTypeId(x - 1, y, z) == Block.CHEST.id)
             chest = new InventoryLargeChest("Large chest", (TileEntityChest) world.getTileEntity(x - 1, y, z), (IInventory) chest);
         if (world.getTypeId(x + 1, y, z) == Block.CHEST.id)
@@ -83,50 +79,42 @@ public class AnySilentChest implements IAnySilentChest
             chest = new InventoryLargeChest("Large chest", (TileEntityChest) world.getTileEntity(x, y, z - 1), (IInventory) chest);
         if (world.getTypeId(x, y, z + 1) == Block.CHEST.id)
             chest = new InventoryLargeChest("Large chest", (IInventory) chest, (TileEntityChest) world.getTileEntity(x, y, z + 1));
-        
+
         boolean returnValue = true;
-        if (!silentchest)
-        {
+        if (!silentchest) {
             player.openContainer((IInventory) chest);
         }
-        else
-        {
-            try
-            {
+        else {
+            try {
                 int id = 0;
-                try
-                {
+                try {
                     Field windowID = player.getClass().getDeclaredField("containerCounter");
                     windowID.setAccessible(true);
                     id = windowID.getInt(player);
                     id = id % 100 + 1;
                     windowID.setInt(player, id);
                 }
-                catch (NoSuchFieldException e)
-                {}
-                
+                catch (NoSuchFieldException e) {}
+
                 player.playerConnection.sendPacket(new Packet100OpenWindow(id, 0, ((IInventory) chest).getName(), ((IInventory) chest).getSize()));
                 player.activeContainer = new SilentContainerChest(player.inventory, ((IInventory) chest));
                 player.activeContainer.windowId = id;
                 player.activeContainer.addSlotListener(player);
-                if (OpenInv.NotifySilentChest())
-                {
+                if (OpenInv.NotifySilentChest()) {
                     p.sendMessage("You are opening a chest silently.");
                 }
                 returnValue = false;
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 e.printStackTrace();
                 p.sendMessage(ChatColor.RED + "Error while sending silent chest.");
             }
         }
-        
-        if (anychest && OpenInv.NotifyAnyChest())
-        {
+
+        if (anychest && OpenInv.NotifyAnyChest()) {
             p.sendMessage("You are opening a blocked chest.");
         }
-        
+
         return returnValue;
     }
 }

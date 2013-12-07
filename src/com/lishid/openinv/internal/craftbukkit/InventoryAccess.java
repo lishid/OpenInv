@@ -27,28 +27,22 @@ import com.lishid.openinv.internal.IInventoryAccess;
 import net.minecraft.server.*;
 import org.bukkit.craftbukkit.inventory.*;
 
-public class InventoryAccess implements IInventoryAccess
-{
-    public boolean check(Inventory inventory, HumanEntity player)
-    {
+public class InventoryAccess implements IInventoryAccess {
+    public boolean check(Inventory inventory, HumanEntity player) {
         IInventory inv = ((CraftInventory) inventory).getInventory();
-        
-        if (inv instanceof SpecialPlayerInventory)
-        {
-            if (!OpenInv.hasPermission(player, Permissions.PERM_EDITINV))
-            {
+
+        if (inv instanceof SpecialPlayerInventory) {
+            if (!OpenInv.hasPermission(player, Permissions.PERM_EDITINV)) {
                 return false;
             }
         }
-        
-        else if (inv instanceof SpecialEnderChest)
-        {
-            if (!OpenInv.hasPermission(player, Permissions.PERM_EDITENDER))
-            {
+
+        else if (inv instanceof SpecialEnderChest) {
+            if (!OpenInv.hasPermission(player, Permissions.PERM_EDITENDER)) {
                 return false;
             }
         }
-        
+
         return true;
     }
 }

@@ -18,7 +18,6 @@ package com.lishid.openinv.internal;
 
 import org.bukkit.entity.Player;
 
-public interface IPlayerDataManager
-{
+public interface IPlayerDataManager {
     public Player loadPlayer(String name);
 }
