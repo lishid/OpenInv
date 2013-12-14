@@ -12,7 +12,7 @@ commands:
            /<command> - Open last person's inventory
            /<command> <Player> - Open a player's inventory
   openender:
-    aliases: [oe, enderchest]
+    aliases: [oe]
     description: Opens the enderchest of a player
     usage: |
            /<command> <Player> - Opens a player's enderchest
