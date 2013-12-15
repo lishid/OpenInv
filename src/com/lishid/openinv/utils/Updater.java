@@ -58,7 +58,7 @@ public class Updater {
 
     private int id = 31432; // Project's Curse ID
     // SEE https://dev.bukkit.org/home/servermods-apikey/
-    private String apiKey = "853a6cc95ff44c08e19cdb3ef96f4001f049ae7c"; // BukkitDev ServerMods API key
+    private String apiKey = null; // BukkitDev ServerMods API key
     private static final String TITLE_VALUE = "name"; // Gets remote file's title
     private static final String LINK_VALUE = "downloadUrl"; // Gets remote file's download link
     private static final String TYPE_VALUE = "releaseType"; // Gets remote file's release type
