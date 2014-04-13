@@ -64,8 +64,13 @@ public class OpenInvPlayerListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.useInteractedBlock() == Result.DENY)
+        if (event.getPlayer().isSneaking()) {
             return;
+        }
+
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.useInteractedBlock() == Result.DENY) {
+            return;
+        }
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == org.bukkit.Material.ENDER_CHEST) {
             if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.GetPlayerSilentChestStatus(player.getName())) {
