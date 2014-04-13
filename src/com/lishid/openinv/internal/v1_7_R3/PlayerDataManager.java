@@ -1,15 +1,15 @@
 /*
  * Copyright (C) 2011-2014 lishid.  All rights reserved.
- *
+ * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation,  version 3.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -20,19 +20,19 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 
-import net.minecraft.server.v1_7_R3.EntityPlayer;
-//Volatile
-import net.minecraft.server.v1_7_R3.MinecraftServer;
-import net.minecraft.server.v1_7_R3.PlayerInteractManager;
-import net.minecraft.util.com.mojang.authlib.GameProfile;
-
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.craftbukkit.v1_7_R3.CraftServer;
 import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IPlayerDataManager;
+
+import net.minecraft.util.com.mojang.authlib.GameProfile;
+
+//Volatile
+import net.minecraft.server.v1_7_R2.*;
+
+import org.bukkit.craftbukkit.v1_7_R2.*;
 
 public class PlayerDataManager implements IPlayerDataManager {
     @Override
@@ -52,7 +52,7 @@ public class PlayerDataManager implements IPlayerDataManager {
 
             MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
 
-            GameProfile profile = new GameProfile(player.getUniqueId(), player.getName());
+            GameProfile profile = new GameProfile(player.getUniqueId().toString(), player.getName());
             // Create an entity to load the player data
             EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), profile, new PlayerInteractManager(server.getWorldServer(0)));
 
