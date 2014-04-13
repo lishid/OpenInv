@@ -30,9 +30,9 @@ import com.lishid.openinv.internal.IPlayerDataManager;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
 
 //Volatile
-import net.minecraft.server.v1_7_R2.*;
+import net.minecraft.server.v1_7_R3.*;
 
-import org.bukkit.craftbukkit.v1_7_R2.*;
+import org.bukkit.craftbukkit.v1_7_R3.*;
 
 public class PlayerDataManager implements IPlayerDataManager {
     @Override
@@ -52,7 +52,7 @@ public class PlayerDataManager implements IPlayerDataManager {
 
             MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
 
-            GameProfile profile = new GameProfile(player.getUniqueId().toString(), player.getName());
+            GameProfile profile = new GameProfile(player.getUniqueId(), player.getName());
             // Create an entity to load the player data
             EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), profile, new PlayerInteractManager(server.getWorldServer(0)));
 
