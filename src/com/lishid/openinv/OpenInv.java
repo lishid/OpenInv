@@ -33,7 +33,6 @@ import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import com.lishid.openinv.internal.InternalAccessor;
-import com.lishid.openinv.utils.Metrics;
 import com.lishid.openinv.utils.UpdateManager;
 
 /**
@@ -46,7 +45,6 @@ public class OpenInv extends JavaPlugin {
 
     public static HashMap<String, ISpecialPlayerInventory> inventories = new HashMap<String, ISpecialPlayerInventory>();
     public static HashMap<String, ISpecialEnderChest> enderChests = new HashMap<String, ISpecialEnderChest>();
-    private static Metrics metrics;
 
     private UpdateManager updater = new UpdateManager();
 
@@ -99,15 +97,6 @@ public class OpenInv extends JavaPlugin {
         getCommand("openender").setExecutor(new OpenEnderPluginCommand(this));
 
         updater.Initialize(this, getFile());
-
-        // Metrics
-        try {
-            metrics = new Metrics(this);
-            metrics.start();
-        }
-        catch (Exception e) {
-            OpenInv.log(e);
-        }
     }
 
     public static boolean NotifySilentChest() {
