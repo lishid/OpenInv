@@ -80,7 +80,8 @@ public class PlayerDataManager implements IPlayerDataManager {
         OfflinePlayer[] offlinePlayers = Bukkit.getOfflinePlayers();
         for (OfflinePlayer player : offlinePlayers) {
             String name = player.getName();
-
+            if (name == null)
+                continue;
             if (name.equalsIgnoreCase(search))
                 return player.getUniqueId();
 
