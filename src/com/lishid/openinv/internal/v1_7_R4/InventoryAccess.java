@@ -16,6 +16,8 @@
 
 package com.lishid.openinv.internal.v1_7_R4;
 
+import java.lang.reflect.Field;
+
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 
@@ -29,8 +31,8 @@ import org.bukkit.craftbukkit.v1_7_R4.inventory.*;
 
 public class InventoryAccess implements IInventoryAccess {
     public boolean check(Inventory inventory, HumanEntity player) {
-        IInventory inv = ((CraftInventory) inventory).getInventory();
-
+        IInventory inv = grabInventory(inventory);
+        
         if (inv instanceof SpecialPlayerInventory) {
             if (!OpenInv.hasPermission(player, Permissions.PERM_EDITINV)) {
                 return false;
@@ -44,5 +46,27 @@ public class InventoryAccess implements IInventoryAccess {
         }
 
         return true;
+    }
+    
+    private IInventory grabInventory(Inventory inventory) {
+        if(inventory instanceof CraftInventory) {
+            return ((CraftInventory) inventory).getInventory();
+        }
+        
+        //Use reflection to find the iiventory
+        Class<? extends Inventory> clazz = inventory.getClass();
+        IInventory result = null;
+        for(Field f : clazz.getDeclaredFields()) {
+            f.setAccessible(true);
+            if(IInventory.class.isAssignableFrom(f.getDeclaringClass())) {
+                try {
+                    result = (IInventory) f.get(inventory);
+                }
+                catch (Exception e) {
+                    OpenInv.log(e);
+                }
+            }
+        }
+        return result;
     }
 }
