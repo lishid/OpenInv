@@ -1,20 +1,20 @@
 /*
  * Copyright (C) 2011-2014 lishid.  All rights reserved.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation,  version 3.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.craftbukkit;
+package com.lishid.openinv.internal.v1_7_R1;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -23,9 +23,9 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 
 //Volatile
-import net.minecraft.server.*;
-import org.bukkit.craftbukkit.entity.*;
-import org.bukkit.craftbukkit.inventory.*;
+import net.minecraft.server.v1_7_R1.*;
+import org.bukkit.craftbukkit.v1_7_R1.entity.*;
+import org.bukkit.craftbukkit.v1_7_R1.inventory.*;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
     CraftPlayer owner;
@@ -50,7 +50,8 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     @Override
     public void InventoryRemovalCheck() {
         owner.saveData();
-        if (transaction.isEmpty() && !playerOnline) {
+        // Conflict with other Offline inventory modification plugins like JSONAPI
+        if (transaction.isEmpty() || !playerOnline) {
             OpenInv.inventories.remove(owner.getName().toLowerCase());
         }
     }
@@ -209,7 +210,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
 
         // Effects
         if (is == this.extra) {
-            owner.getHandle().drop(itemstack);
+            owner.getHandle().drop(itemstack, true);
             itemstack = null;
         }
 
@@ -239,15 +240,15 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
-    public String getName() {
-        if (player.name.length() > 16) {
-            return player.name.substring(0, 16);
+    public String getInventoryName() {
+        if (player.getName().length() > 16) {
+            return player.getName().substring(0, 16);
         }
-        return player.name;
+        return player.getName();
     }
 
     @Override
-    public boolean a_(EntityHuman entityhuman) {
+    public boolean a(EntityHuman entityhuman) {
         return true;
     }
 }
