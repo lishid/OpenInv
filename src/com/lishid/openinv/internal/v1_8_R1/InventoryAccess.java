@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_7_R4;
+package com.lishid.openinv.internal.v1_8_R1;
 
 import java.lang.reflect.Field;
 
@@ -27,8 +27,8 @@ import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.IInventoryAccess;
 
 //Volatile
-import net.minecraft.server.v1_7_R4.*;
-import org.bukkit.craftbukkit.v1_7_R4.inventory.*;
+import net.minecraft.server.v1_8_R1.*;
+import org.bukkit.craftbukkit.v1_8_R1.inventory.*;
 
 public class InventoryAccess implements IInventoryAccess {
     public boolean check(Inventory inventory, HumanEntity player) {
