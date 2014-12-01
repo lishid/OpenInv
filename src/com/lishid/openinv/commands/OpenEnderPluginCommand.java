@@ -17,12 +17,16 @@
 package com.lishid.openinv.commands;
 
 import java.util.HashMap;
+import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
@@ -53,8 +57,7 @@ public class OpenEnderPluginCommand implements CommandExecutor {
             return true;
         }
 
-        Player player = (Player) sender;
-        boolean offline = false;
+        final Player player = (Player) sender;
 
         // History management
         String history = openEnderHistory.get(player);
@@ -64,55 +67,74 @@ public class OpenEnderPluginCommand implements CommandExecutor {
             openEnderHistory.put(player, history);
         }
 
-        // Target selecting
-        Player target;
-
-        String name = "";
+        final String name;
 
         // Read from history if target is not named
         if (args.length < 1) {
-            if (history != null && history != "") {
-                name = history;
-            }
-            else {
-                sender.sendMessage(ChatColor.RED + "OpenEnder history is empty!");
-                return true;
-            }
+            name = history;
         }
         else {
             name = args[0];
         }
 
-        target = this.plugin.getServer().getPlayer(name);
+        sender.sendMessage(ChatColor.GREEN + "Starting inventory lookup.");
+        final UUID senderID = player.getUniqueId();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
+                if (Bukkit.getPlayer(senderID) == null) {
+                    return;
+                }
+                if (offlinePlayer == null || !offlinePlayer.hasPlayedBefore()) {
+                    player.sendMessage(ChatColor.RED + "Player not found!");
+                    return;
+                }
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (Bukkit.getPlayer(senderID) == null) {
+                            return;
+                        }
+                        openInventory(player, offlinePlayer.getUniqueId());
+                    }
+                }.runTask(plugin);
+            }
+        }.runTaskAsynchronously(plugin);
+
+        return true;
+    }
+
+    private void openInventory(Player player, UUID uuid) {
+
+        Player target = this.plugin.getServer().getPlayer(uuid);
 
         if (target == null) {
             // Try loading the player's data
-            target = OpenInv.playerLoader.loadPlayer(name);
+            target = OpenInv.playerLoader.loadPlayer(uuid);
 
             if (target == null) {
-                sender.sendMessage(ChatColor.RED + "Player " + name + " not found!");
-                return true;
+                player.sendMessage(ChatColor.RED + "Player not found!");
+                return;
             }
         }
 
-        if (target != sender && !OpenInv.hasPermission(sender, Permissions.PERM_ENDERCHEST_ALL)) {
-            sender.sendMessage(ChatColor.RED + "You do not have permission to access other player's enderchest");
-            return true;
+
+        if (target != player && !OpenInv.hasPermission(player, Permissions.PERM_ENDERCHEST_ALL)) {
+            player.sendMessage(ChatColor.RED + "You do not have permission to access other player's enderchest");
+            return;
         }
 
         // Record the target
-        history = target.getName();
-        openEnderHistory.put(player, history);
+        openEnderHistory.put(player, target.getName());
 
         // Create the inventory
         ISpecialEnderChest chest = OpenInv.enderChests.get(target.getName().toLowerCase());
         if (chest == null) {
-            chest = InternalAccessor.Instance.newSpecialEnderChest(target, !offline);
+            chest = InternalAccessor.Instance.newSpecialEnderChest(target, !target.isOnline());
         }
 
         // Open the inventory
         player.openInventory(chest.getBukkitInventory());
-
-        return true;
     }
 }

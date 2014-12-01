@@ -16,8 +16,11 @@
 
 package com.lishid.openinv.internal;
 
+import java.util.UUID;
+
 import org.bukkit.entity.Player;
 
 public interface IPlayerDataManager {
     public Player loadPlayer(String name);
+    public Player loadPlayer(UUID uuid);
 }
