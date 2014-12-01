@@ -14,19 +14,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_7_R4;
+package com.lishid.openinv.internal.v1_8_R1;
 
 //Volatile
-import net.minecraft.server.v1_7_R4.*;
+import net.minecraft.server.v1_8_R1.*;
 
 public class SilentContainerChest extends ContainerChest {
     public IInventory inv;
 
-    public SilentContainerChest(IInventory i1, IInventory i2) {
-        super(i1, i2);
+    public SilentContainerChest(IInventory i1, IInventory i2, EntityHuman e1) {
+        super(i1, i2, e1);
         inv = i2;
         // close signal
-        inv.closeContainer();
+        inv.closeContainer(e1);
     }
 
     @Override

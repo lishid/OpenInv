@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_7_R3;
+package com.lishid.openinv.internal.v1_8_R1;
 
 import java.io.File;
 import java.util.UUID;
@@ -25,12 +25,12 @@ import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IPlayerDataManager;
-import net.minecraft.util.com.mojang.authlib.GameProfile;
+import com.mojang.authlib.GameProfile;
 
 //Volatile
-import net.minecraft.server.v1_7_R3.*;
+import net.minecraft.server.v1_8_R1.*;
 
-import org.bukkit.craftbukkit.v1_7_R3.*;
+import org.bukkit.craftbukkit.v1_8_R1.*;
 
 public class PlayerDataManager implements IPlayerDataManager {
     public Player loadPlayer(String name) {
@@ -80,10 +80,13 @@ public class PlayerDataManager implements IPlayerDataManager {
         OfflinePlayer[] offlinePlayers = Bukkit.getOfflinePlayers();
         for (OfflinePlayer player : offlinePlayers) {
             String name = player.getName();
-
-            if (name.equalsIgnoreCase(search))
+           
+            if (name == null){
+                continue;
+            }
+            if (name.equalsIgnoreCase(search)){
                 return player.getUniqueId();
-
+            }
             if (name.toLowerCase().startsWith(lowerSearch)) {
                 int curDelta = name.length() - lowerSearch.length();
                 if (curDelta < delta) {

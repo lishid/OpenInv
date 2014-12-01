@@ -14,7 +14,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_7_R3;
+package com.lishid.openinv.internal.v1_8_R1;
+
+import java.lang.reflect.Field;
 
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
@@ -24,13 +26,13 @@ import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.IInventoryAccess;
 
 //Volatile
-import net.minecraft.server.v1_7_R3.*;
-import org.bukkit.craftbukkit.v1_7_R3.inventory.*;
+import net.minecraft.server.v1_8_R1.*;
+import org.bukkit.craftbukkit.v1_8_R1.inventory.*;
 
 public class InventoryAccess implements IInventoryAccess {
     public boolean check(Inventory inventory, HumanEntity player) {
-        IInventory inv = ((CraftInventory) inventory).getInventory();
-
+        IInventory inv = grabInventory(inventory);
+        
         if (inv instanceof SpecialPlayerInventory) {
             if (!OpenInv.hasPermission(player, Permissions.PERM_EDITINV)) {
                 return false;
@@ -44,5 +46,27 @@ public class InventoryAccess implements IInventoryAccess {
         }
 
         return true;
+    }
+    
+    private IInventory grabInventory(Inventory inventory) {
+        if(inventory instanceof CraftInventory) {
+            return ((CraftInventory) inventory).getInventory();
+        }
+        
+        //Use reflection to find the iiventory
+        Class<? extends Inventory> clazz = inventory.getClass();
+        IInventory result = null;
+        for(Field f : clazz.getDeclaredFields()) {
+            f.setAccessible(true);
+            if(IInventory.class.isAssignableFrom(f.getDeclaringClass())) {
+                try {
+                    result = (IInventory) f.get(inventory);
+                }
+                catch (Exception e) {
+                    OpenInv.log(e);
+                }
+            }
+        }
+        return result;
     }
 }

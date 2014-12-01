@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_7_R3;
+package com.lishid.openinv.internal.v1_8_R1;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -29,9 +29,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 //Volatile
-import net.minecraft.server.v1_7_R3.*;
-import org.bukkit.craftbukkit.v1_7_R3.entity.*;
-import org.bukkit.craftbukkit.v1_7_R3.inventory.*;
+import net.minecraft.server.v1_8_R1.*;
+import org.bukkit.craftbukkit.v1_8_R1.entity.*;
+import org.bukkit.craftbukkit.v1_8_R1.inventory.*;
 
 public class SpecialEnderChest extends InventorySubcontainer implements IInventory, ISpecialEnderChest {
     public List<HumanEntity> transaction = new ArrayList<HumanEntity>();
@@ -42,7 +42,7 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     private CraftInventory inventory = new CraftInventory(this);
 
     public SpecialEnderChest(Player p, Boolean online) {
-        super(((CraftPlayer) p).getHandle().getEnderChest().getInventoryName(), ((CraftPlayer) p).getHandle().getEnderChest().k_(), ((CraftPlayer) p).getHandle().getEnderChest().getSize());
+        super(((CraftPlayer) p).getHandle().getEnderChest().getName(), ((CraftPlayer) p).getHandle().getEnderChest().hasCustomName(), ((CraftPlayer) p).getHandle().getEnderChest().getSize());
         CraftPlayer player = (CraftPlayer) p;
         this.enderChest = player.getHandle().getEnderChest();
         this.owner = player;
