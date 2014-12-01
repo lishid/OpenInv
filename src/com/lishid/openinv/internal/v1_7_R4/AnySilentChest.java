@@ -34,6 +34,7 @@ public class AnySilentChest implements IAnySilentChest {
         // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
+        
         // If block on top
         if (world.getType(x, y + 1, z).c())
             return true;
