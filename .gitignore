@@ -1,4 +1,7 @@
 .classpath
 .project
+.idea
+*.iml
 bin/
 lib/
+out/
