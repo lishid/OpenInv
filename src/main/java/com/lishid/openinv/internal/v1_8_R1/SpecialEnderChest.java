@@ -40,7 +40,7 @@ public class SpecialEnderChest extends InventorySubcontainer implements ISpecial
     private CraftPlayer owner;
     private boolean playerOnline = false;
 
-    public SpecialEnderChest(Player p, boolean online) {
+    public SpecialEnderChest(Player p, Boolean online) {
         this(p, ((CraftPlayer) p).getHandle().getEnderChest(), online);
     }
 
