@@ -34,7 +34,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     private CraftPlayer owner;
     private boolean playerOnline = false;
 
-    public SpecialPlayerInventory(Player p, boolean online) {
+    public SpecialPlayerInventory(Player p, Boolean online) {
         super(((CraftPlayer) p).getHandle());
         this.owner = (CraftPlayer) p;
         this.items = player.inventory.items;
