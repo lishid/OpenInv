@@ -17,6 +17,7 @@
 package com.lishid.openinv;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -33,20 +34,17 @@ import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import com.lishid.openinv.internal.InternalAccessor;
-import com.lishid.openinv.utils.UpdateManager;
 
 /**
  * Open other player's inventory
- * 
+ *
  * @author lishid
  */
 public class OpenInv extends JavaPlugin {
     public static final Logger logger = Logger.getLogger("Minecraft.OpenInv");
 
-    public static HashMap<String, ISpecialPlayerInventory> inventories = new HashMap<String, ISpecialPlayerInventory>();
-    public static HashMap<String, ISpecialEnderChest> enderChests = new HashMap<String, ISpecialEnderChest>();
-
-    private UpdateManager updater = new UpdateManager();
+    public static Map<String, ISpecialPlayerInventory> inventories = new HashMap<String, ISpecialPlayerInventory>();
+    public static Map<String, ISpecialEnderChest> enderChests = new HashMap<String, ISpecialEnderChest>();
 
     public static OpenInv mainPlugin;
 
@@ -95,8 +93,6 @@ public class OpenInv extends JavaPlugin {
         getCommand("silentchest").setExecutor(new SilentChestPluginCommand(this));
         getCommand("anychest").setExecutor(new AnyChestPluginCommand(this));
         getCommand("openender").setExecutor(new OpenEnderPluginCommand(this));
-
-        updater.Initialize(this, getFile());
     }
 
     public static boolean NotifySilentChest() {
@@ -105,10 +101,6 @@ public class OpenInv extends JavaPlugin {
 
     public static boolean NotifyAnyChest() {
         return mainPlugin.getConfig().getBoolean("NotifyAnyChest", true);
-    }
-
-    public static boolean GetCheckForUpdates() {
-        return mainPlugin.getConfig().getBoolean("CheckForUpdates", true);
     }
 
     public static boolean GetPlayerItemOpenInvStatus(String name) {

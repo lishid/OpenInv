@@ -34,94 +34,69 @@ import net.minecraft.server.v1_8_R1.*;
 import org.bukkit.craftbukkit.v1_8_R1.entity.*;
 import org.bukkit.craftbukkit.v1_8_R1.inventory.*;
 
-public class SpecialEnderChest extends InventorySubcontainer implements IInventory, ISpecialEnderChest {
-    public List<HumanEntity> transaction = new ArrayList<HumanEntity>();
-    public boolean playerOnline = false;
-    private CraftPlayer owner;
-    private InventoryEnderChest enderChest;
-    private int maxStack = MAX_STACK;
+public class SpecialEnderChest extends InventorySubcontainer implements ISpecialEnderChest {
     private CraftInventory inventory = new CraftInventory(this);
+    private InventoryEnderChest enderChest;
+    private CraftPlayer owner;
+    private boolean playerOnline = false;
 
-    public SpecialEnderChest(Player p, Boolean online) {
-        super(((CraftPlayer) p).getHandle().getEnderChest().getName(), ((CraftPlayer) p).getHandle().getEnderChest().hasCustomName(), ((CraftPlayer) p).getHandle().getEnderChest().getSize());
-        CraftPlayer player = (CraftPlayer) p;
-        this.enderChest = player.getHandle().getEnderChest();
-        this.owner = player;
+    public SpecialEnderChest(Player p, boolean online) {
+        this(p, ((CraftPlayer) p).getHandle().getEnderChest(), online);
+    }
+
+    public SpecialEnderChest(Player p, InventoryEnderChest enderchest, boolean online) {
+        super(enderchest.getName(), enderchest.hasCustomName(), enderchest.getSize());
+        this.owner = (CraftPlayer) p;
+        this.enderChest = enderchest;
         this.items = enderChest.getContents();
+        this.playerOnline = online;
         OpenInv.enderChests.put(owner.getName().toLowerCase(), this);
+    }
+
+    private void saveOnExit() {
+        if (transaction.isEmpty() && !playerOnline) {
+            owner.saveData();
+            OpenInv.enderChests.remove(owner.getName().toLowerCase());
+        }
+    }
+
+    private void linkInventory(InventoryEnderChest inventory) {
+        inventory.items = this.items;
     }
 
     public Inventory getBukkitInventory() {
         return inventory;
     }
 
-    public void InventoryRemovalCheck() {
-        owner.saveData();
-        if (transaction.isEmpty() && !playerOnline) {
-            OpenInv.enderChests.remove(owner.getName().toLowerCase());
-        }
-    }
-
-    public void PlayerGoOnline(Player p) {
+    public void playerOnline(Player p) {
         if (!playerOnline) {
-            try {
-                InventoryEnderChest playerEnderChest = ((CraftPlayer) p).getHandle().getEnderChest();
-                Field field = playerEnderChest.getClass().getField("items");
-                field.setAccessible(true);
-                field.set(playerEnderChest, this.items);
-            }
-            catch (Exception e) {}
+            linkInventory(((CraftPlayer) p).getHandle().getEnderChest());
             p.saveData();
             playerOnline = true;
         }
     }
 
-    public void PlayerGoOffline() {
+    public void playerOffline() {
         playerOnline = false;
+        owner.loadData();
+        linkInventory(owner.getHandle().getEnderChest());
+        saveOnExit();
     }
 
-    public ItemStack[] getContents() {
-        return this.items;
-    }
-
-    public void onOpen(CraftHumanEntity who) {
-        transaction.add(who);
-    }
-
+    @Override
     public void onClose(CraftHumanEntity who) {
-        transaction.remove(who);
-        this.InventoryRemovalCheck();
+        super.onClose(who);
+        saveOnExit();
     }
 
-    public List<HumanEntity> getViewers() {
-        return transaction;
-    }
-
+    @Override
     public InventoryHolder getOwner() {
         return this.owner;
     }
 
-    public void setMaxStackSize(int size) {
-        maxStack = size;
-    }
-
-    public int getMaxStackSize() {
-        return maxStack;
-    }
-
-    public boolean a(EntityHuman entityhuman) {
-        return true;
-    }
-
-    public void startOpen() {
-
-    }
-
-    public void f() {
-
-    }
-
+    @Override
     public void update() {
+        super.update();
         enderChest.update();
     }
 }

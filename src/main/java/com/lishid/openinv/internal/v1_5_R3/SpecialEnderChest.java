@@ -61,7 +61,7 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
         }
     }
 
-    public void PlayerGoOnline(Player p) {
+    public void playerOnline(Player p) {
         if (!playerOnline) {
             try {
                 InventoryEnderChest playerEnderChest = ((CraftPlayer) p).getHandle().getEnderChest();
@@ -75,7 +75,7 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
         }
     }
 
-    public void PlayerGoOffline() {
+    public void playerOffline() {
         playerOnline = false;
     }
 

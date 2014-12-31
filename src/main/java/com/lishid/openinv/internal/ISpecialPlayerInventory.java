@@ -22,9 +22,7 @@ import org.bukkit.inventory.Inventory;
 public interface ISpecialPlayerInventory {
     public Inventory getBukkitInventory();
 
-    public void InventoryRemovalCheck();
+    public void playerOnline(Player p);
 
-    public void PlayerGoOnline(Player p);
-
-    public void PlayerGoOffline();
+    public void playerOffline();
 }

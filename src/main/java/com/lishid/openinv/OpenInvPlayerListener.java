@@ -38,13 +38,13 @@ public class OpenInvPlayerListener implements Listener {
         ISpecialPlayerInventory inventory = OpenInv.inventories.get(event.getPlayer().getName().toLowerCase());
 
         if (inventory != null) {
-            inventory.PlayerGoOnline(event.getPlayer());
+            inventory.playerOnline(event.getPlayer());
         }
 
         ISpecialEnderChest chest = OpenInv.enderChests.get(event.getPlayer().getName().toLowerCase());
 
         if (chest != null) {
-            chest.PlayerGoOnline(event.getPlayer());
+            chest.playerOnline(event.getPlayer());
         }
     }
 
@@ -52,11 +52,11 @@ public class OpenInvPlayerListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         ISpecialPlayerInventory inventory = OpenInv.inventories.get(event.getPlayer().getName().toLowerCase());
         if (inventory != null) {
-            inventory.PlayerGoOffline();
+            inventory.playerOffline();
         }
         ISpecialEnderChest chest = OpenInv.enderChests.get(event.getPlayer().getName().toLowerCase());
         if (chest != null) {
-            chest.PlayerGoOffline();
+            chest.playerOffline();
         }
     }
 

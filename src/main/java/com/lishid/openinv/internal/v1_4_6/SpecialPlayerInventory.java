@@ -47,7 +47,6 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         return inventory;
     }
 
-    @Override
     public void InventoryRemovalCheck() {
         owner.saveData();
         if (transaction.isEmpty() && !playerOnline) {
@@ -56,7 +55,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
-    public void PlayerGoOnline(Player player) {
+    public void playerOnline(Player player) {
         if (!playerOnline) {
             CraftPlayer p = (CraftPlayer) player;
             p.getHandle().inventory.items = this.items;
@@ -67,7 +66,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
-    public void PlayerGoOffline() {
+    public void playerOffline() {
         playerOnline = false;
         this.InventoryRemovalCheck();
     }

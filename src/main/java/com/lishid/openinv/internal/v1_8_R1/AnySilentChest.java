@@ -16,9 +16,8 @@
 
 package com.lishid.openinv.internal.v1_8_R1;
 
-import java.lang.reflect.Field;
+import java.util.Iterator;
 
-import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
@@ -33,89 +32,105 @@ import org.bukkit.craftbukkit.v1_8_R1.entity.*;
 public class AnySilentChest implements IAnySilentChest {
     public boolean IsAnyChestNeeded(Player p, int x, int y, int z) {
         // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
+        BlockPosition position = new BlockPosition(x, y, z);
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
+        BlockChest chest = (BlockChest) Block.getByName("chest");
 
         // If block on top
-        if (world.getType(new BlockPosition(x, y + 1, z)).getBlock().c()){
+        if (topBlocking(world, position)) {
             return true;
         }
 
-        int id = Block.getId(world.getType(new BlockPosition(x, y, z)).getBlock());
-
         // If block next to chest is chest and has a block on top
-        if ((Block.getId(world.getType(new BlockPosition(x - 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x - 1, y + 1, z)).getBlock().c()))
-            return true;
-        if ((Block.getId(world.getType(new BlockPosition(x + 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x + 1, y + 1, z)).getBlock().c()))
-            return true;
-        if ((Block.getId(world.getType(new BlockPosition(x, y, z - 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z - 1)).getBlock().c()))
-            return true;
-        if ((Block.getId(world.getType(new BlockPosition(x, y, z + 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z + 1)).getBlock().c()))
-            return true;
+        for (EnumDirection direction : EnumDirectionList.HORIZONTAL) {
+            BlockPosition sidePosition = position.shift(direction);
+            Block var8 = world.getType(sidePosition).getBlock();
+            if (var8 == chest) {
+                if (this.topBlocking(world, sidePosition)) {
+                    return true;
+                }
+            }
+        }
 
         return false;
     }
+    private boolean topBlocking(World world, BlockPosition position) {
+        return this.blockOnTop(world, position) || this.ocelotOnTop(world, position);
+    }
+
+    private boolean blockOnTop(World world, BlockPosition position) {
+        return world.getType(position.up()).getBlock().isOccluding();
+    }
+
+    private boolean ocelotOnTop(World world, BlockPosition position) {
+        Iterator var3 = world.a(EntityOcelot.class,
+                new AxisAlignedBB((double) position.getX(), (double) (position.getY() + 1),
+                        (double) position.getZ(), (double) (position.getX() + 1),
+                        (double) (position.getY() + 2), (double) (position.getZ() + 1))).iterator();
+
+        EntityOcelot var5;
+        do {
+            if (!var3.hasNext()) {
+                return false;
+            }
+
+            Entity var4 = (Entity) var3.next();
+            var5 = (EntityOcelot) var4;
+        } while (!var5.isSitting());
+
+        return true;
+    }
 
     public boolean ActivateChest(Player p, boolean anychest, boolean silentchest, int x, int y, int z) {
+        BlockPosition position = new BlockPosition(x, y, z);
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
-        Object chest = (TileEntityChest) world.getTileEntity(new BlockPosition(x, y, z));
-        if (chest == null)
+        if (world.isStatic) {
             return true;
-
-        int id = Block.getId(world.getType(new BlockPosition(x, y, z)).getBlock());
-
-        if (!anychest) {
-            if (world.getType(new BlockPosition(x, y + 1, z)).getBlock().c())
-                return true;
-            if ((Block.getId(world.getType(new BlockPosition(x - 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x - 1, y + 1, z)).getBlock().c()))
-                return true;
-            if ((Block.getId(world.getType(new BlockPosition(x + 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x + 1, y + 1, z)).getBlock().c()))
-                return true;
-            if ((Block.getId(world.getType(new BlockPosition(x, y, z - 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z - 1)).getBlock().c()))
-                return true;
-            if ((Block.getId(world.getType(new BlockPosition(x, y, z + 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z + 1)).getBlock().c()))
-                return true;
         }
 
-        if (Block.getId(world.getType(new BlockPosition(x - 1, y, z)).getBlock()) == id)
-        	chest = new InventoryLargeChest("Large chest", (ITileInventory) world.getTileEntity(new BlockPosition(x - 1, y, z)), (ITileInventory) chest);
-        if (Block.getId(world.getType(new BlockPosition(x + 1, y, z)).getBlock()) == id)
-            chest = new InventoryLargeChest("Large chest", (ITileInventory) chest, (ITileInventory) world.getTileEntity(new BlockPosition(x + 1, y, z)));
-        if (Block.getId(world.getType(new BlockPosition(x, y, z - 1)).getBlock()) == id)
-            chest = new InventoryLargeChest("Large chest", (ITileInventory) world.getTileEntity(new BlockPosition(x, y, z - 1)), (ITileInventory) chest);
-        if (Block.getId(world.getType(new BlockPosition(x, y, z + 1)).getBlock()) == id)
-            chest = new InventoryLargeChest("Large chest", (ITileInventory) chest, (ITileInventory) world.getTileEntity(new BlockPosition(x, y, z + 1)));
+        BlockChest chest = (BlockChest) Block.getByName("chest");
+
+        TileEntity tileEntity = world.getTileEntity(position);
+        if (!(tileEntity instanceof TileEntityChest)) {
+            return true;
+        }
+
+        ITileInventory tileInventory = (ITileInventory) tileEntity;
+        if (!anychest && this.topBlocking(world, position)) {
+            return true;
+        }
+
+        for (EnumDirection direction : EnumDirectionList.HORIZONTAL) {
+            BlockPosition side = position.shift(direction);
+            Block block = world.getType(side).getBlock();
+            if (block == chest) {
+                if (!anychest && this.topBlocking(world, side)) {
+                    return true;
+                }
+
+                TileEntity sideTileEntity = world.getTileEntity(side);
+                if (sideTileEntity instanceof TileEntityChest) {
+                    if (direction != EnumDirection.WEST && direction != EnumDirection.NORTH) {
+                        tileInventory = new InventoryLargeChest("container.chestDouble", tileInventory, (TileEntityChest) sideTileEntity);
+                    } else {
+                        tileInventory = new InventoryLargeChest("container.chestDouble", (TileEntityChest) sideTileEntity, tileInventory);
+                    }
+                }
+            }
+        }
 
         boolean returnValue = true;
-        if (!silentchest) {
-            player.openContainer((IInventory) chest);
-        }
-        else {
-            try {
-                int windowId = 0;
-                try {
-                    Field windowID = player.getClass().getDeclaredField("containerCounter");
-                    windowID.setAccessible(true);
-                    windowId = windowID.getInt(player);
-                    windowId = windowId % 100 + 1;
-                    windowID.setInt(player, windowId);
-                }
-                catch (NoSuchFieldException e) {}
-                player.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, "minecraft:chest", new ChatComponentText(((IInventory) chest).getName()), ((IInventory) chest).getSize()));
-                player.activeContainer = new SilentContainerChest(player.inventory, ((IInventory) chest), player);
-                player.activeContainer.windowId = windowId;
-                player.activeContainer.addSlotListener(player);
-                if (OpenInv.NotifySilentChest()) {
-                    p.sendMessage("You are opening a chest silently.");
-                }
-                returnValue = false;
+        if (silentchest) {
+            tileInventory = new SilentInventory(tileInventory);
+            if (OpenInv.NotifySilentChest()) {
+                p.sendMessage("You are opening a chest silently.");
             }
-            catch (Exception e) {
-                e.printStackTrace();
-                p.sendMessage(ChatColor.RED + "Error while sending silent chest.");
-            }
+            returnValue = false;
         }
+
+        player.openContainer(tileInventory);
 
         if (anychest && OpenInv.NotifyAnyChest()) {
             p.sendMessage("You are opening a blocked chest.");

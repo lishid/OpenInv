@@ -29,54 +29,56 @@ import org.bukkit.craftbukkit.v1_8_R1.entity.*;
 import org.bukkit.craftbukkit.v1_8_R1.inventory.*;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
-    CraftPlayer owner;
-    public boolean playerOnline = false;
-    private ItemStack[] extra = new ItemStack[5];
     private CraftInventory inventory = new CraftInventory(this);
+    private ItemStack[] extra = new ItemStack[5];
+    private CraftPlayer owner;
+    private boolean playerOnline = false;
 
-    public SpecialPlayerInventory(Player p, Boolean online) {
+    public SpecialPlayerInventory(Player p, boolean online) {
         super(((CraftPlayer) p).getHandle());
-        this.owner = ((CraftPlayer) p);
-        this.playerOnline = online;
+        this.owner = (CraftPlayer) p;
         this.items = player.inventory.items;
         this.armor = player.inventory.armor;
+        this.playerOnline = online;
         OpenInv.inventories.put(owner.getName().toLowerCase(), this);
     }
 
-    @Override
     public Inventory getBukkitInventory() {
         return inventory;
     }
 
-    @Override
-    public void InventoryRemovalCheck() {
-        owner.saveData();
+    private void saveOnExit() {
         if (transaction.isEmpty() && !playerOnline) {
+            owner.saveData();
             OpenInv.inventories.remove(owner.getName().toLowerCase());
         }
     }
 
-    @Override
-    public void PlayerGoOnline(Player player) {
+    private void linkInventory(PlayerInventory inventory) {
+        inventory.items = this.items;
+        inventory.armor = this.armor;
+    }
+
+    public void playerOnline(Player player) {
         if (!playerOnline) {
             CraftPlayer p = (CraftPlayer) player;
-            p.getHandle().inventory.items = this.items;
-            p.getHandle().inventory.armor = this.armor;
+            linkInventory(p.getHandle().inventory);
             p.saveData();
             playerOnline = true;
         }
     }
 
-    @Override
-    public void PlayerGoOffline() {
+    public void playerOffline() {
         playerOnline = false;
-        this.InventoryRemovalCheck();
+        owner.loadData();
+        linkInventory(owner.getHandle().inventory);
+        saveOnExit();
     }
 
     @Override
     public void onClose(CraftHumanEntity who) {
         super.onClose(who);
-        this.InventoryRemovalCheck();
+        this.saveOnExit();
     }
 
     @Override
@@ -99,16 +101,14 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         if (i >= is.length) {
             i -= is.length;
             is = this.armor;
-        }
-        else {
+        } else {
             i = getReversedItemSlotNum(i);
         }
 
         if (i >= is.length) {
             i -= is.length;
             is = this.extra;
-        }
-        else if (is == this.armor) {
+        } else if (is == this.armor) {
             i = getReversedArmorSlotNum(i);
         }
 
@@ -122,16 +122,14 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         if (i >= is.length) {
             i -= is.length;
             is = this.armor;
-        }
-        else {
+        } else {
             i = getReversedItemSlotNum(i);
         }
 
         if (i >= is.length) {
             i -= is.length;
             is = this.extra;
-        }
-        else if (is == this.armor) {
+        } else if (is == this.armor) {
             i = getReversedArmorSlotNum(i);
         }
 
@@ -142,8 +140,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
                 itemstack = is[i];
                 is[i] = null;
                 return itemstack;
-            }
-            else {
+            } else {
                 itemstack = is[i].a(j);
                 if (is[i].count == 0) {
                     is[i] = null;
@@ -151,8 +148,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
 
                 return itemstack;
             }
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -164,16 +160,14 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         if (i >= is.length) {
             i -= is.length;
             is = this.armor;
-        }
-        else {
+        } else {
             i = getReversedItemSlotNum(i);
         }
 
         if (i >= is.length) {
             i -= is.length;
             is = this.extra;
-        }
-        else if (is == this.armor) {
+        } else if (is == this.armor) {
             i = getReversedArmorSlotNum(i);
         }
 
@@ -182,8 +176,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
 
             is[i] = null;
             return itemstack;
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -195,16 +188,14 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         if (i >= is.length) {
             i -= is.length;
             is = this.armor;
-        }
-        else {
+        } else {
             i = getReversedItemSlotNum(i);
         }
 
         if (i >= is.length) {
             i -= is.length;
             is = this.extra;
-        }
-        else if (is == this.armor) {
+        } else if (is == this.armor) {
             i = getReversedArmorSlotNum(i);
         }
 
@@ -239,15 +230,24 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             return i;
     }
 
-    public String getInventoryName() {
-        if (player.getName().length() > 16) {
-            return player.getName().substring(0, 16);
-        }
+    @Override
+    public boolean hasCustomName() {
+        return true;
+    }
+
+    @Override
+    public String getName() {
         return player.getName();
     }
 
     @Override
     public boolean a(EntityHuman entityhuman) {
         return true;
+    }
+
+    @Override
+    public void update() {
+        super.update();
+        player.inventory.update();
     }
 }

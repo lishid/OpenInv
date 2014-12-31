@@ -22,10 +22,8 @@ import org.bukkit.inventory.Inventory;
 public interface ISpecialEnderChest {
     public Inventory getBukkitInventory();
 
-    public void InventoryRemovalCheck();
+    public void playerOnline(Player p);
 
-    public void PlayerGoOnline(Player p);
-
-    public void PlayerGoOffline();
+    public void playerOffline();
 
 }
