@@ -71,12 +71,12 @@ public class SilentInventory implements ITileInventory {
 
     @Override
     public void startOpen(EntityHuman entityHuman) {
-        inv.startOpen(entityHuman);
+        //Don't do anything
     }
 
     @Override
     public void closeContainer(EntityHuman entityHuman) {
-        inv.closeContainer(entityHuman);
+        //Don't do anything
     }
 
     @Override
@@ -151,7 +151,8 @@ public class SilentInventory implements ITileInventory {
 
     @Override
     public Container createContainer(PlayerInventory playerInventory, EntityHuman entityHuman) {
-        return inv.createContainer(playerInventory, entityHuman);
+        //Don't let the chest itself create the container.
+        return new ContainerChest(playerInventory, this, entityHuman);
     }
 
     @Override

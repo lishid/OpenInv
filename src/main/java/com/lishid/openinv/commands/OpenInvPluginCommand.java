@@ -79,14 +79,12 @@ public class OpenInvPluginCommand implements CommandExecutor {
         target = this.plugin.getServer().getPlayer(name);
 
         if (target == null) {
-            if (target == null) {
-                // Try loading the player's data
-                target = OpenInv.playerLoader.loadPlayer(name);
+            // Try loading the player's data
+            target = OpenInv.playerLoader.loadPlayer(name);
 
-                if (target == null) {
-                    sender.sendMessage(ChatColor.RED + "Player " + name + " not found!");
-                    return true;
-                }
+            if (target == null) {
+                sender.sendMessage(ChatColor.RED + "Player " + name + " not found!");
+                return true;
             }
         }
 

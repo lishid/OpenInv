@@ -1,7 +1,9 @@
-.classpath
-.project
-.idea
+/.settings
+/.gitignore
+/.project
+/.classpath
+/.idea
+/bin
+/lib
+/out
 *.iml
-bin/
-lib/
-out/

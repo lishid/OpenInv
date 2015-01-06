@@ -16,8 +16,6 @@
 
 package com.lishid.openinv.internal.v1_8_R1;
 
-import java.io.File;
-
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -41,12 +39,6 @@ public class PlayerDataManager implements IPlayerDataManager {
                 return null;
             }
 
-            // Default player folder
-            File playerfolder = new File(Bukkit.getWorlds().get(0).getWorldFolder(), "playerdata");
-            if (!playerfolder.exists()) {
-                return null;
-            }
-
             OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
             if (player == null) {
                 return null;
@@ -57,7 +49,7 @@ public class PlayerDataManager implements IPlayerDataManager {
             EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), profile, new PlayerInteractManager(server.getWorldServer(0)));
 
             // Get the bukkit entity
-            Player target = (entity == null) ? null : entity.getBukkitEntity();
+            Player target = entity.getBukkitEntity();
             if (target != null) {
                 // Load data
                 target.loadData();
@@ -81,7 +73,7 @@ public class PlayerDataManager implements IPlayerDataManager {
         OfflinePlayer[] offlinePlayers = Bukkit.getOfflinePlayers();
         for (OfflinePlayer player : offlinePlayers) {
             String name = player.getName();
-           
+
             if (name == null){
                 continue;
             }
