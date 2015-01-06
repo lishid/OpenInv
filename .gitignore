@@ -3,6 +3,7 @@
 /.project
 /.classpath
 /.idea
+/target
 /bin
 /lib
 /out
