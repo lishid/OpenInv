@@ -35,7 +35,8 @@ public class AnySilentChest implements IAnySilentChest {
         BlockPosition position = new BlockPosition(x, y, z);
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
-        BlockChest chest = (BlockChest) Block.getByName("chest");
+        BlockChest chest = (BlockChest) (((BlockChest) world.getType(position).getBlock()).b == 1 ?
+                Block.getByName("trapped_chest") : Block.getByName("chest"));
 
         // If block on top
         if (topBlocking(world, position)) {
@@ -90,7 +91,8 @@ public class AnySilentChest implements IAnySilentChest {
             return true;
         }
 
-        BlockChest chest = (BlockChest) Block.getByName("chest");
+        BlockChest chest = (BlockChest) (((BlockChest) world.getType(position).getBlock()).b == 1 ?
+                Block.getByName("trapped_chest") : Block.getByName("chest"));
 
         TileEntity tileEntity = world.getTileEntity(position);
         if (!(tileEntity instanceof TileEntityChest)) {
