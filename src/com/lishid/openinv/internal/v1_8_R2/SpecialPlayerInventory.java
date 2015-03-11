@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_8_R1;
+package com.lishid.openinv.internal.v1_8_R2;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -23,15 +23,19 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 
 //Volatile
-import net.minecraft.server.v1_8_R1.*;
-import org.bukkit.craftbukkit.v1_8_R1.entity.*;
-import org.bukkit.craftbukkit.v1_8_R1.inventory.*;
+import org.bukkit.craftbukkit.v1_8_R2.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventory;
+
+import net.minecraft.server.v1_8_R2.EntityHuman;
+import net.minecraft.server.v1_8_R2.ItemStack;
+import net.minecraft.server.v1_8_R2.PlayerInventory;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
     CraftPlayer owner;
     public boolean playerOnline = false;
-    private ItemStack[] extra = new ItemStack[5];
-    private CraftInventory inventory = new CraftInventory(this);
+    private final ItemStack[] extra = new ItemStack[5];
+    private final CraftInventory inventory = new CraftInventory(this);
 
     public SpecialPlayerInventory(Player p, Boolean online) {
         super(((CraftPlayer) p).getHandle());

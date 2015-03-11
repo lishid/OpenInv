@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_8_R1;
+package com.lishid.openinv.internal.v1_8_R2;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -22,18 +22,22 @@ import org.bukkit.entity.Player;
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IAnySilentChest;
 
-
-
-
-
-
 //Volatile
-import net.minecraft.server.v1_8_R1.*;
+import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
 
-import org.bukkit.craftbukkit.v1_8_R1.entity.*;
+import net.minecraft.server.v1_8_R2.Block;
+import net.minecraft.server.v1_8_R2.BlockPosition;
+import net.minecraft.server.v1_8_R2.EntityPlayer;
+import net.minecraft.server.v1_8_R2.IInventory;
+import net.minecraft.server.v1_8_R2.ITileInventory;
+import net.minecraft.server.v1_8_R2.InventoryLargeChest;
+import net.minecraft.server.v1_8_R2.PacketPlayOutOpenWindow;
+import net.minecraft.server.v1_8_R2.TileEntityChest;
+import net.minecraft.server.v1_8_R2.World;
 
 public class AnySilentChest implements IAnySilentChest {
-    public boolean IsAnyChestNeeded(Player p, int x, int y, int z) {
+    @Override
+	public boolean IsAnyChestNeeded(Player p, int x, int y, int z) {
         // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
@@ -56,10 +60,11 @@ public class AnySilentChest implements IAnySilentChest {
         return false;
     }
 
-    public boolean ActivateChest(Player p, boolean anychest, boolean silentchest, int x, int y, int z) {
+    @Override
+	public boolean ActivateChest(Player p, boolean anychest, boolean silentchest, int x, int y, int z) {
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
-        Object chest = (TileEntityChest) world.getTileEntity(new BlockPosition(x, y, z));
+        Object chest = world.getTileEntity(new BlockPosition(x, y, z));
         if (chest == null)
             return true;
 

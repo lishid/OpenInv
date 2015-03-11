@@ -17,6 +17,7 @@
 package com.lishid.openinv.commands;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -41,7 +42,8 @@ public class OpenInvPluginCommand implements CommandExecutor {
         this.plugin = plugin;
     }
 
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    @Override
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
             return true;
@@ -76,11 +78,15 @@ public class OpenInvPluginCommand implements CommandExecutor {
             name = args[0];
         }
 
-        sender.sendMessage(ChatColor.GREEN + "Starting inventory lookup.");
         final UUID senderID = player.getUniqueId();
         new BukkitRunnable() {
             @Override
             public void run() {
+                List<Player> matches = Bukkit.matchPlayer(name);
+                if (!matches.isEmpty()) {
+                    openInventory(player, matches.get(0).getUniqueId());
+                    return;
+                }
                 final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
                 if (Bukkit.getPlayer(senderID) == null) {
                     return;
