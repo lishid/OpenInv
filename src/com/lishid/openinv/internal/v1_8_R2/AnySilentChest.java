@@ -37,7 +37,7 @@ import net.minecraft.server.v1_8_R2.World;
 
 public class AnySilentChest implements IAnySilentChest {
     @Override
-	public boolean IsAnyChestNeeded(Player p, int x, int y, int z) {
+    public boolean IsAnyChestNeeded(Player p, int x, int y, int z) {
         // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
@@ -61,7 +61,7 @@ public class AnySilentChest implements IAnySilentChest {
     }
 
     @Override
-	public boolean ActivateChest(Player p, boolean anychest, boolean silentchest, int x, int y, int z) {
+    public boolean ActivateChest(Player p, boolean anychest, boolean silentchest, int x, int y, int z) {
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
         Object chest = world.getTileEntity(new BlockPosition(x, y, z));

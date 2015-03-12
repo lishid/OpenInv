@@ -57,12 +57,12 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     }
 
     @Override
-	public Inventory getBukkitInventory() {
+    public Inventory getBukkitInventory() {
         return inventory;
     }
 
     @Override
-	public void InventoryRemovalCheck() {
+    public void InventoryRemovalCheck() {
         owner.saveData();
         if (transaction.isEmpty() && !playerOnline) {
             OpenInv.enderChests.remove(owner.getName().toLowerCase());
@@ -70,7 +70,7 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     }
 
     @Override
-	public void PlayerGoOnline(Player p) {
+    public void PlayerGoOnline(Player p) {
         if (!playerOnline) {
             try {
                 InventoryEnderChest playerEnderChest = ((CraftPlayer) p).getHandle().getEnderChest();
@@ -85,48 +85,48 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     }
 
     @Override
-	public void PlayerGoOffline() {
+    public void PlayerGoOffline() {
         playerOnline = false;
     }
 
     @Override
-	public ItemStack[] getContents() {
+    public ItemStack[] getContents() {
         return this.items;
     }
 
     @Override
-	public void onOpen(CraftHumanEntity who) {
+    public void onOpen(CraftHumanEntity who) {
         transaction.add(who);
     }
 
     @Override
-	public void onClose(CraftHumanEntity who) {
+    public void onClose(CraftHumanEntity who) {
         transaction.remove(who);
         this.InventoryRemovalCheck();
     }
 
     @Override
-	public List<HumanEntity> getViewers() {
+    public List<HumanEntity> getViewers() {
         return transaction;
     }
 
     @Override
-	public InventoryHolder getOwner() {
+    public InventoryHolder getOwner() {
         return this.owner;
     }
 
     @Override
-	public void setMaxStackSize(int size) {
+    public void setMaxStackSize(int size) {
         maxStack = size;
     }
 
     @Override
-	public int getMaxStackSize() {
+    public int getMaxStackSize() {
         return maxStack;
     }
 
     @Override
-	public boolean a(EntityHuman entityhuman) {
+    public boolean a(EntityHuman entityhuman) {
         return true;
     }
 
@@ -139,7 +139,7 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     }
 
     @Override
-	public void update() {
+    public void update() {
         enderChest.update();
     }
 }

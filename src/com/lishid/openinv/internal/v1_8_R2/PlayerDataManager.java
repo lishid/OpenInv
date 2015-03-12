@@ -36,7 +36,7 @@ import net.minecraft.server.v1_8_R2.PlayerInteractManager;
 
 public class PlayerDataManager implements IPlayerDataManager {
     @Override
-	public Player loadPlayer(String name) {
+    public Player loadPlayer(String name) {
         try {
             UUID uuid = matchUser(name);
             if (uuid == null) {
@@ -110,7 +110,7 @@ public class PlayerDataManager implements IPlayerDataManager {
      */
     @Override
     public Player loadPlayer(UUID uuid) {
-    	OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
         if (player == null || !player.hasPlayedBefore()) {
             return null;
         }

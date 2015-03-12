@@ -32,7 +32,7 @@ import net.minecraft.server.v1_8_R2.IInventory;
 
 public class InventoryAccess implements IInventoryAccess {
     @Override
-	public boolean check(Inventory inventory, HumanEntity player) {
+    public boolean check(Inventory inventory, HumanEntity player) {
         IInventory inv = grabInventory(inventory);
         
         if (inv instanceof SpecialPlayerInventory) {
