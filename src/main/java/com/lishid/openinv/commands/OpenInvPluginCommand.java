@@ -114,7 +114,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
             return;
         }
 
-        // Crosswork check
+        // Crossworld check
         if ((!OpenInv.hasPermission(player, Permissions.PERM_CROSSWORLD) && !OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE)) && target.getWorld() != player.getWorld()) {
             player.sendMessage(ChatColor.RED + target.getDisplayName() + " is not in your world!");
             return;
