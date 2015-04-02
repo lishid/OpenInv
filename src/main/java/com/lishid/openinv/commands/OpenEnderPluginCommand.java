@@ -122,6 +122,12 @@ public class OpenEnderPluginCommand implements CommandExecutor {
             return;
         }
 
+        // Permissions checks
+        if (!OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE) && OpenInv.hasPermission(target, Permissions.PERM_EXEMPT)) {
+            player.sendMessage(ChatColor.RED + target.getDisplayName() + "'s enderchest is protected!");
+            return;
+        }
+
         // Crossworld check
         if ((!OpenInv.hasPermission(player, Permissions.PERM_CROSSWORLD) && !OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE)) && target.getWorld() != player.getWorld()) {
             player.sendMessage(ChatColor.RED + target.getDisplayName() + " is not in your world!");
