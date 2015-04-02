@@ -18,6 +18,7 @@ package com.lishid.openinv.commands;
 
 import java.util.HashMap;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -54,7 +55,6 @@ public class OpenEnderPluginCommand implements CommandExecutor {
         }
 
         Player player = (Player) sender;
-        boolean offline = false;
 
         // History management
         String history = openEnderHistory.get(player);
@@ -64,10 +64,7 @@ public class OpenEnderPluginCommand implements CommandExecutor {
             openEnderHistory.put(player, history);
         }
 
-        // Target selecting
-        Player target;
-
-        String name = "";
+        final String name;
 
         // Read from history if target is not named
         if (args.length < 1) {
@@ -83,36 +80,60 @@ public class OpenEnderPluginCommand implements CommandExecutor {
             name = args[0];
         }
 
-        target = this.plugin.getServer().getPlayer(name);
-
+        final String playername = player.getName();
+        Player target = plugin.getServer().getPlayer(name);
+        // Targeted player was not found online, start asynchron lookup in files
         if (target == null) {
-            // Try loading the player's data
-            target = OpenInv.playerLoader.loadPlayer(name);
-
-            if (target == null) {
-                sender.sendMessage(ChatColor.RED + "Player " + name + " not found!");
-                return true;
-            }
+            sender.sendMessage(ChatColor.GREEN + "Starting inventory lookup.");
+            plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    // Try loading the player's data asynchronly
+                    final Player target = OpenInv.playerLoader.loadPlayer(name);
+                    // Back to synchron to send messages and display inventory
+                    Bukkit.getScheduler().runTask(plugin, new Runnable() {
+                        @Override
+                        public void run() {
+                            Player player = Bukkit.getPlayer(playername);
+                            // If sender is no longer online after loading the target. Abort!
+                            if (player == null) {
+                                return;
+                            }
+                            openInventory(player, target);
+                        }
+                    });
+                }
+            });
+        } else {
+            openInventory(player, target);
         }
 
-        if (target != sender && !OpenInv.hasPermission(sender, Permissions.PERM_ENDERCHEST_ALL)) {
-            sender.sendMessage(ChatColor.RED + "You do not have permission to access other player's enderchest");
-            return true;
+        return true;
+    }
+
+    private void openInventory(Player player, Player target) {
+        if (target == null) {
+            player.sendMessage(ChatColor.RED + "Player not found!");
+            return;
+        }
+
+        if (target != player && !OpenInv.hasPermission(player, Permissions.PERM_ENDERCHEST_ALL)) {
+            player.sendMessage(ChatColor.RED + "You do not have permission to access other player's enderchest");
+            return;
         }
 
         // Record the target
-        history = target.getName();
-        openEnderHistory.put(player, history);
+        openEnderHistory.put(player, target.getName());
 
         // Create the inventory
         ISpecialEnderChest chest = OpenInv.enderChests.get(target.getName().toLowerCase());
         if (chest == null) {
-            chest = InternalAccessor.Instance.newSpecialEnderChest(target, !offline);
+            chest = InternalAccessor.Instance.newSpecialEnderChest(target, target.isOnline());
         }
 
         // Open the inventory
         player.openInventory(chest.getBukkitInventory());
 
-        return true;
+        return;
     }
 }
