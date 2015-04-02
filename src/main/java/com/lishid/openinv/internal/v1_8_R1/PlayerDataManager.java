@@ -65,6 +65,10 @@ public class PlayerDataManager implements IPlayerDataManager {
     }
 
     private static UUID matchUser(String search) {
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(search);
+        if (offlinePlayer != null && offlinePlayer.hasPlayedBefore()) {
+            return offlinePlayer.getUniqueId();
+        }
         UUID found = null;
 
         String lowerSearch = search.toLowerCase();
