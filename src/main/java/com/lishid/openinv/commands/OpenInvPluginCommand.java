@@ -16,7 +16,8 @@
 
 package com.lishid.openinv.commands;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -32,7 +33,7 @@ import com.lishid.openinv.internal.InternalAccessor;
 
 public class OpenInvPluginCommand implements CommandExecutor {
     private final OpenInv plugin;
-    public static HashMap<Player, String> openInvHistory = new HashMap<Player, String>();
+    public static Map<Player, String> openInvHistory = new ConcurrentHashMap<Player, String>();
 
     public OpenInvPluginCommand(OpenInv plugin) {
         this.plugin = plugin;
