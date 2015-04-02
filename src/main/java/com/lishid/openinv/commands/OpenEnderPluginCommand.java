@@ -122,6 +122,12 @@ public class OpenEnderPluginCommand implements CommandExecutor {
             return;
         }
 
+        // Crossworld check
+        if ((!OpenInv.hasPermission(player, Permissions.PERM_CROSSWORLD) && !OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE)) && target.getWorld() != player.getWorld()) {
+            player.sendMessage(ChatColor.RED + target.getDisplayName() + " is not in your world!");
+            return;
+        }
+
         // Record the target
         openEnderHistory.put(player, target.getName());
 
