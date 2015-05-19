@@ -79,7 +79,6 @@ public class OpenEnderPluginCommand implements CommandExecutor {
             name = args[0];
         }
 
-        sender.sendMessage(ChatColor.GREEN + "Starting inventory lookup.");
         final UUID senderID = player.getUniqueId();
         new BukkitRunnable() {
             @Override
