@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_8_R2;
+package com.lishid.openinv.internal.v1_8_R3;
 
 import java.io.File;
 import java.util.UUID;
@@ -27,12 +27,12 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IPlayerDataManager;
 import com.mojang.authlib.GameProfile;
 
-import org.bukkit.craftbukkit.v1_8_R2.CraftServer;
-
-import net.minecraft.server.v1_8_R2.EntityPlayer;
 //Volatile
-import net.minecraft.server.v1_8_R2.MinecraftServer;
-import net.minecraft.server.v1_8_R2.PlayerInteractManager;
+import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
+
+import net.minecraft.server.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_8_R3.MinecraftServer;
+import net.minecraft.server.v1_8_R3.PlayerInteractManager;
 
 public class PlayerDataManager implements IPlayerDataManager {
     @Override

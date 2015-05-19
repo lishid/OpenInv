@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_8_R2;
+package com.lishid.openinv.internal.v1_8_R3;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -23,17 +23,17 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IAnySilentChest;
 
 //Volatile
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 
-import net.minecraft.server.v1_8_R2.Block;
-import net.minecraft.server.v1_8_R2.BlockPosition;
-import net.minecraft.server.v1_8_R2.EntityPlayer;
-import net.minecraft.server.v1_8_R2.IInventory;
-import net.minecraft.server.v1_8_R2.ITileInventory;
-import net.minecraft.server.v1_8_R2.InventoryLargeChest;
-import net.minecraft.server.v1_8_R2.PacketPlayOutOpenWindow;
-import net.minecraft.server.v1_8_R2.TileEntityChest;
-import net.minecraft.server.v1_8_R2.World;
+import net.minecraft.server.v1_8_R3.Block;
+import net.minecraft.server.v1_8_R3.BlockPosition;
+import net.minecraft.server.v1_8_R3.EntityPlayer;
+import net.minecraft.server.v1_8_R3.IInventory;
+import net.minecraft.server.v1_8_R3.ITileInventory;
+import net.minecraft.server.v1_8_R3.InventoryLargeChest;
+import net.minecraft.server.v1_8_R3.PacketPlayOutOpenWindow;
+import net.minecraft.server.v1_8_R3.TileEntityChest;
+import net.minecraft.server.v1_8_R3.World;
 
 public class AnySilentChest implements IAnySilentChest {
     @Override

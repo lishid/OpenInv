@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_8_R2;
+package com.lishid.openinv.internal.v1_8_R3;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -23,13 +23,13 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 
 //Volatile
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
 
-import net.minecraft.server.v1_8_R2.EntityHuman;
-import net.minecraft.server.v1_8_R2.ItemStack;
-import net.minecraft.server.v1_8_R2.PlayerInventory;
+import net.minecraft.server.v1_8_R3.EntityHuman;
+import net.minecraft.server.v1_8_R3.ItemStack;
+import net.minecraft.server.v1_8_R3.PlayerInventory;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
     CraftPlayer owner;

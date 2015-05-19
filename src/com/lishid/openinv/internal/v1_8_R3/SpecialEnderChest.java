@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_8_R2;
+package com.lishid.openinv.internal.v1_8_R3;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -28,16 +28,16 @@ import org.bukkit.inventory.InventoryHolder;
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventory;
-
 //Volatile
-import net.minecraft.server.v1_8_R2.EntityHuman;
-import net.minecraft.server.v1_8_R2.IInventory;
-import net.minecraft.server.v1_8_R2.InventoryEnderChest;
-import net.minecraft.server.v1_8_R2.InventorySubcontainer;
-import net.minecraft.server.v1_8_R2.ItemStack;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
+
+import net.minecraft.server.v1_8_R3.EntityHuman;
+import net.minecraft.server.v1_8_R3.IInventory;
+import net.minecraft.server.v1_8_R3.InventoryEnderChest;
+import net.minecraft.server.v1_8_R3.InventorySubcontainer;
+import net.minecraft.server.v1_8_R3.ItemStack;
 
 public class SpecialEnderChest extends InventorySubcontainer implements IInventory, ISpecialEnderChest {
     public List<HumanEntity> transaction = new ArrayList<HumanEntity>();
