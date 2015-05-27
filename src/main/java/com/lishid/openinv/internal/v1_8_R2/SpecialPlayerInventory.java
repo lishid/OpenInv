@@ -85,7 +85,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     public ItemStack[] getContents() {
         ItemStack[] C = new ItemStack[getSize()];
         System.arraycopy(items, 0, C, 0, items.length);
-        System.arraycopy(items, 0, C, items.length, armor.length);
+        System.arraycopy(armor, 0, C, items.length, armor.length);
         return C;
     }
 

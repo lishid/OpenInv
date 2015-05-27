@@ -14,9 +14,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_7_R3;
+package com.lishid.openinv.internal.v1_8_R3;
 
-import java.io.File;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -25,24 +24,18 @@ import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IPlayerDataManager;
-import net.minecraft.util.com.mojang.authlib.GameProfile;
+import com.mojang.authlib.GameProfile;
 
 //Volatile
-import net.minecraft.server.v1_7_R3.*;
+import net.minecraft.server.v1_8_R3.*;
 
-import org.bukkit.craftbukkit.v1_7_R3.*;
+import org.bukkit.craftbukkit.v1_8_R3.*;
 
 public class PlayerDataManager implements IPlayerDataManager {
     public Player loadPlayer(String name) {
         try {
             UUID uuid = matchUser(name);
             if (uuid == null) {
-                return null;
-            }
-
-            // Default player folder
-            File playerfolder = new File(Bukkit.getWorlds().get(0).getWorldFolder(), "playerdata");
-            if (!playerfolder.exists()) {
                 return null;
             }
 
@@ -56,7 +49,7 @@ public class PlayerDataManager implements IPlayerDataManager {
             EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), profile, new PlayerInteractManager(server.getWorldServer(0)));
 
             // Get the bukkit entity
-            Player target = (entity == null) ? null : entity.getBukkitEntity();
+            Player target = entity.getBukkitEntity();
             if (target != null) {
                 // Load data
                 target.loadData();
@@ -85,9 +78,12 @@ public class PlayerDataManager implements IPlayerDataManager {
         for (OfflinePlayer player : offlinePlayers) {
             String name = player.getName();
 
-            if (name.equalsIgnoreCase(search))
+            if (name == null){
+                continue;
+            }
+            if (name.equalsIgnoreCase(search)){
                 return player.getUniqueId();
-
+            }
             if (name.toLowerCase().startsWith(lowerSearch)) {
                 int curDelta = name.length() - lowerSearch.length();
                 if (curDelta < delta) {
