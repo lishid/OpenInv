@@ -67,13 +67,13 @@ public class OpenInv extends JavaPlugin {
         mainPlugin = this;
         FileConfiguration config = getConfig();
         config.set("CheckForUpdates", config.getBoolean("CheckForUpdates", true));
-        config.set("notifySilentChest", config.getBoolean("notifySilentChest", true));
-        config.set("notifyAnyChest", config.getBoolean("notifyAnyChest", true));
+        config.set("NotifySilentChest", config.getBoolean("NotifySilentChest", true));
+        config.set("NotifyAnyChest", config.getBoolean("NotifyAnyChest", true));
         config.set("ItemOpenInvItemID", config.getInt("ItemOpenInvItemID", 280));
         config.addDefault("ItemOpenInvItemID", 280);
         config.addDefault("CheckForUpdates", true);
-        config.addDefault("notifySilentChest", true);
-        config.addDefault("notifyAnyChest", true);
+        config.addDefault("NotifySilentChest", true);
+        config.addDefault("NotifyAnyChest", true);
         config.options().copyDefaults(true);
         saveConfig();
 
@@ -90,11 +90,11 @@ public class OpenInv extends JavaPlugin {
     }
 
     public static boolean notifySilentChest() {
-        return mainPlugin.getConfig().getBoolean("notifySilentChest", true);
+        return mainPlugin.getConfig().getBoolean("NotifySilentChest", true);
     }
 
     public static boolean notifyAnyChest() {
-        return mainPlugin.getConfig().getBoolean("notifyAnyChest", true);
+        return mainPlugin.getConfig().getBoolean("NotifyAnyChest", true);
     }
 
     public static boolean getPlayerItemOpenInvStatus(String name) {
