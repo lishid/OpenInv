@@ -26,32 +26,33 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 
 public class SilentChestPluginCommand implements CommandExecutor {
-    public SilentChestPluginCommand(OpenInv plugin) {
-
-    }
-
+    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
-            return true;
-        }
-        if (!OpenInv.hasPermission(sender, Permissions.PERM_SILENT)) {
-            sender.sendMessage(ChatColor.RED + "You do not have permission to use silent chest.");
-            return true;
-        }
-
-        if (args.length > 0) {
-            if (args[0].equalsIgnoreCase("check")) {
-                if (OpenInv.GetPlayerSilentChestStatus(sender.getName()))
-                    sender.sendMessage("SilentChest is ON.");
-                else
-                    sender.sendMessage("SilentChest is OFF.");
+        if (command.getName().equalsIgnoreCase("silentchest")) {
+            if (!(sender instanceof Player)) {
+                sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
+                return true;
             }
+            if (!OpenInv.hasPermission(sender, Permissions.PERM_SILENT)) {
+                sender.sendMessage(ChatColor.RED + "You do not have permission to use silent chest.");
+                return true;
+            }
+
+            if (args.length > 0) {
+                if (args[0].equalsIgnoreCase("check")) {
+                    if (OpenInv.GetPlayerSilentChestStatus(sender.getName()))
+                        sender.sendMessage("SilentChest is ON.");
+                    else
+                        sender.sendMessage("SilentChest is OFF.");
+                }
+            }
+
+            OpenInv.SetPlayerSilentChestStatus(sender.getName(), !OpenInv.GetPlayerSilentChestStatus(sender.getName()));
+            sender.sendMessage("SilentChest is now " + (OpenInv.GetPlayerSilentChestStatus(sender.getName()) ? "On" : "Off") + ".");
+
+            return true;
         }
 
-        OpenInv.SetPlayerSilentChestStatus(sender.getName(), !OpenInv.GetPlayerSilentChestStatus(sender.getName()));
-        sender.sendMessage("SilentChest is now " + (OpenInv.GetPlayerSilentChestStatus(sender.getName()) ? "On" : "Off") + ".");
-
-        return true;
+        return false;
     }
 }
