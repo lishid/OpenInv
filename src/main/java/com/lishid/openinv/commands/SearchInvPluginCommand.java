@@ -28,50 +28,52 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 
 public class SearchInvPluginCommand implements CommandExecutor {
-    public SearchInvPluginCommand() {
-
-    }
-
+    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (sender instanceof Player) {
-            if (!OpenInv.hasPermission(sender, Permissions.PERM_SEARCH)) {
-                sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
-                return true;
+        if (command.getName().equalsIgnoreCase("searchinv")) {
+            if (sender instanceof Player) {
+                if (!OpenInv.hasPermission(sender, Permissions.PERM_SEARCH)) {
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
+                    return true;
+                }
             }
-        }
 
-        String PlayerList = "";
+            String playerList = "";
 
-        Material material = null;
-        int count = 1;
+            Material material = null;
+            int count = 1;
 
-        if (args.length >= 1) {
-            String[] gData = null;
-            gData = args[0].split(":");
-            material = Material.matchMaterial(gData[0]);
-        }
-        if (args.length >= 2) {
-            try {
-                count = Integer.parseInt(args[1]);
+            if (args.length >= 1) {
+                String[] gData = null;
+                gData = args[0].split(":");
+                material = Material.matchMaterial(gData[0]);
             }
-            catch (NumberFormatException ex) {
-                sender.sendMessage(ChatColor.RED + "'" + args[1] + "' is not a number!");
+            if (args.length >= 2) {
+                try {
+                    count = Integer.parseInt(args[1]);
+                }
+                catch (NumberFormatException ex) {
+                    sender.sendMessage(ChatColor.RED + "'" + args[1] + "' is not a number!");
+                    return false;
+                }
+            }
+
+            if (material == null) {
+                sender.sendMessage(ChatColor.RED + "Unknown item");
                 return false;
             }
-        }
 
-        if (material == null) {
-            sender.sendMessage(ChatColor.RED + "Unknown item");
-            return false;
-        }
-
-        for (Player templayer : Bukkit.getServer().getOnlinePlayers()) {
-            if (templayer.getInventory().contains(material, count)) {
-                PlayerList += templayer.getName() + "  ";
+            for (Player templayer : Bukkit.getServer().getOnlinePlayers()) {
+                if (templayer.getInventory().contains(material, count)) {
+                    playerList += templayer.getName() + "  ";
+                }
             }
+
+            sender.sendMessage("Players with the item " + material.toString() + ":  " + playerList);
+
+            return true;
         }
 
-        sender.sendMessage("Players with the item " + material.toString() + ":  " + PlayerList);
-        return true;
+        return false;
     }
 }
