@@ -111,10 +111,12 @@ public class SilentInventory implements ITileInventory {
         return inv.getContents();
     }
 
+    @Override
     public void onOpen(CraftHumanEntity craftHumanEntity) {
         inv.onOpen(craftHumanEntity);
     }
 
+    @Override
     public void onClose(CraftHumanEntity craftHumanEntity) {
         inv.onClose(craftHumanEntity);
     }

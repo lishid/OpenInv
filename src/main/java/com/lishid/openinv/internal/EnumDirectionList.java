@@ -11,7 +11,7 @@ public enum EnumDirectionList implements Iterable<EnumDirection> {
     HORIZONTAL(EnumDirectionLimit.HORIZONTAL),
     VERTICAL(EnumDirectionLimit.VERTICAL);
 
-    private EnumDirectionLimit list;
+    private final EnumDirectionLimit list;
 
     private EnumDirectionList(EnumDirectionLimit list) {
         this.list = list;

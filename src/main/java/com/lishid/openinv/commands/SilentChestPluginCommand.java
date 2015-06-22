@@ -40,15 +40,15 @@ public class SilentChestPluginCommand implements CommandExecutor {
 
             if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("check")) {
-                    if (OpenInv.GetPlayerSilentChestStatus(sender.getName()))
+                    if (OpenInv.getPlayerSilentChestStatus(sender.getName()))
                         sender.sendMessage("SilentChest is ON.");
                     else
                         sender.sendMessage("SilentChest is OFF.");
                 }
             }
 
-            OpenInv.SetPlayerSilentChestStatus(sender.getName(), !OpenInv.GetPlayerSilentChestStatus(sender.getName()));
-            sender.sendMessage("SilentChest is now " + (OpenInv.GetPlayerSilentChestStatus(sender.getName()) ? "On" : "Off") + ".");
+            OpenInv.setPlayerSilentChestStatus(sender.getName(), !OpenInv.getPlayerSilentChestStatus(sender.getName()));
+            sender.sendMessage("SilentChest is now " + (OpenInv.getPlayerSilentChestStatus(sender.getName()) ? "On" : "Off") + ".");
 
             return true;
         }

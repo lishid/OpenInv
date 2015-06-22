@@ -124,7 +124,7 @@ public class AnySilentChest {
         boolean returnValue = true;
         if (silentchest) {
             tileInventory = new SilentInventory(tileInventory);
-            if (OpenInv.NotifySilentChest()) {
+            if (OpenInv.notifySilentChest()) {
                 p.sendMessage("You are opening a chest silently.");
             }
             returnValue = false;
@@ -132,7 +132,7 @@ public class AnySilentChest {
 
         player.openContainer(tileInventory);
 
-        if (anychest && OpenInv.NotifyAnyChest()) {
+        if (anychest && OpenInv.notifyAnyChest()) {
             p.sendMessage("You are opening a blocked chest.");
         }
 

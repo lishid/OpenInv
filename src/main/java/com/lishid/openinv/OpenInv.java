@@ -67,13 +67,13 @@ public class OpenInv extends JavaPlugin {
         mainPlugin = this;
         FileConfiguration config = getConfig();
         config.set("CheckForUpdates", config.getBoolean("CheckForUpdates", true));
-        config.set("NotifySilentChest", config.getBoolean("NotifySilentChest", true));
-        config.set("NotifyAnyChest", config.getBoolean("NotifyAnyChest", true));
+        config.set("notifySilentChest", config.getBoolean("notifySilentChest", true));
+        config.set("notifyAnyChest", config.getBoolean("notifyAnyChest", true));
         config.set("ItemOpenInvItemID", config.getInt("ItemOpenInvItemID", 280));
         config.addDefault("ItemOpenInvItemID", 280);
         config.addDefault("CheckForUpdates", true);
-        config.addDefault("NotifySilentChest", true);
-        config.addDefault("NotifyAnyChest", true);
+        config.addDefault("notifySilentChest", true);
+        config.addDefault("notifyAnyChest", true);
         config.options().copyDefaults(true);
         saveConfig();
 
@@ -89,49 +89,49 @@ public class OpenInv extends JavaPlugin {
         getCommand("openender").setExecutor(new OpenEnderPluginCommand(this));
     }
 
-    public static boolean NotifySilentChest() {
-        return mainPlugin.getConfig().getBoolean("NotifySilentChest", true);
+    public static boolean notifySilentChest() {
+        return mainPlugin.getConfig().getBoolean("notifySilentChest", true);
     }
 
-    public static boolean NotifyAnyChest() {
-        return mainPlugin.getConfig().getBoolean("NotifyAnyChest", true);
+    public static boolean notifyAnyChest() {
+        return mainPlugin.getConfig().getBoolean("notifyAnyChest", true);
     }
 
-    public static boolean GetPlayerItemOpenInvStatus(String name) {
+    public static boolean getPlayerItemOpenInvStatus(String name) {
         return mainPlugin.getConfig().getBoolean("ItemOpenInv." + name.toLowerCase() + ".toggle", false);
     }
 
-    public static void SetPlayerItemOpenInvStatus(String name, boolean status) {
+    public static void setPlayerItemOpenInvStatus(String name, boolean status) {
         mainPlugin.getConfig().set("ItemOpenInv." + name.toLowerCase() + ".toggle", status);
         mainPlugin.saveConfig();
     }
 
-    public static boolean GetPlayerSilentChestStatus(String name) {
+    public static boolean getPlayerSilentChestStatus(String name) {
         return mainPlugin.getConfig().getBoolean("SilentChest." + name.toLowerCase() + ".toggle", false);
     }
 
-    public static void SetPlayerSilentChestStatus(String name, boolean status) {
+    public static void setPlayerSilentChestStatus(String name, boolean status) {
         mainPlugin.getConfig().set("SilentChest." + name.toLowerCase() + ".toggle", status);
         mainPlugin.saveConfig();
     }
 
-    public static boolean GetPlayerAnyChestStatus(String name) {
+    public static boolean getPlayerAnyChestStatus(String name) {
         return mainPlugin.getConfig().getBoolean("AnyChest." + name.toLowerCase() + ".toggle", true);
     }
 
-    public static void SetPlayerAnyChestStatus(String name, boolean status) {
+    public static void setPlayerAnyChestStatus(String name, boolean status) {
         mainPlugin.getConfig().set("AnyChest." + name.toLowerCase() + ".toggle", status);
         mainPlugin.saveConfig();
     }
 
-    public static int GetItemOpenInvItem() {
+    public static int getItemOpenInvItem() {
         if (mainPlugin.getConfig().get("ItemOpenInvItemID") == null) {
-            SaveToConfig("ItemOpenInvItemID", 280);
+            saveToConfig("ItemOpenInvItemID", 280);
         }
         return mainPlugin.getConfig().getInt("ItemOpenInvItemID", 280);
     }
 
-    public static Object GetFromConfig(String data, Object defaultValue) {
+    public static Object getFromConfig(String data, Object defaultValue) {
         Object val = mainPlugin.getConfig().get(data);
         if (val == null) {
             mainPlugin.getConfig().set(data, defaultValue);
@@ -142,7 +142,7 @@ public class OpenInv extends JavaPlugin {
         }
     }
 
-    public static void SaveToConfig(String data, Object value) {
+    public static void saveToConfig(String data, Object value) {
         mainPlugin.getConfig().set(data, value);
         mainPlugin.saveConfig();
     }
@@ -162,7 +162,7 @@ public class OpenInv extends JavaPlugin {
         e.printStackTrace();
     }
 
-    public static void ShowHelp(Player player) {
+    public static void showHelp(Player player) {
         player.sendMessage(ChatColor.GREEN + "/openinv <Player> - Open a player's inventory");
         player.sendMessage(ChatColor.GREEN + "   (aliases: oi, inv, open)");
         player.sendMessage(ChatColor.GREEN + "/openender <Player> - Open a player's enderchest");

@@ -79,7 +79,7 @@ public class OpenInvPlayerListener implements Listener {
         }
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == org.bukkit.Material.ENDER_CHEST) {
-            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.GetPlayerSilentChestStatus(player.getName())) {
+            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.getPlayerSilentChestStatus(player.getName())) {
                 event.setCancelled(true);
                 player.openInventory(player.getEnderChest());
             }
@@ -92,11 +92,11 @@ public class OpenInvPlayerListener implements Listener {
             int y = event.getClickedBlock().getY();
             int z = event.getClickedBlock().getZ();
 
-            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.GetPlayerSilentChestStatus(player.getName())) {
+            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.getPlayerSilentChestStatus(player.getName())) {
                 silentchest = true;
             }
 
-            if (OpenInv.hasPermission(player, Permissions.PERM_ANYCHEST) && OpenInv.GetPlayerAnyChestStatus(player.getName())) {
+            if (OpenInv.hasPermission(player, Permissions.PERM_ANYCHEST) && OpenInv.getPlayerAnyChestStatus(player.getName())) {
                 try {
                     anychest = OpenInv.anySilentChest.IsAnyChestNeeded(player, x, y, z);
                 }
@@ -129,7 +129,7 @@ public class OpenInvPlayerListener implements Listener {
         }
 
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (!(player.getItemInHand().getType().getId() == OpenInv.GetItemOpenInvItem()) || (!OpenInv.GetPlayerItemOpenInvStatus(player.getName())) || !OpenInv.hasPermission(player, Permissions.PERM_OPENINV)) {
+            if (!(player.getItemInHand().getType().getId() == OpenInv.getItemOpenInvItem()) || (!OpenInv.getPlayerItemOpenInvStatus(player.getName())) || !OpenInv.hasPermission(player, Permissions.PERM_OPENINV)) {
                 return;
             }
 

@@ -43,19 +43,19 @@ public class ToggleOpenInvPluginCommand implements CommandExecutor {
             Player player = (Player) sender;
             if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("check")) {
-                    if (OpenInv.GetPlayerItemOpenInvStatus(player.getName()))
-                        player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.GetItemOpenInvItem()).toString() + " is ON.");
+                    if (OpenInv.getPlayerItemOpenInvStatus(player.getName()))
+                        player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.getItemOpenInvItem()).toString() + " is ON.");
                     else
-                        player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.GetItemOpenInvItem()).toString() + " is OFF.");
+                        player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.getItemOpenInvItem()).toString() + " is OFF.");
                 }
             }
-            if (OpenInv.GetPlayerItemOpenInvStatus(player.getName())) {
-                OpenInv.SetPlayerItemOpenInvStatus(player.getName(), false);
-                player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.GetItemOpenInvItem()).toString() + " is OFF.");
+            if (OpenInv.getPlayerItemOpenInvStatus(player.getName())) {
+                OpenInv.setPlayerItemOpenInvStatus(player.getName(), false);
+                player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.getItemOpenInvItem()).toString() + " is OFF.");
             }
             else {
-                OpenInv.SetPlayerItemOpenInvStatus(player.getName(), true);
-                player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.GetItemOpenInvItem()).toString() + " is ON.");
+                OpenInv.setPlayerItemOpenInvStatus(player.getName(), true);
+                player.sendMessage("OpenInv with " + Material.getMaterial(OpenInv.getItemOpenInvItem()).toString() + " is ON.");
             }
             return true;
         }

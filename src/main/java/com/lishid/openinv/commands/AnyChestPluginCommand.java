@@ -40,15 +40,15 @@ public class AnyChestPluginCommand implements CommandExecutor {
 
             if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("check")) {
-                    if (OpenInv.GetPlayerAnyChestStatus(sender.getName()))
+                    if (OpenInv.getPlayerAnyChestStatus(sender.getName()))
                         sender.sendMessage("AnyChest is ON.");
                     else
                         sender.sendMessage("AnyChest is OFF.");
                 }
             }
 
-            OpenInv.SetPlayerAnyChestStatus(sender.getName(), !OpenInv.GetPlayerAnyChestStatus(sender.getName()));
-            sender.sendMessage("AnyChest is now " + (OpenInv.GetPlayerAnyChestStatus(sender.getName()) ? "On" : "Off") + ".");
+            OpenInv.setPlayerAnyChestStatus(sender.getName(), !OpenInv.getPlayerAnyChestStatus(sender.getName()));
+            sender.sendMessage("AnyChest is now " + (OpenInv.getPlayerAnyChestStatus(sender.getName()) ? "On" : "Off") + ".");
 
             return true;
         }

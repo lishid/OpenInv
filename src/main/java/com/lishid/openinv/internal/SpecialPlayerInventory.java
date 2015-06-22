@@ -27,9 +27,9 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.*;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.*;
 
 public class SpecialPlayerInventory extends PlayerInventory {
-    private CraftInventory inventory = new CraftInventory(this);
-    private ItemStack[] extra = new ItemStack[5];
-    private CraftPlayer owner;
+    private final CraftInventory inventory = new CraftInventory(this);
+    private final ItemStack[] extra = new ItemStack[5];
+    private final CraftPlayer owner;
     private boolean playerOnline = false;
 
     public SpecialPlayerInventory(Player p, boolean online) {

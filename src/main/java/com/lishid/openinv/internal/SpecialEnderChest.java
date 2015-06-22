@@ -28,9 +28,9 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.*;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.*;
 
 public class SpecialEnderChest extends InventorySubcontainer {
-    private CraftInventory inventory = new CraftInventory(this);
-    private InventoryEnderChest enderChest;
-    private CraftPlayer owner;
+    private final CraftInventory inventory = new CraftInventory(this);
+    private final InventoryEnderChest enderChest;
+    private final CraftPlayer owner;
     private boolean playerOnline = false;
 
     public SpecialEnderChest(Player p, Boolean online) {
