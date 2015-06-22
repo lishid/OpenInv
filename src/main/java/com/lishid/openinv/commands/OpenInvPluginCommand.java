@@ -34,7 +34,7 @@ import com.lishid.openinv.utils.UUIDUtil;
 
 public class OpenInvPluginCommand implements CommandExecutor {
     private final OpenInv plugin;
-    public static final Map<UUID, UUID> openInvHistory = new ConcurrentHashMap<UUID, UUID>();
+    private final Map<UUID, UUID> openInvHistory = new ConcurrentHashMap<UUID, UUID>();
 
     public OpenInvPluginCommand(OpenInv plugin) {
         this.plugin = plugin;
@@ -48,7 +48,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
                 return true;
             }
             if (!OpenInv.hasPermission(sender, Permissions.PERM_OPENINV)) {
-                sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
+                sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories.");
                 return true;
             }
 
@@ -57,7 +57,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
                 return true;
             }
 
-            Player player = (Player) sender;
+            final Player player = (Player) sender;
 
             // History management
             UUID history = openInvHistory.get(player.getUniqueId());
@@ -78,21 +78,25 @@ public class OpenInvPluginCommand implements CommandExecutor {
             }
 
             final UUID playerUUID = player.getUniqueId();
+
             Player target = Bukkit.getPlayer(uuid);
-            // Targeted player was not found online, start asynchron lookup in files
             if (target == null) {
-                sender.sendMessage(ChatColor.GREEN + "Starting inventory lookup.");
-                plugin.getServer().getScheduler().runTaskAsynchronously(plugin, new Runnable() {
+                // Targeted player was not found online, start asynchronous lookup in files
+                Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
                     @Override
                     public void run() {
-                        // Try loading the player's data asynchronly
+                        // Try loading the player's data asynchronously
                         final Player target = OpenInv.playerLoader.loadPlayer(uuid);
-                        // Back to synchron to send messages and display inventory
+                        if (target == null) {
+                            player.sendMessage(ChatColor.RED + "Player not found!");
+                            return;
+                        }
+                        // Open target's inventory synchronously
                         Bukkit.getScheduler().runTask(plugin, new Runnable() {
                             @Override
                             public void run() {
                                 Player player = Bukkit.getPlayer(playerUUID);
-                                // If sender is no longer online after loading the target. Abort!
+                                // If sender is no longer online after loading the target, abort!
                                 if (player == null) {
                                     return;
                                 }

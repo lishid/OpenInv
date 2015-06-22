@@ -34,7 +34,7 @@ public class PlayerDataManager {
     public Player loadPlayer(UUID uuid) {
         try {
             OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-            if (player == null) {
+            if (player == null || !player.hasPlayedBefore()) {
                 return null;
             }
             GameProfile profile = new GameProfile(uuid, player.getName());

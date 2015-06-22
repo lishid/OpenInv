@@ -32,7 +32,7 @@ public class SpecialPlayerInventory extends PlayerInventory {
     private CraftPlayer owner;
     private boolean playerOnline = false;
 
-    public SpecialPlayerInventory(Player p, Boolean online) {
+    public SpecialPlayerInventory(Player p, boolean online) {
         super(((CraftPlayer) p).getHandle());
         this.owner = (CraftPlayer) p;
         this.items = player.inventory.items;
