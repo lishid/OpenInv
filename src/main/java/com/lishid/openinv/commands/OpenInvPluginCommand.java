@@ -53,7 +53,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
             }
 
             if (args.length > 0 && args[0].equalsIgnoreCase("?")) {
-                OpenInv.ShowHelp((Player) sender);
+                OpenInv.showHelp((Player) sender);
                 return true;
             }
 
