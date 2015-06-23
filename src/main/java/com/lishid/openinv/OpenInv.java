@@ -131,9 +131,9 @@ public class OpenInv extends JavaPlugin {
         if (!mainPlugin.getConfig().isSet("items.open-inv")) {
             saveToConfig("items.open-inv", "STICK");
         }
-
         String itemName = mainPlugin.getConfig().getString("items.open-inv", "STICK");
-        return Material.getMaterial(itemName);
+        Material material = Material.getMaterial(itemName);
+        return material != null ? material : Material.STICK;
     }
 
     public static boolean notifySilentChest() {
@@ -198,13 +198,13 @@ public class OpenInv extends JavaPlugin {
     }
 
     public static void showHelp(Player player) {
-        player.sendMessage(ChatColor.GREEN + "/openinv <Player> - Open a player's inventory");
+        player.sendMessage(ChatColor.GREEN + "/openinv <player> - Open a player's inventory");
         player.sendMessage(ChatColor.GREEN + "   (aliases: oi, inv, open)");
-        player.sendMessage(ChatColor.GREEN + "/openender <Player> - Open a player's enderchest");
+        player.sendMessage(ChatColor.GREEN + "/openender <player> - Open a player's ender chest");
         player.sendMessage(ChatColor.GREEN + "   (aliases: oe, enderchest)");
         player.sendMessage(ChatColor.GREEN + "/toggleopeninv - Toggle item openinv function");
         player.sendMessage(ChatColor.GREEN + "   (aliases: toi, toggleoi, toggleinv)");
-        player.sendMessage(ChatColor.GREEN + "/searchinv <Item> [MinAmount] - ");
+        player.sendMessage(ChatColor.GREEN + "/searchinv <item> [minAmount] - ");
         player.sendMessage(ChatColor.GREEN + "   Search and list players having a specific item.");
         player.sendMessage(ChatColor.GREEN + "   (aliases: si, search)");
         player.sendMessage(ChatColor.GREEN + "/anychest - Toggle anychest function");

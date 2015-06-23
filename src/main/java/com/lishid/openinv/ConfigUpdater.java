@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import com.lishid.openinv.utils.UUIDUtil;
 
@@ -30,119 +31,92 @@ public class ConfigUpdater {
     public void checkForUpdates() {
         if (isConfigOutdated()) {
             plugin.getLogger().info("[Config] Update found! Performing update...");
-            updateConfig();
+            performUpdate();
         } else {
             plugin.getLogger().info("[Config] Update not found. Config is already up-to-date.");
         }
     }
 
-    private void updateConfig() {
+    private void performUpdate() {
+        // Update according to the right version
+        switch (getConfigVersion()) {
+            case 1:
+                updateConfig1To2();
+                break;
+        }
+    }
+
+    private void updateConfig1To2() {
         // Get the old config settings
-        int itemOpenInvItemId = plugin.getConfig().getInt("ItemOpenInvItemID", 280);
-        boolean checkForUpdates = plugin.getConfig().getBoolean("CheckForUpdates", true);
-        boolean notifySilentChest = plugin.getConfig().getBoolean("NotifySilentChest", true);
-        boolean notifyAnyChest = plugin.getConfig().getBoolean("NotifyAnyChest", true);
+        FileConfiguration config = plugin.getConfig();
+
+        int itemOpenInvItemId = config.getInt("ItemOpenInvItemID", 280);
+        boolean checkForUpdates = config.getBoolean("CheckForUpdates", true);
+        boolean notifySilentChest = config.getBoolean("NotifySilentChest", true);
+        boolean notifyAnyChest = config.getBoolean("NotifyAnyChest", true);
 
         Map<UUID, Boolean> anyChestToggles = null;
         Map<UUID, Boolean> itemOpenInvToggles = null;
         Map<UUID, Boolean> silentChestToggles = null;
 
-        if (plugin.getConfig().isSet("AnyChest")) {
-            anyChestToggles = updateAnyChestToggles();
+        if (config.isSet("AnyChest")) {
+            anyChestToggles = updateToggles("AnyChest");
         }
 
-        if (plugin.getConfig().isSet("ItemOpenInv")) {
-            itemOpenInvToggles = updateItemOpenInvToggles();
+        if (config.isSet("ItemOpenInv")) {
+            itemOpenInvToggles = updateToggles("ItemOpenInv");
         }
 
-        if (plugin.getConfig().isSet("SilentChest")) {
-            silentChestToggles = updateSilentChestToggles();
+        if (config.isSet("SilentChest")) {
+            silentChestToggles = updateToggles("SilentChest");
         }
 
         // Clear the old config
-        for (String key : plugin.getConfig().getKeys(false)) {
+        for (String key : config.getKeys(false)) {
             plugin.getConfig().set(key, null);
         }
 
         // Set the new config options
-        plugin.getConfig().set("config-version", CONFIG_VERSION);
-        plugin.getConfig().set("check-for-updates", checkForUpdates);
-        plugin.getConfig().set("items.open-inv", getMaterialById(itemOpenInvItemId).toString());
-        plugin.getConfig().set("notify.any-chest", notifyAnyChest);
-        plugin.getConfig().set("notify.silent-chest", notifySilentChest);
+        config.set("config-version", "2");
+        config.set("check-for-updates", checkForUpdates);
+        config.set("items.open-inv", getMaterialById(itemOpenInvItemId).toString());
+        config.set("notify.any-chest", notifyAnyChest);
+        config.set("notify.silent-chest", notifySilentChest);
 
         if (anyChestToggles != null && !anyChestToggles.isEmpty()) {
             for (Map.Entry<UUID, Boolean> entry : anyChestToggles.entrySet()) {
-                plugin.getConfig().set("toggles.any-chest." + entry.getKey(), entry.getValue());
+                config.set("toggles.any-chest." + entry.getKey(), entry.getValue());
             }
         }
 
         if (itemOpenInvToggles != null && !itemOpenInvToggles.isEmpty()) {
             for (Map.Entry<UUID, Boolean> entry : itemOpenInvToggles.entrySet()) {
-                plugin.getConfig().set("toggles.items.open-inv." + entry.getKey(), entry.getValue());
+                config.set("toggles.items.open-inv." + entry.getKey(), entry.getValue());
             }
         }
 
         if (silentChestToggles != null && !silentChestToggles.isEmpty()) {
             for (Map.Entry<UUID, Boolean> entry : silentChestToggles.entrySet()) {
-                plugin.getConfig().set("toggles.silent-chest." + entry.getKey(), entry.getValue());
+                config.set("toggles.silent-chest." + entry.getKey(), entry.getValue());
             }
         }
 
         // Save the new config
         plugin.saveConfig();
-
         plugin.getLogger().info("[Config] Update complete.");
-
     }
 
-    private Map<UUID, Boolean> updateAnyChestToggles() {
+    private Map<UUID, Boolean> updateToggles(String sectionName) {
         Map<UUID, Boolean> toggles = new HashMap<UUID, Boolean>();
 
-        ConfigurationSection anyChestSection = plugin.getConfig().getConfigurationSection("AnyChest");
-        Set<String> keys = anyChestSection.getKeys(false);
+        ConfigurationSection section = plugin.getConfig().getConfigurationSection(sectionName);
+        Set<String> keys = section.getKeys(false);
         if (keys == null || keys.isEmpty()) return null;
 
         for (String playerName : keys) {
             UUID uuid = UUIDUtil.getUUIDOf(playerName);
             if (uuid != null) {
-                boolean toggled = anyChestSection.getBoolean(playerName + ".toggle", false);
-                toggles.put(uuid, toggled);
-            }
-        }
-
-        return toggles;
-    }
-
-    private Map<UUID, Boolean> updateItemOpenInvToggles() {
-        Map<UUID, Boolean> toggles = new HashMap<UUID, Boolean>();
-
-        ConfigurationSection anyChestSection = plugin.getConfig().getConfigurationSection("ItemOpenInv");
-        Set<String> keys = anyChestSection.getKeys(false);
-        if (keys == null || keys.isEmpty()) return null;
-
-        for (String playerName : keys) {
-            UUID uuid = UUIDUtil.getUUIDOf(playerName);
-            if (uuid != null) {
-                boolean toggled = anyChestSection.getBoolean(playerName + ".toggle", false);
-                toggles.put(uuid, toggled);
-            }
-        }
-
-        return toggles;
-    }
-
-    private Map<UUID, Boolean> updateSilentChestToggles() {
-        Map<UUID, Boolean> toggles = new HashMap<UUID, Boolean>();
-
-        ConfigurationSection silentChestSection = plugin.getConfig().getConfigurationSection("SilentChest");
-        Set<String> keys = silentChestSection.getKeys(false);
-        if (keys == null || keys.isEmpty()) return null;
-
-        for (String playerName : keys) {
-            UUID uuid = UUIDUtil.getUUIDOf(playerName);
-            if (uuid != null) {
-                boolean toggled = silentChestSection.getBoolean(playerName + ".toggle", false);
+                boolean toggled = section.getBoolean(playerName + ".toggle", false);
                 toggles.put(uuid, toggled);
             }
         }
