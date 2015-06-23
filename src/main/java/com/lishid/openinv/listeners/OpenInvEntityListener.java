@@ -19,37 +19,36 @@ package com.lishid.openinv.listeners;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 
 import com.lishid.openinv.OpenInv;
+import com.lishid.openinv.Permissions;
 
-@SuppressWarnings("deprecation")
 public class OpenInvEntityListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onEntityDamage(EntityDamageEvent event) {
-        if (event instanceof EntityDamageByEntityEvent) {
-            EntityDamageByEntityEvent evt = (EntityDamageByEntityEvent) event;
-            Entity attacker = evt.getDamager();
-            Entity defender = evt.getEntity();
+    public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
+        Entity attacker = event.getDamager();
+        Entity defender = event.getEntity();
 
-            if (!(attacker instanceof Player) || !(defender instanceof Player)) {
-                return;
-            }
+        if (!(attacker instanceof Player) || !(defender instanceof Player)) {
+            return;
+        }
 
-            Player player = (Player) attacker;
+        Player player = (Player) attacker;
 
-            if (!(player.getItemInHand().getType().getId() == OpenInv.getItemOpenInvItem()) || (!OpenInv.getPlayerItemOpenInvStatus(player.getName())) || !OpenInv.hasPermission(player, "OpenInv.openinv")) {
+        if (player.getItemInHand().getType() == OpenInv.getOpenInvItem()) {
+            if (!OpenInv.getPlayerItemOpenInvStatus(player) || !OpenInv.hasPermission(player, Permissions.PERM_OPENINV)) {
                 return;
             }
 
             Player target = (Player) defender;
-            player.performCommand("openinv " + target.getName());
 
-            evt.setDamage(0);
-            evt.setCancelled(true);
+            event.setDamage(0);
+            event.setCancelled(true);
+
+            player.performCommand("openinv " + target.getName());
         }
     }
 }

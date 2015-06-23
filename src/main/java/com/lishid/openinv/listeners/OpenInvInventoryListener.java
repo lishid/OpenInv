@@ -16,22 +16,22 @@
 
 package com.lishid.openinv.listeners;
 
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 
 import com.lishid.openinv.OpenInv;
 
 public class OpenInvInventoryListener implements Listener {
-    @EventHandler(priority = EventPriority.NORMAL)
+    @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        // If this is the top inventory
-        // if (event.getView().convertSlot(event.getRawSlot()) == event.getRawSlot())
-        // {
-        if (!OpenInv.inventoryAccess.check(event.getInventory(), event.getWhoClicked())) {
+        Inventory inventory = event.getInventory();
+        HumanEntity player = event.getWhoClicked();
+
+        if (!OpenInv.getInventoryAccess().check(inventory, player)) {
             event.setCancelled(true);
         }
-        // }
     }
 }

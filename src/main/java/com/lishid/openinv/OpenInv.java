@@ -19,16 +19,21 @@ package com.lishid.openinv;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.lishid.openinv.commands.*;
+import com.lishid.openinv.commands.AnyChestCommand;
+import com.lishid.openinv.commands.OpenEnderCommand;
+import com.lishid.openinv.commands.OpenInvCommand;
+import com.lishid.openinv.commands.SearchInvCommand;
+import com.lishid.openinv.commands.SilentChestCommand;
+import com.lishid.openinv.commands.ToggleOpenInvCommand;
 import com.lishid.openinv.internal.AnySilentChest;
 import com.lishid.openinv.internal.InventoryAccess;
 import com.lishid.openinv.internal.PlayerDataManager;
@@ -44,93 +49,67 @@ import com.lishid.openinv.listeners.OpenInvPlayerListener;
  * @author lishid
  */
 public class OpenInv extends JavaPlugin {
-    public static final Logger logger = Logger.getLogger("Minecraft.OpenInv");
-
     public static final Map<UUID, SpecialPlayerInventory> inventories = new HashMap<UUID, SpecialPlayerInventory>();
     public static final Map<UUID, SpecialEnderChest> enderChests = new HashMap<UUID, SpecialEnderChest>();
 
     public static OpenInv mainPlugin;
 
-    public static PlayerDataManager playerLoader;
-    public static InventoryAccess inventoryAccess;
-    public static AnySilentChest anySilentChest;
+    private static PlayerDataManager playerLoader;
+    private static InventoryAccess inventoryAccess;
+    private static AnySilentChest anySilentChest;
 
     @Override
     public void onEnable() {
-        // Get plugin manager
-        PluginManager pm = getServer().getPluginManager();
+        // Plugin
+        mainPlugin = this;
 
+        // Config
+        ConfigUpdater configUpdater = new ConfigUpdater(this);
+        configUpdater.checkForUpdates();
+
+        // Initialize
         playerLoader = new PlayerDataManager();
         inventoryAccess = new InventoryAccess();
         anySilentChest = new AnySilentChest();
 
-        mainPlugin = this;
-        FileConfiguration config = getConfig();
-        config.set("CheckForUpdates", config.getBoolean("CheckForUpdates", true));
-        config.set("NotifySilentChest", config.getBoolean("NotifySilentChest", true));
-        config.set("NotifyAnyChest", config.getBoolean("NotifyAnyChest", true));
-        config.set("ItemOpenInvItemID", config.getInt("ItemOpenInvItemID", 280));
-        config.addDefault("ItemOpenInvItemID", 280);
-        config.addDefault("CheckForUpdates", true);
-        config.addDefault("NotifySilentChest", true);
-        config.addDefault("NotifyAnyChest", true);
-        config.options().copyDefaults(true);
-        saveConfig();
+        // Save the default config.yml if it doesn't already exist
+        saveDefaultConfig();
+
+        // Register the plugin's events & commands
+        registerEvents();
+        registerCommands();
+    }
+
+    private void registerEvents() {
+        PluginManager pm = getServer().getPluginManager();
 
         pm.registerEvents(new OpenInvPlayerListener(), this);
         pm.registerEvents(new OpenInvEntityListener(), this);
         pm.registerEvents(new OpenInvInventoryListener(), this);
-
-        getCommand("openinv").setExecutor(new OpenInvPluginCommand(this));
-        getCommand("searchinv").setExecutor(new SearchInvPluginCommand());
-        getCommand("toggleopeninv").setExecutor(new ToggleOpenInvPluginCommand());
-        getCommand("silentchest").setExecutor(new SilentChestPluginCommand());
-        getCommand("anychest").setExecutor(new AnyChestPluginCommand());
-        getCommand("openender").setExecutor(new OpenEnderPluginCommand(this));
     }
 
-    public static boolean notifySilentChest() {
-        return mainPlugin.getConfig().getBoolean("NotifySilentChest", true);
+    private void registerCommands() {
+        getCommand("openinv").setExecutor(new OpenInvCommand(this));
+        getCommand("searchinv").setExecutor(new SearchInvCommand());
+        getCommand("toggleopeninv").setExecutor(new ToggleOpenInvCommand());
+        getCommand("silentchest").setExecutor(new SilentChestCommand());
+        getCommand("anychest").setExecutor(new AnyChestCommand());
+        getCommand("openender").setExecutor(new OpenEnderCommand(this));
     }
 
-    public static boolean notifyAnyChest() {
-        return mainPlugin.getConfig().getBoolean("NotifyAnyChest", true);
+    public static PlayerDataManager getPlayerLoader() {
+        return playerLoader;
     }
 
-    public static boolean getPlayerItemOpenInvStatus(String name) {
-        return mainPlugin.getConfig().getBoolean("ItemOpenInv." + name.toLowerCase() + ".toggle", false);
+    public static InventoryAccess getInventoryAccess() {
+        return inventoryAccess;
     }
 
-    public static void setPlayerItemOpenInvStatus(String name, boolean status) {
-        mainPlugin.getConfig().set("ItemOpenInv." + name.toLowerCase() + ".toggle", status);
-        mainPlugin.saveConfig();
+    public static AnySilentChest getAnySilentChest() {
+        return anySilentChest;
     }
 
-    public static boolean getPlayerSilentChestStatus(String name) {
-        return mainPlugin.getConfig().getBoolean("SilentChest." + name.toLowerCase() + ".toggle", false);
-    }
-
-    public static void setPlayerSilentChestStatus(String name, boolean status) {
-        mainPlugin.getConfig().set("SilentChest." + name.toLowerCase() + ".toggle", status);
-        mainPlugin.saveConfig();
-    }
-
-    public static boolean getPlayerAnyChestStatus(String name) {
-        return mainPlugin.getConfig().getBoolean("AnyChest." + name.toLowerCase() + ".toggle", true);
-    }
-
-    public static void setPlayerAnyChestStatus(String name, boolean status) {
-        mainPlugin.getConfig().set("AnyChest." + name.toLowerCase() + ".toggle", status);
-        mainPlugin.saveConfig();
-    }
-
-    public static int getItemOpenInvItem() {
-        if (mainPlugin.getConfig().get("ItemOpenInvItemID") == null) {
-            saveToConfig("ItemOpenInvItemID", 280);
-        }
-        return mainPlugin.getConfig().getInt("ItemOpenInvItemID", 280);
-    }
-
+    /*
     public static Object getFromConfig(String data, Object defaultValue) {
         Object val = mainPlugin.getConfig().get(data);
         if (val == null) {
@@ -141,25 +120,81 @@ public class OpenInv extends JavaPlugin {
             return val;
         }
     }
+    */
 
     public static void saveToConfig(String data, Object value) {
         mainPlugin.getConfig().set(data, value);
         mainPlugin.saveConfig();
     }
 
-    /**
-     * Log an information
-     */
-    public static void log(String text) {
-        logger.info("[OpenInv] " + text);
+    public static Material getOpenInvItem() {
+        if (!mainPlugin.getConfig().isSet("items.open-inv")) {
+            saveToConfig("items.open-inv", "STICK");
+        }
+
+        String itemName = mainPlugin.getConfig().getString("items.open-inv", "STICK");
+        return Material.getMaterial(itemName);
+    }
+
+    public static boolean notifySilentChest() {
+        return mainPlugin.getConfig().getBoolean("notify.silent-chest", true);
+    }
+
+    public static boolean notifyAnyChest() {
+        return mainPlugin.getConfig().getBoolean("notify.any-chest", true);
+    }
+
+    public static boolean getPlayerAnyChestStatus(Player player) {
+        return mainPlugin.getConfig().getBoolean("toggles.any-chest." + player.getUniqueId(), false);
+    }
+
+    public static void setPlayerAnyChestStatus(Player player, boolean status) {
+        saveToConfig("toggles.any-chest." + player.getUniqueId(), status);
+    }
+
+    public static boolean getPlayerItemOpenInvStatus(Player player) {
+        return mainPlugin.getConfig().getBoolean("toggles.items.open-inv" + player.getUniqueId(), false);
+    }
+
+    public static void setPlayerItemOpenInvStatus(Player player, boolean status) {
+        saveToConfig("toggles.items.open-inv." + player.getUniqueId(), status);
+    }
+
+    public static boolean getPlayerSilentChestStatus(Player player) {
+        return mainPlugin.getConfig().getBoolean("toggles.silent-chest." + player.getUniqueId(), false);
+    }
+
+    public static void setPlayerSilentChestStatus(Player player, boolean status) {
+        saveToConfig("toggles.silent-chest." + player.getUniqueId(), status);
     }
 
     /**
-     * Log an error
+     * Logs a given message to console.
+     *
+     * @param text the text to log
+     */
+    public static void log(String text) {
+        mainPlugin.getLogger().info("[OpenInv] " + text);
+    }
+
+    /**
+     * Logs an error to console.
+     *
+     * @param e the throwable error to log
      */
     public static void log(Throwable e) {
-        logger.severe("[OpenInv] " + e.toString());
+        mainPlugin.getLogger().severe("[OpenInv] " + e.toString());
         e.printStackTrace();
+    }
+
+    /**
+     * Sends a specified message to a given CommandSender with the OpenInv prefix.
+     *
+     * @param sender the CommandSender to message
+     * @param message the message to send to the player
+     */
+    public static void sendMessage(CommandSender sender, String message) {
+        sender.sendMessage(ChatColor.AQUA + "[OpenInv] " + ChatColor.WHITE + message);
     }
 
     public static void showHelp(Player player) {

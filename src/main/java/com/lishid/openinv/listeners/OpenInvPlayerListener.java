@@ -17,6 +17,8 @@
 package com.lishid.openinv.listeners;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
@@ -34,7 +36,6 @@ import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.SpecialEnderChest;
 import com.lishid.openinv.internal.SpecialPlayerInventory;
 
-@SuppressWarnings("deprecation")
 public class OpenInvPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
@@ -70,35 +71,40 @@ public class OpenInvPlayerListener implements Listener {
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
-        if (event.getPlayer().isSneaking()) {
+        if (player.isSneaking()) {
             return;
         }
 
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.useInteractedBlock() == Result.DENY) {
+        Action action = event.getAction();
+
+        if (action == Action.RIGHT_CLICK_BLOCK && event.useInteractedBlock() == Result.DENY) {
             return;
         }
 
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == org.bukkit.Material.ENDER_CHEST) {
-            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.getPlayerSilentChestStatus(player.getName())) {
+        Block block = event.getClickedBlock();
+
+        if (action == Action.RIGHT_CLICK_BLOCK && block.getType() == Material.ENDER_CHEST) {
+            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.getPlayerSilentChestStatus(player)) {
                 event.setCancelled(true);
                 player.openInventory(player.getEnderChest());
             }
         }
 
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getState() instanceof Chest) {
-            boolean silentchest = false;
-            boolean anychest = false;
-            int x = event.getClickedBlock().getX();
-            int y = event.getClickedBlock().getY();
-            int z = event.getClickedBlock().getZ();
+        if (action == Action.RIGHT_CLICK_BLOCK && block.getState() instanceof Chest) {
+            boolean silentChest = false;
+            boolean anyChest = false;
 
-            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.getPlayerSilentChestStatus(player.getName())) {
-                silentchest = true;
+            int x = block.getX();
+            int y = block.getY();
+            int z = block.getZ();
+
+            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.getPlayerSilentChestStatus(player)) {
+                silentChest = true;
             }
 
-            if (OpenInv.hasPermission(player, Permissions.PERM_ANYCHEST) && OpenInv.getPlayerAnyChestStatus(player.getName())) {
+            if (OpenInv.hasPermission(player, Permissions.PERM_ANYCHEST) && OpenInv.getPlayerAnyChestStatus(player)) {
                 try {
-                    anychest = OpenInv.anySilentChest.IsAnyChestNeeded(player, x, y, z);
+                    anyChest = OpenInv.getAnySilentChest().isAnyChestNeeded(player, x, y, z);
                 }
                 catch (Exception e) {
                     player.sendMessage(ChatColor.RED + "Error while executing openinv. Unsupported CraftBukkit.");
@@ -107,16 +113,16 @@ public class OpenInvPlayerListener implements Listener {
             }
 
             // If the anychest or silentchest is active
-            if (anychest || silentchest) {
-                if (!OpenInv.anySilentChest.ActivateChest(player, anychest, silentchest, x, y, z)) {
+            if (anyChest || silentChest) {
+                if (!OpenInv.getAnySilentChest().activateChest(player, anyChest, silentChest, x, y, z)) {
                     event.setCancelled(true);
                 }
             }
         }
 
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getState() instanceof Sign) {
+        if (action == Action.RIGHT_CLICK_BLOCK && block.getState() instanceof Sign) {
             try {
-                Sign sign = ((Sign) event.getClickedBlock().getState());
+                Sign sign = ((Sign) block.getState());
                 if (OpenInv.hasPermission(player, Permissions.PERM_OPENINV) && sign.getLine(0).equalsIgnoreCase("[openinv]")) {
                     String text = sign.getLine(1).trim() + sign.getLine(2).trim() + sign.getLine(3).trim();
                     player.performCommand("openinv " + text);
@@ -128,8 +134,8 @@ public class OpenInvPlayerListener implements Listener {
             }
         }
 
-        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (!(player.getItemInHand().getType().getId() == OpenInv.getItemOpenInvItem()) || (!OpenInv.getPlayerItemOpenInvStatus(player.getName())) || !OpenInv.hasPermission(player, Permissions.PERM_OPENINV)) {
+        if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
+            if (!(player.getItemInHand().getType() == OpenInv.getOpenInvItem()) || (!OpenInv.getPlayerItemOpenInvStatus(player)) || !OpenInv.hasPermission(player, Permissions.PERM_OPENINV)) {
                 return;
             }
 

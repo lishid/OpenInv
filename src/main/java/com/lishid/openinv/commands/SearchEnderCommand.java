@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2011-2014 lishid.  All rights reserved.
- * 
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation,  version 3.
- * 
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.lishid.openinv.commands;
 
 import org.bukkit.Bukkit;
@@ -27,18 +11,18 @@ import org.bukkit.entity.Player;
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 
-public class SearchInvPluginCommand implements CommandExecutor {
+public class SearchEnderCommand implements CommandExecutor {
+    // TODO
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("searchinv")) {
             if (sender instanceof Player) {
                 if (!OpenInv.hasPermission(sender, Permissions.PERM_SEARCH)) {
-                    sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
+                    sender.sendMessage(ChatColor.RED + "You do not have permission to search player ender chests.");
                     return true;
                 }
             }
-
-            String playerList = "";
 
             Material material = null;
             int count = 1;
@@ -63,12 +47,16 @@ public class SearchInvPluginCommand implements CommandExecutor {
                 return false;
             }
 
-            for (Player templayer : Bukkit.getServer().getOnlinePlayers()) {
-                if (templayer.getInventory().contains(material, count)) {
-                    playerList += templayer.getName() + "  ";
+            StringBuilder sb = new StringBuilder();
+
+            for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers()) {
+                if (onlinePlayer.getInventory().contains(material, count)) {
+                    sb.append(onlinePlayer.getName());
+                    sb.append("  ");
                 }
             }
 
+            String playerList = sb.toString();
             sender.sendMessage("Players with the item " + material.toString() + ":  " + playerList);
 
             return true;

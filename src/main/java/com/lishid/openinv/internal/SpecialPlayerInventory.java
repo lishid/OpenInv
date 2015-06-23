@@ -180,7 +180,7 @@ public class SpecialPlayerInventory extends PlayerInventory {
     }
 
     @Override
-    public void setItem(int i, ItemStack itemstack) {
+    public void setItem(int i, ItemStack itemStack) {
         ItemStack[] is = this.items;
 
         if (i >= is.length) {
@@ -199,11 +199,11 @@ public class SpecialPlayerInventory extends PlayerInventory {
 
         // Effects
         if (is == this.extra) {
-            owner.getHandle().drop(itemstack, true);
-            itemstack = null;
+            owner.getHandle().drop(itemStack, true);
+            itemStack = null;
         }
 
-        is[i] = itemstack;
+        is[i] = itemStack;
 
         owner.getHandle().defaultContainer.b();
     }

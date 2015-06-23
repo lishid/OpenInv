@@ -25,30 +25,34 @@ import org.bukkit.entity.Player;
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 
-public class SilentChestPluginCommand implements CommandExecutor {
+public class ToggleOpenInvCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (command.getName().equalsIgnoreCase("silentchest")) {
+        if (command.getName().equalsIgnoreCase("toggleopeninv")) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
+                sender.sendMessage(ChatColor.RED + "You can't use this command from the console.");
                 return true;
             }
-            if (!OpenInv.hasPermission(sender, Permissions.PERM_SILENT)) {
-                sender.sendMessage(ChatColor.RED + "You do not have permission to use silent chest.");
+
+            if (!OpenInv.hasPermission(sender, Permissions.PERM_OPENINV)) {
+                sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories.");
                 return true;
             }
+
+            Player player = (Player) sender;
 
             if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("check")) {
-                    if (OpenInv.getPlayerSilentChestStatus(sender.getName()))
-                        sender.sendMessage("SilentChest is ON.");
-                    else
-                        sender.sendMessage("SilentChest is OFF.");
+                    String status = OpenInv.getPlayerItemOpenInvStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
+                    OpenInv.sendMessage(player, "OpenInv with " + ChatColor.GRAY + OpenInv.getOpenInvItem() + ChatColor.RESET + status + ChatColor.RESET + ".");
+                    return true;
                 }
             }
 
-            OpenInv.setPlayerSilentChestStatus(sender.getName(), !OpenInv.getPlayerSilentChestStatus(sender.getName()));
-            sender.sendMessage("SilentChest is now " + (OpenInv.getPlayerSilentChestStatus(sender.getName()) ? "On" : "Off") + ".");
+            OpenInv.setPlayerItemOpenInvStatus(player, !OpenInv.getPlayerItemOpenInvStatus(player));
+
+            String status = OpenInv.getPlayerItemOpenInvStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
+            OpenInv.sendMessage(player, "OpenInv with " + ChatColor.GRAY + OpenInv.getOpenInvItem() + ChatColor.RESET + " is now " + status + ChatColor.RESET + ".");
 
             return true;
         }
