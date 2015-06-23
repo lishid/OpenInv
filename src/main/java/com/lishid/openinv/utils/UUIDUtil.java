@@ -56,11 +56,10 @@ public class UUIDUtil {
                 Bukkit.getServer().getLogger().warning("Exception while running UUIDFetcher");
                 e.printStackTrace();
                 */
-                Bukkit.getServer().getLogger().warning("Exception while running UUIDFetcher");
+
                 // Failed to retrieve with UUIDFetcher, server might be offline?
                 // Fallback on searching for the player via their name
                 OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
-
                 if (offlinePlayer != null) {
                     uuid = offlinePlayer.getUniqueId();
                 }
