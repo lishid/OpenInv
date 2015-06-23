@@ -135,7 +135,7 @@ public class OpenInv extends JavaPlugin {
         String itemName = mainPlugin.getConfig().getString("items.open-inv", "STICK");
         Material material = Material.getMaterial(itemName);
         if (material == null) {
-            mainPlugin.getLogger().info("OpenInv item '" + itemName + "' does not match to a valid item. Defaulting to stick.");
+            mainPlugin.getLogger().warning("OpenInv item '" + itemName + "' does not match to a valid item. Defaulting to stick.");
             material = Material.STICK;
         }
 

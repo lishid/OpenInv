@@ -1,5 +1,6 @@
 package com.lishid.openinv;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -32,7 +33,8 @@ public class ConfigUpdater {
         if (isConfigOutdated()) {
             plugin.getLogger().info("[Config] Update found! Performing update...");
             performUpdate();
-        } else {
+        }
+        else {
             plugin.getLogger().info("[Config] Update not required.");
         }
     }
@@ -47,9 +49,19 @@ public class ConfigUpdater {
     }
 
     private void updateConfig1To2() {
-        // Get the old config settings
         FileConfiguration config = plugin.getConfig();
 
+        // Backup the old config file
+        File configFile = new File(plugin.getDataFolder(), "config.yml");
+        File oldConfigFile = new File(plugin.getDataFolder(), "config_old.yml");
+
+        configFile.renameTo(oldConfigFile);
+
+        if (configFile.exists()) {
+            configFile.delete();
+        }
+
+        // Get the old config settings
         int itemOpenInvItemId = config.getInt("ItemOpenInvItemID", 280);
         boolean checkForUpdates = config.getBoolean("CheckForUpdates", true);
         boolean notifySilentChest = config.getBoolean("NotifySilentChest", true);
@@ -73,10 +85,15 @@ public class ConfigUpdater {
 
         // Clear the old config
         for (String key : config.getKeys(false)) {
-            plugin.getConfig().set(key, null);
+            config.set(key, null);
         }
 
         // Set the new config options
+        plugin.saveDefaultConfig();
+        plugin.reloadConfig();
+
+        config = plugin.getConfig(); // Refresh the referenced config
+
         config.set("config-version", "2");
         config.set("check-for-updates", checkForUpdates);
         config.set("items.open-inv", getMaterialById(itemOpenInvItemId).toString());
@@ -111,13 +128,18 @@ public class ConfigUpdater {
 
         ConfigurationSection section = plugin.getConfig().getConfigurationSection(sectionName);
         Set<String> keys = section.getKeys(false);
-        if (keys == null || keys.isEmpty()) return null;
+        if (keys == null || keys.isEmpty()) {
+            return null;
+        }
 
         for (String playerName : keys) {
             UUID uuid = UUIDUtil.getUUIDOf(playerName);
             if (uuid != null) {
                 boolean toggled = section.getBoolean(playerName + ".toggle", false);
                 toggles.put(uuid, toggled);
+            }
+            else {
+                plugin.getLogger().warning("Failed to retrieve UUID of player: " + playerName);
             }
         }
 

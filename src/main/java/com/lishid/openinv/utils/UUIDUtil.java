@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 public class UUIDUtil {
@@ -32,6 +33,7 @@ public class UUIDUtil {
         return found;
     }
 
+    @SuppressWarnings("deprecation")
     public static UUID getUUIDOf(String name) {
         UUID uuid = null;
         Player player = getPlayer(name);
@@ -47,11 +49,21 @@ public class UUIDUtil {
 
             try {
                 response = fetcher.call();
-                uuid = response.get(name);
+                uuid = response.get(name.toLowerCase());
             }
             catch (Exception e) {
+                /*
                 Bukkit.getServer().getLogger().warning("Exception while running UUIDFetcher");
                 e.printStackTrace();
+                */
+                Bukkit.getServer().getLogger().warning("Exception while running UUIDFetcher");
+                // Failed to retrieve with UUIDFetcher, server might be offline?
+                // Fallback on searching for the player via their name
+                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
+
+                if (offlinePlayer != null) {
+                    uuid = offlinePlayer.getUniqueId();
+                }
             }
         }
 
