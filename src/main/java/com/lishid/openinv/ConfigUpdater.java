@@ -13,7 +13,7 @@ import com.lishid.openinv.utils.UUIDUtil;
 public class ConfigUpdater {
     private final OpenInv plugin;
 
-    private static final int LATEST_CONFIG_VERSION = 2;
+    private static final int CONFIG_VERSION = 2;
 
     public ConfigUpdater(OpenInv plugin) {
         this.plugin = plugin;
@@ -24,7 +24,7 @@ public class ConfigUpdater {
     }
 
     private boolean isConfigOutdated() {
-        return getConfigVersion() < LATEST_CONFIG_VERSION;
+        return getConfigVersion() < CONFIG_VERSION;
     }
 
     public void checkForUpdates() {
@@ -65,7 +65,7 @@ public class ConfigUpdater {
         }
 
         // Set the new config options
-        plugin.getConfig().set("config-version", LATEST_CONFIG_VERSION);
+        plugin.getConfig().set("config-version", CONFIG_VERSION);
         plugin.getConfig().set("check-for-updates", checkForUpdates);
         plugin.getConfig().set("items.open-inv", getMaterialById(itemOpenInvItemId).toString());
         plugin.getConfig().set("notify.any-chest", notifyAnyChest);
