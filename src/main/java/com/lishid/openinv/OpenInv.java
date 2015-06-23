@@ -131,9 +131,15 @@ public class OpenInv extends JavaPlugin {
         if (!mainPlugin.getConfig().isSet("items.open-inv")) {
             saveToConfig("items.open-inv", "STICK");
         }
+
         String itemName = mainPlugin.getConfig().getString("items.open-inv", "STICK");
         Material material = Material.getMaterial(itemName);
-        return material != null ? material : Material.STICK;
+        if (material == null) {
+            mainPlugin.getLogger().info("OpenInv item '" + itemName + "' does not match to a valid item. Defaulting to stick.");
+            material = Material.STICK;
+        }
+
+        return material;
     }
 
     public static boolean notifySilentChest() {
