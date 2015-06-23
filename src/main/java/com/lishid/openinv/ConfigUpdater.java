@@ -33,7 +33,7 @@ public class ConfigUpdater {
             plugin.getLogger().info("[Config] Update found! Performing update...");
             performUpdate();
         } else {
-            plugin.getLogger().info("[Config] Update not found. Config is already up-to-date.");
+            plugin.getLogger().info("[Config] Update not required.");
         }
     }
 
