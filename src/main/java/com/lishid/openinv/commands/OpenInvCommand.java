@@ -75,7 +75,6 @@ public class OpenInvCommand implements CommandExecutor {
             }
             else {
                 uuid = UUIDUtil.getUUIDOf(args[0]);
-
                 if (uuid == null) {
                     player.sendMessage(ChatColor.RED + "Player not found!");
                     return true;
