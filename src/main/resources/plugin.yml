@@ -7,7 +7,7 @@ description: >
 commands:
   openinv:
     aliases: [oi, inv, open]
-    description: Open a player's inventory.
+    description: Opens a player's inventory.
     usage: |
            /<command> - Opens last person's inventory.
            /<command> <player> - Opens a player's inventory.

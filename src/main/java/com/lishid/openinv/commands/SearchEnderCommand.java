@@ -12,8 +12,6 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 
 public class SearchEnderCommand implements CommandExecutor {
-    // TODO
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("searchender")) {

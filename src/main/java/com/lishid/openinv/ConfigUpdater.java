@@ -65,7 +65,6 @@ public class ConfigUpdater {
 
         // Get the old config settings
         int itemOpenInvItemId = config.getInt("ItemOpenInvItemID", 280);
-        // boolean checkForUpdates = config.getBoolean("CheckForUpdates", true);
         boolean notifySilentChest = config.getBoolean("NotifySilentChest", true);
         boolean notifyAnyChest = config.getBoolean("NotifyAnyChest", true);
 
@@ -97,7 +96,6 @@ public class ConfigUpdater {
         config = plugin.getConfig(); // Refresh the referenced plugin config
 
         config.set("config-version", 2);
-        // config.set("check-for-updates", checkForUpdates);
         config.set("items.open-inv", getMaterialById(itemOpenInvItemId).toString());
         config.set("notify.any-chest", notifyAnyChest);
         config.set("notify.silent-chest", notifySilentChest);

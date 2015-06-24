@@ -1,5 +1,4 @@
 config-version: 2
-check-for-updates: true
 notify:
   any-chest: true
   silent-chest: true
