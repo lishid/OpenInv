@@ -22,7 +22,7 @@ import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
 
-//Volatile
+// Volatile
 import net.minecraft.server.v1_8_R3.*;
 
 import org.bukkit.craftbukkit.v1_8_R3.entity.*;
@@ -125,7 +125,7 @@ public class AnySilentChest {
         if (silentChest) {
             tileInventory = new SilentInventory(tileInventory);
             if (OpenInv.notifySilentChest()) {
-                p.sendMessage("You are opening a chest silently.");
+                OpenInv.sendMessage(p, "You are opening a chest silently.");
             }
             returnValue = false;
         }
@@ -133,7 +133,7 @@ public class AnySilentChest {
         player.openContainer(tileInventory);
 
         if (anyChest && OpenInv.notifyAnyChest()) {
-            p.sendMessage("You are opening a blocked chest.");
+            OpenInv.sendMessage(p, "You are opening a blocked chest.");
         }
 
         return returnValue;

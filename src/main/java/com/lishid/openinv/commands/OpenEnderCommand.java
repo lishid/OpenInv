@@ -62,7 +62,6 @@ public class OpenEnderCommand implements CommandExecutor {
 
             // History management
             UUID history = openEnderHistory.get(player.getUniqueId());
-
             if (history == null) {
                 history = player.getUniqueId();
                 openEnderHistory.put(player.getUniqueId(), history);

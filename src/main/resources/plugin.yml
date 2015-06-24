@@ -7,32 +7,38 @@ description: >
 commands:
   openinv:
     aliases: [oi, inv, open]
-    description: Open a player's inventory
+    description: Open a player's inventory.
     usage: |
-           /<command> - Open last person's inventory
-           /<command> <Player> - Open a player's inventory
+           /<command> - Opens last person's inventory.
+           /<command> <player> - Opens a player's inventory.
   openender:
     aliases: [oe]
-    description: Opens the enderchest of a player
+    description: Opens a player's ender chest.
     usage: |
-           /<command> <Player> - Opens a player's enderchest
+           /<command> - Opens last person's ender chest.
+           /<command> <player> - Opens a player's ender chest.
   searchinv:
     aliases: [si]
-    description: Search and list players having a specific item
+    description: Searches and lists players that have a specific item in their inventory.
     usage: |
-           /<command> <Item> [MinAmount] - Item can be the Item ID or the CraftBukkit Item Name, MinAmount is the minimum amount to be considered.
+           /<command> <item> [minAmount] - Item can be the Item ID or the CraftBukkit Item Name, minAmount is the minimum amount to be considered.
+  searchender:
+    aliases: [se]
+    description: Searches and lists players that have a specific item in their ender chest.
+    usage: |
+           /<command> <item> [minAmount] - Item can be the Item ID or the CraftBukkit Item Name, minAmount is the minimum amount to be considered.
   toggleopeninv:
     aliases: [toi, toggleoi, toggleinv]
-    description: Toggle item openinv function
+    description: Toggles the item openinv function.
     usage: |
-           /<command> [Check] - Checks whether item openinv is enabled
-  silentchest:
-    aliases: [sc, silent]
-    description: Toggle silent chest function, which hides the animation of a chest when opened or closed, and suppresses the sound.
-    usage: |
-           /<command> [Check] - Checks whether silent chest is enabled
+           /<command> [check] - Checks whether item openinv is enabled.
   anychest:
     aliases: [ac]
-    description: Toggle anychest function, which allows opening of blocked chests.
+    description: Toggles the any chest function, which allows opening of blocked chests.
     usage: |
-           /<command> [Check] - Checks whether anychest is enabled
+           /<command> [check] - Checks whether any chest is enabled.
+  silentchest:
+    aliases: [sc, silent]
+    description: Toggles the silent chest function, which hides the animation of a chest when opened or closed, and suppresses the sound.
+    usage: |
+           /<command> [check] - Checks whether silent chest is enabled.

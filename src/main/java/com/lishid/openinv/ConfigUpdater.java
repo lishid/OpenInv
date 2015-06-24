@@ -61,9 +61,11 @@ public class ConfigUpdater {
             configFile.delete();
         }
 
+        plugin.getLogger().info("[Config] Backup of old config.yml file created.");
+
         // Get the old config settings
         int itemOpenInvItemId = config.getInt("ItemOpenInvItemID", 280);
-        boolean checkForUpdates = config.getBoolean("CheckForUpdates", true);
+        // boolean checkForUpdates = config.getBoolean("CheckForUpdates", true);
         boolean notifySilentChest = config.getBoolean("NotifySilentChest", true);
         boolean notifyAnyChest = config.getBoolean("NotifyAnyChest", true);
 
@@ -92,10 +94,10 @@ public class ConfigUpdater {
         plugin.saveDefaultConfig();
         plugin.reloadConfig();
 
-        config = plugin.getConfig(); // Refresh the referenced config
+        config = plugin.getConfig(); // Refresh the referenced plugin config
 
-        config.set("config-version", "2");
-        config.set("check-for-updates", checkForUpdates);
+        config.set("config-version", 2);
+        // config.set("check-for-updates", checkForUpdates);
         config.set("items.open-inv", getMaterialById(itemOpenInvItemId).toString());
         config.set("notify.any-chest", notifyAnyChest);
         config.set("notify.silent-chest", notifySilentChest);
@@ -132,16 +134,19 @@ public class ConfigUpdater {
             return null;
         }
 
+        int total = keys.size();
+        int converted = 0;
+
         for (String playerName : keys) {
             UUID uuid = UUIDUtil.getUUIDOf(playerName);
             if (uuid != null) {
                 boolean toggled = section.getBoolean(playerName + ".toggle", false);
                 toggles.put(uuid, toggled);
-            }
-            else {
-                plugin.getLogger().warning("Failed to retrieve UUID of player: " + playerName);
+                converted++;
             }
         }
+
+        plugin.getLogger().info("[Config] Converted (" + converted + "/" + total + ") " + sectionName + " toggle player usernames to UUIDs.");
 
         return toggles;
     }

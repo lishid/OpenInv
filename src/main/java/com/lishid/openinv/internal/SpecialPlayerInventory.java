@@ -21,8 +21,9 @@ import org.bukkit.inventory.Inventory;
 
 import com.lishid.openinv.OpenInv;
 
-//Volatile
+// Volatile
 import net.minecraft.server.v1_8_R3.*;
+
 import org.bukkit.craftbukkit.v1_8_R3.entity.*;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.*;
 
@@ -30,7 +31,7 @@ public class SpecialPlayerInventory extends PlayerInventory {
     private final CraftInventory inventory = new CraftInventory(this);
     private final ItemStack[] extra = new ItemStack[5];
     private final CraftPlayer owner;
-    private boolean playerOnline = false;
+    private boolean playerOnline;
 
     public SpecialPlayerInventory(Player p, boolean online) {
         super(((CraftPlayer) p).getHandle());

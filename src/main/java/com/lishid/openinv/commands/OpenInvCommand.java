@@ -61,7 +61,6 @@ public class OpenInvCommand implements CommandExecutor {
 
             // History management
             UUID history = openInvHistory.get(player.getUniqueId());
-
             if (history == null) {
                 history = player.getUniqueId();
                 openInvHistory.put(player.getUniqueId(), history);

@@ -42,7 +42,7 @@ public class SearchInvCommand implements CommandExecutor {
             int count = 1;
 
             if (args.length >= 1) {
-                String[] gData = null;
+                String[] gData;
                 gData = args[0].split(":");
                 material = Material.matchMaterial(gData[0]);
             }
@@ -71,7 +71,7 @@ public class SearchInvCommand implements CommandExecutor {
             }
 
             String playerList = sb.toString();
-            sender.sendMessage("Players with the item " + material.toString() + ":  " + playerList);
+            sender.sendMessage("Players with the item " + ChatColor.GRAY + material.toString() + ChatColor.RESET + " in their inventory:  " + playerList);
 
             return true;
         }

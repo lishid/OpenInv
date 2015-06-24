@@ -16,7 +16,7 @@ public class SearchEnderCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (command.getName().equalsIgnoreCase("searchinv")) {
+        if (command.getName().equalsIgnoreCase("searchender")) {
             if (sender instanceof Player) {
                 if (!OpenInv.hasPermission(sender, Permissions.PERM_SEARCH)) {
                     sender.sendMessage(ChatColor.RED + "You do not have permission to search player ender chests.");
@@ -28,7 +28,7 @@ public class SearchEnderCommand implements CommandExecutor {
             int count = 1;
 
             if (args.length >= 1) {
-                String[] gData = null;
+                String[] gData;
                 gData = args[0].split(":");
                 material = Material.matchMaterial(gData[0]);
             }
@@ -50,14 +50,14 @@ public class SearchEnderCommand implements CommandExecutor {
             StringBuilder sb = new StringBuilder();
 
             for (Player onlinePlayer : Bukkit.getServer().getOnlinePlayers()) {
-                if (onlinePlayer.getInventory().contains(material, count)) {
+                if (onlinePlayer.getEnderChest().contains(material, count)) {
                     sb.append(onlinePlayer.getName());
                     sb.append("  ");
                 }
             }
 
             String playerList = sb.toString();
-            sender.sendMessage("Players with the item " + material.toString() + ":  " + playerList);
+            sender.sendMessage("Players with the item " + ChatColor.GRAY + material.toString() + ChatColor.RESET + " in their ender chest:  " + playerList);
 
             return true;
         }

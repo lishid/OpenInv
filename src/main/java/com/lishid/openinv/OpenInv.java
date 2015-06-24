@@ -31,6 +31,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.lishid.openinv.commands.AnyChestCommand;
 import com.lishid.openinv.commands.OpenEnderCommand;
 import com.lishid.openinv.commands.OpenInvCommand;
+import com.lishid.openinv.commands.SearchEnderCommand;
 import com.lishid.openinv.commands.SearchInvCommand;
 import com.lishid.openinv.commands.SilentChestCommand;
 import com.lishid.openinv.commands.ToggleOpenInvCommand;
@@ -63,7 +64,7 @@ public class OpenInv extends JavaPlugin {
         // Plugin
         mainPlugin = this;
 
-        // Config
+        // Config Updater
         ConfigUpdater configUpdater = new ConfigUpdater(this);
         configUpdater.checkForUpdates();
 
@@ -90,11 +91,12 @@ public class OpenInv extends JavaPlugin {
 
     private void registerCommands() {
         getCommand("openinv").setExecutor(new OpenInvCommand(this));
-        getCommand("searchinv").setExecutor(new SearchInvCommand());
-        getCommand("toggleopeninv").setExecutor(new ToggleOpenInvCommand());
-        getCommand("silentchest").setExecutor(new SilentChestCommand());
-        getCommand("anychest").setExecutor(new AnyChestCommand());
         getCommand("openender").setExecutor(new OpenEnderCommand(this));
+        getCommand("searchinv").setExecutor(new SearchInvCommand());
+        getCommand("searchender").setExecutor(new SearchEnderCommand());
+        getCommand("toggleopeninv").setExecutor(new ToggleOpenInvCommand());
+        getCommand("anychest").setExecutor(new AnyChestCommand());
+        getCommand("silentchest").setExecutor(new SilentChestCommand());
     }
 
     public static PlayerDataManager getPlayerLoader() {
@@ -109,21 +111,19 @@ public class OpenInv extends JavaPlugin {
         return anySilentChest;
     }
 
-    /*
-    public static Object getFromConfig(String data, Object defaultValue) {
-        Object val = mainPlugin.getConfig().get(data);
+    public static Object getFromConfig(String path, Object defaultValue) {
+        Object val = mainPlugin.getConfig().get(path);
         if (val == null) {
-            mainPlugin.getConfig().set(data, defaultValue);
+            mainPlugin.getConfig().set(path, defaultValue);
             return defaultValue;
         }
         else {
             return val;
         }
     }
-    */
 
-    public static void saveToConfig(String data, Object value) {
-        mainPlugin.getConfig().set(data, value);
+    public static void saveToConfig(String path, Object value) {
+        mainPlugin.getConfig().set(path, value);
         mainPlugin.saveConfig();
     }
 
@@ -174,48 +174,41 @@ public class OpenInv extends JavaPlugin {
         saveToConfig("toggles.silent-chest." + player.getUniqueId(), status);
     }
 
-    /**
-     * Logs a given message to console.
-     *
-     * @param text the text to log
-     */
     public static void log(String text) {
         mainPlugin.getLogger().info("[OpenInv] " + text);
     }
 
-    /**
-     * Logs an error to console.
-     *
-     * @param e the throwable error to log
-     */
     public static void log(Throwable e) {
         mainPlugin.getLogger().severe("[OpenInv] " + e.toString());
         e.printStackTrace();
     }
 
-    /**
-     * Sends a specified message to a given CommandSender with the OpenInv prefix.
-     *
-     * @param sender the CommandSender to message
-     * @param message the message to send to the player
-     */
     public static void sendMessage(CommandSender sender, String message) {
         sender.sendMessage(ChatColor.AQUA + "[OpenInv] " + ChatColor.WHITE + message);
     }
 
     public static void showHelp(Player player) {
-        player.sendMessage(ChatColor.GREEN + "/openinv <player> - Open a player's inventory");
+        player.sendMessage(ChatColor.GREEN + "/openinv <player> - Open a player's inventory.");
         player.sendMessage(ChatColor.GREEN + "   (aliases: oi, inv, open)");
-        player.sendMessage(ChatColor.GREEN + "/openender <player> - Open a player's ender chest");
-        player.sendMessage(ChatColor.GREEN + "   (aliases: oe, enderchest)");
-        player.sendMessage(ChatColor.GREEN + "/toggleopeninv - Toggle item openinv function");
-        player.sendMessage(ChatColor.GREEN + "   (aliases: toi, toggleoi, toggleinv)");
-        player.sendMessage(ChatColor.GREEN + "/searchinv <item> [minAmount] - ");
+
+        player.sendMessage(ChatColor.GREEN + "/openender <player> - Open a player's ender chest.");
+        player.sendMessage(ChatColor.GREEN + "   (aliases: oe)");
+
+        player.sendMessage(ChatColor.GREEN + "/searchinv <item> [minAmount] -");
         player.sendMessage(ChatColor.GREEN + "   Search and list players having a specific item.");
-        player.sendMessage(ChatColor.GREEN + "   (aliases: si, search)");
-        player.sendMessage(ChatColor.GREEN + "/anychest - Toggle anychest function");
+        player.sendMessage(ChatColor.GREEN + "   (aliases: si)");
+
+        player.sendMessage(ChatColor.GREEN + "/searchender <item> [minAmount] -");
+        player.sendMessage(ChatColor.GREEN + "   Search and list players having a specific item.");
+        player.sendMessage(ChatColor.GREEN + "   (aliases: se)");
+
+        player.sendMessage(ChatColor.GREEN + "/toggleopeninv - Toggle the item openinv function.");
+        player.sendMessage(ChatColor.GREEN + "   (aliases: toi, toggleoi, toggleinv)");
+
+        player.sendMessage(ChatColor.GREEN + "/anychest - Toggle the any chest function.");
         player.sendMessage(ChatColor.GREEN + "   (aliases: ac)");
-        player.sendMessage(ChatColor.GREEN + "/silentchest - Toggle silent chest function");
+
+        player.sendMessage(ChatColor.GREEN + "/silentchest - Toggle the silent chest function.");
         player.sendMessage(ChatColor.GREEN + "   (aliases: sc, silent)");
     }
 

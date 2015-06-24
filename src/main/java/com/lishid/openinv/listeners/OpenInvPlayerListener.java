@@ -67,7 +67,7 @@ public class OpenInvPlayerListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
         Player player = event.getPlayer();
 
@@ -76,70 +76,76 @@ public class OpenInvPlayerListener implements Listener {
         }
 
         Action action = event.getAction();
-
-        if (action == Action.RIGHT_CLICK_BLOCK && event.useInteractedBlock() == Result.DENY) {
-            return;
-        }
-
         Block block = event.getClickedBlock();
 
-        if (action == Action.RIGHT_CLICK_BLOCK && block.getType() == Material.ENDER_CHEST) {
-            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.getPlayerSilentChestStatus(player)) {
-                event.setCancelled(true);
-                player.openInventory(player.getEnderChest());
-            }
-        }
-
-        if (action == Action.RIGHT_CLICK_BLOCK && block.getState() instanceof Chest) {
-            boolean silentChest = false;
-            boolean anyChest = false;
-
-            int x = block.getX();
-            int y = block.getY();
-            int z = block.getZ();
-
-            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.getPlayerSilentChestStatus(player)) {
-                silentChest = true;
-            }
-
-            if (OpenInv.hasPermission(player, Permissions.PERM_ANYCHEST) && OpenInv.getPlayerAnyChestStatus(player)) {
-                try {
-                    anyChest = OpenInv.getAnySilentChest().isAnyChestNeeded(player, x, y, z);
+        switch (action) {
+            case RIGHT_CLICK_BLOCK:
+                if (event.useInteractedBlock() == Result.DENY) {
+                    return;
                 }
-                catch (Exception e) {
-                    player.sendMessage(ChatColor.RED + "Error while executing openinv. Unsupported CraftBukkit.");
-                    e.printStackTrace();
+
+                // Ender Chests
+                if (block.getType() == Material.ENDER_CHEST) {
+                    if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.getPlayerSilentChestStatus(player)) {
+                        event.setCancelled(true);
+                        player.openInventory(player.getEnderChest());
+                        return;
+                    }
                 }
-            }
 
-            // If the anychest or silentchest is active
-            if (anyChest || silentChest) {
-                if (!OpenInv.getAnySilentChest().activateChest(player, anyChest, silentChest, x, y, z)) {
-                    event.setCancelled(true);
+                // Chests
+                if (block.getState() instanceof Chest) {
+                    boolean silentChest = false;
+                    boolean anyChest = false;
+                    int x = block.getX();
+                    int y = block.getY();
+                    int z = block.getZ();
+
+                    if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.getPlayerSilentChestStatus(player)) {
+                        silentChest = true;
+                    }
+
+                    if (OpenInv.hasPermission(player, Permissions.PERM_ANYCHEST) && OpenInv.getPlayerAnyChestStatus(player)) {
+                        try {
+                            anyChest = OpenInv.getAnySilentChest().isAnyChestNeeded(player, x, y, z);
+                        }
+                        catch (Exception e) {
+                            player.sendMessage(ChatColor.RED + "Error while executing openinv. Unsupported CraftBukkit.");
+                            e.printStackTrace();
+                        }
+                    }
+
+                    // If the anyChest or silentChest is active
+                    if (anyChest || silentChest) {
+                        if (!OpenInv.getAnySilentChest().activateChest(player, anyChest, silentChest, x, y, z)) {
+                            event.setCancelled(true);
+                        }
+                    }
+
+                    return;
                 }
-            }
-        }
 
-        if (action == Action.RIGHT_CLICK_BLOCK && block.getState() instanceof Sign) {
-            try {
-                Sign sign = ((Sign) block.getState());
-                if (OpenInv.hasPermission(player, Permissions.PERM_OPENINV) && sign.getLine(0).equalsIgnoreCase("[openinv]")) {
-                    String text = sign.getLine(1).trim() + sign.getLine(2).trim() + sign.getLine(3).trim();
-                    player.performCommand("openinv " + text);
+                // Signs
+                if (block.getState() instanceof Sign) {
+                    try {
+                        Sign sign = ((Sign) block.getState());
+                        if (OpenInv.hasPermission(player, Permissions.PERM_OPENINV) && sign.getLine(0).equalsIgnoreCase("[openinv]")) {
+                            String text = sign.getLine(1).trim() + sign.getLine(2).trim() + sign.getLine(3).trim();
+                            player.performCommand("openinv " + text);
+                        }
+                    }
+                    catch (Exception e) {
+                        player.sendMessage("Internal Error.");
+                        e.printStackTrace();
+                    }
+
+                    return;
                 }
-            }
-            catch (Exception ex) {
-                player.sendMessage("Internal Error.");
-                ex.printStackTrace();
-            }
-        }
-
-        if (action == Action.RIGHT_CLICK_AIR || action == Action.RIGHT_CLICK_BLOCK) {
-            if (!(player.getItemInHand().getType() == OpenInv.getOpenInvItem()) || (!OpenInv.getPlayerItemOpenInvStatus(player)) || !OpenInv.hasPermission(player, Permissions.PERM_OPENINV)) {
-                return;
-            }
-
-            player.performCommand("openinv");
+            case RIGHT_CLICK_AIR:
+                // OpenInv item
+                if (player.getItemInHand().getType() == OpenInv.getOpenInvItem() && OpenInv.getPlayerItemOpenInvStatus(player) && OpenInv.hasPermission(player, Permissions.PERM_OPENINV)) {
+                    player.performCommand("openinv");
+                }
         }
     }
 }
