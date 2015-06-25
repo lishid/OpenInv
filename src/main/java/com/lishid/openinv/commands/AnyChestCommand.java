@@ -25,30 +25,34 @@ import org.bukkit.entity.Player;
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 
-public class AnyChestPluginCommand implements CommandExecutor {
+public class AnyChestCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("anychest")) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
+                sender.sendMessage(ChatColor.RED + "You can't use this command from the console.");
                 return true;
             }
+
             if (!OpenInv.hasPermission(sender, Permissions.PERM_ANYCHEST)) {
-                sender.sendMessage(ChatColor.RED + "You do not have permission to use anychest.");
+                sender.sendMessage(ChatColor.RED + "You do not have permission to use any chest.");
                 return true;
             }
+
+            Player player = (Player) sender;
 
             if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("check")) {
-                    if (OpenInv.getPlayerAnyChestStatus(sender.getName()))
-                        sender.sendMessage("AnyChest is ON.");
-                    else
-                        sender.sendMessage("AnyChest is OFF.");
+                    String status = OpenInv.getPlayerAnyChestStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
+                    OpenInv.sendMessage(player, "Any Chest is " + status + ChatColor.RESET + ".");
+                    return true;
                 }
             }
 
-            OpenInv.setPlayerAnyChestStatus(sender.getName(), !OpenInv.getPlayerAnyChestStatus(sender.getName()));
-            sender.sendMessage("AnyChest is now " + (OpenInv.getPlayerAnyChestStatus(sender.getName()) ? "On" : "Off") + ".");
+            OpenInv.setPlayerAnyChestStatus(player, !OpenInv.getPlayerAnyChestStatus(player));
+
+            String status = OpenInv.getPlayerAnyChestStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
+            OpenInv.sendMessage(player, "Any Chest is now " + status + ChatColor.RESET + ".");
 
             return true;
         }

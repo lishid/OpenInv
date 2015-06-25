@@ -21,8 +21,9 @@ import org.bukkit.inventory.Inventory;
 
 import com.lishid.openinv.OpenInv;
 
-//Volatile
+// Volatile
 import net.minecraft.server.v1_8_R3.*;
+
 import org.bukkit.craftbukkit.v1_8_R3.entity.*;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.*;
 
@@ -30,7 +31,7 @@ public class SpecialPlayerInventory extends PlayerInventory {
     private final CraftInventory inventory = new CraftInventory(this);
     private final ItemStack[] extra = new ItemStack[5];
     private final CraftPlayer owner;
-    private boolean playerOnline = false;
+    private boolean playerOnline;
 
     public SpecialPlayerInventory(Player p, boolean online) {
         super(((CraftPlayer) p).getHandle());
@@ -180,7 +181,7 @@ public class SpecialPlayerInventory extends PlayerInventory {
     }
 
     @Override
-    public void setItem(int i, ItemStack itemstack) {
+    public void setItem(int i, ItemStack itemStack) {
         ItemStack[] is = this.items;
 
         if (i >= is.length) {
@@ -199,11 +200,11 @@ public class SpecialPlayerInventory extends PlayerInventory {
 
         // Effects
         if (is == this.extra) {
-            owner.getHandle().drop(itemstack, true);
-            itemstack = null;
+            owner.getHandle().drop(itemStack, true);
+            itemStack = null;
         }
 
-        is[i] = itemstack;
+        is[i] = itemStack;
 
         owner.getHandle().defaultContainer.b();
     }

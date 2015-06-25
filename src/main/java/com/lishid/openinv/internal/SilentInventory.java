@@ -6,7 +6,7 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftHumanEntity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 
-//Volatile
+// Volatile
 import net.minecraft.server.v1_8_R3.*;
 
 public class SilentInventory implements ITileInventory {
@@ -73,12 +73,12 @@ public class SilentInventory implements ITileInventory {
 
     @Override
     public void startOpen(EntityHuman entityHuman) {
-        //Don't do anything
+        // Don't do anything
     }
 
     @Override
     public void closeContainer(EntityHuman entityHuman) {
-        //Don't do anything
+        // Don't do anything
     }
 
     @Override
@@ -153,7 +153,7 @@ public class SilentInventory implements ITileInventory {
 
     @Override
     public Container createContainer(PlayerInventory playerInventory, EntityHuman entityHuman) {
-        //Don't let the chest itself create the container.
+        // Don't let the chest itself create the container.
         return new ContainerChest(playerInventory, this, entityHuman);
     }
 

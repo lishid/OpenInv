@@ -29,26 +29,27 @@ import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
-import com.lishid.openinv.internal.SpecialPlayerInventory;
+import com.lishid.openinv.internal.SpecialEnderChest;
 import com.lishid.openinv.utils.UUIDUtil;
 
-public class OpenInvPluginCommand implements CommandExecutor {
+public class OpenEnderCommand implements CommandExecutor {
     private final OpenInv plugin;
-    private final Map<UUID, UUID> openInvHistory = new ConcurrentHashMap<UUID, UUID>();
+    private final Map<UUID, UUID> openEnderHistory = new ConcurrentHashMap<UUID, UUID>();
 
-    public OpenInvPluginCommand(OpenInv plugin) {
+    public OpenEnderCommand(OpenInv plugin) {
         this.plugin = plugin;
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (command.getName().equalsIgnoreCase("openinv")) {
+        if (command.getName().equalsIgnoreCase("openender")) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
+                sender.sendMessage(ChatColor.RED + "You can't use this command from the console.");
                 return true;
             }
-            if (!OpenInv.hasPermission(sender, Permissions.PERM_OPENINV)) {
-                sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories.");
+
+            if (!OpenInv.hasPermission(sender, Permissions.PERM_ENDERCHEST)) {
+                sender.sendMessage(ChatColor.RED + "You do not have permission to access player ender chests.");
                 return true;
             }
 
@@ -60,21 +61,30 @@ public class OpenInvPluginCommand implements CommandExecutor {
             final Player player = (Player) sender;
 
             // History management
-            UUID history = openInvHistory.get(player.getUniqueId());
-
+            UUID history = openEnderHistory.get(player.getUniqueId());
             if (history == null) {
                 history = player.getUniqueId();
-                openInvHistory.put(player.getUniqueId(), history);
+                openEnderHistory.put(player.getUniqueId(), history);
             }
 
             final UUID uuid;
 
             // Read from history if target is not named
             if (args.length < 1) {
-                uuid = history;
+                if (history != null) {
+                    uuid = history;
+                }
+                else {
+                    sender.sendMessage(ChatColor.RED + "OpenEnder history is empty!");
+                    return true;
+                }
             }
             else {
                 uuid = UUIDUtil.getUUIDOf(args[0]);
+                if (uuid == null) {
+                    player.sendMessage(ChatColor.RED + "Player not found!");
+                    return true;
+                }
             }
 
             final UUID playerUUID = player.getUniqueId();
@@ -86,11 +96,12 @@ public class OpenInvPluginCommand implements CommandExecutor {
                     @Override
                     public void run() {
                         // Try loading the player's data asynchronously
-                        final Player target = OpenInv.playerLoader.loadPlayer(uuid);
+                        final Player target = OpenInv.getPlayerLoader().loadPlayer(uuid);
                         if (target == null) {
                             player.sendMessage(ChatColor.RED + "Player not found!");
                             return;
                         }
+
                         // Open target's inventory synchronously
                         Bukkit.getScheduler().runTask(plugin, new Runnable() {
                             @Override
@@ -121,9 +132,14 @@ public class OpenInvPluginCommand implements CommandExecutor {
             return;
         }
 
+        if (target != player && !OpenInv.hasPermission(player, Permissions.PERM_ENDERCHEST_ALL)) {
+            player.sendMessage(ChatColor.RED + "You do not have permission to access other player's ender chests.");
+            return;
+        }
+
         // Permissions checks
         if (!OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE) && OpenInv.hasPermission(target, Permissions.PERM_EXEMPT)) {
-            player.sendMessage(ChatColor.RED + target.getDisplayName() + "'s inventory is protected!");
+            player.sendMessage(ChatColor.RED + target.getDisplayName() + "'s ender chest is protected!");
             return;
         }
 
@@ -133,22 +149,16 @@ public class OpenInvPluginCommand implements CommandExecutor {
             return;
         }
 
-        // Self-open check
-        if (!OpenInv.hasPermission(player, Permissions.PERM_OPENSELF) && target.equals(player)) {
-            player.sendMessage(ChatColor.RED + "You're not allowed to openinv yourself.");
-            return;
-        }
-
         // Record the target
-        openInvHistory.put(player.getUniqueId(), target.getUniqueId());
+        openEnderHistory.put(player.getUniqueId(), target.getUniqueId());
 
         // Create the inventory
-        SpecialPlayerInventory inv = OpenInv.inventories.get(target.getUniqueId());
-        if (inv == null) {
-            inv = new SpecialPlayerInventory(target, target.isOnline());
+        SpecialEnderChest chest = OpenInv.enderChests.get(target.getUniqueId());
+        if (chest == null) {
+            chest = new SpecialEnderChest(target, target.isOnline());
         }
 
         // Open the inventory
-        player.openInventory(inv.getBukkitInventory());
+        player.openInventory(chest.getBukkitInventory());
     }
 }

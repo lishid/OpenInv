@@ -16,7 +16,7 @@
 
 package com.lishid.openinv.internal;
 
-//Volatile
+// Volatile
 import net.minecraft.server.v1_8_R3.*;
 
 public class SilentContainerChest extends ContainerChest {
@@ -25,7 +25,7 @@ public class SilentContainerChest extends ContainerChest {
     public SilentContainerChest(IInventory i1, IInventory i2, EntityHuman human) {
         super(i1, i2, human);
         inv = i2;
-        // close signal
+        // Close signal
         inv.closeContainer(human);
     }
 

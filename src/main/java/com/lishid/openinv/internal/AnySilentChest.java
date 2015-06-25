@@ -22,13 +22,13 @@ import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
 
-//Volatile
+// Volatile
 import net.minecraft.server.v1_8_R3.*;
 
 import org.bukkit.craftbukkit.v1_8_R3.entity.*;
 
 public class AnySilentChest {
-    public boolean IsAnyChestNeeded(Player p, int x, int y, int z) {
+    public boolean isAnyChestNeeded(Player p, int x, int y, int z) {
         // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
         BlockPosition position = new BlockPosition(x, y, z);
         EntityPlayer player = ((CraftPlayer) p).getHandle();
@@ -81,7 +81,7 @@ public class AnySilentChest {
         return true;
     }
 
-    public boolean ActivateChest(Player p, boolean anychest, boolean silentchest, int x, int y, int z) {
+    public boolean activateChest(Player p, boolean anyChest, boolean silentChest, int x, int y, int z) {
         BlockPosition position = new BlockPosition(x, y, z);
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
@@ -98,7 +98,7 @@ public class AnySilentChest {
         }
 
         ITileInventory tileInventory = (ITileInventory) tileEntity;
-        if (!anychest && this.topBlocking(world, position)) {
+        if (!anyChest && this.topBlocking(world, position)) {
             return true;
         }
 
@@ -106,7 +106,7 @@ public class AnySilentChest {
             BlockPosition side = position.shift(direction);
             Block block = world.getType(side).getBlock();
             if (block == chest) {
-                if (!anychest && this.topBlocking(world, side)) {
+                if (!anyChest && this.topBlocking(world, side)) {
                     return true;
                 }
 
@@ -122,18 +122,18 @@ public class AnySilentChest {
         }
 
         boolean returnValue = true;
-        if (silentchest) {
+        if (silentChest) {
             tileInventory = new SilentInventory(tileInventory);
             if (OpenInv.notifySilentChest()) {
-                p.sendMessage("You are opening a chest silently.");
+                OpenInv.sendMessage(p, "You are opening a chest silently.");
             }
             returnValue = false;
         }
 
         player.openContainer(tileInventory);
 
-        if (anychest && OpenInv.notifyAnyChest()) {
-            p.sendMessage("You are opening a blocked chest.");
+        if (anyChest && OpenInv.notifyAnyChest()) {
+            OpenInv.sendMessage(p, "You are opening a blocked chest.");
         }
 
         return returnValue;

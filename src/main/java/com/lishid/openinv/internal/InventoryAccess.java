@@ -24,7 +24,7 @@ import org.bukkit.inventory.Inventory;
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 
-//Volatile
+// Volatile
 import net.minecraft.server.v1_8_R3.*;
 
 import org.bukkit.craftbukkit.v1_8_R3.inventory.*;
@@ -53,7 +53,7 @@ public class InventoryAccess {
             return ((CraftInventory) inventory).getInventory();
         }
         
-        //Use reflection to find the inventory
+        // Use reflection to find the inventory
         Class<? extends Inventory> clazz = inventory.getClass();
         IInventory result = null;
         for(Field f : clazz.getDeclaredFields()) {

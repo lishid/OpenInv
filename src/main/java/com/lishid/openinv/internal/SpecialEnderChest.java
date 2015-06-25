@@ -22,8 +22,9 @@ import org.bukkit.inventory.InventoryHolder;
 
 import com.lishid.openinv.OpenInv;
 
-//Volatile
+// Volatile
 import net.minecraft.server.v1_8_R3.*;
+
 import org.bukkit.craftbukkit.v1_8_R3.entity.*;
 import org.bukkit.craftbukkit.v1_8_R3.inventory.*;
 
@@ -31,17 +32,17 @@ public class SpecialEnderChest extends InventorySubcontainer {
     private final CraftInventory inventory = new CraftInventory(this);
     private final InventoryEnderChest enderChest;
     private final CraftPlayer owner;
-    private boolean playerOnline = false;
+    private boolean playerOnline;
 
-    public SpecialEnderChest(Player p, Boolean online) {
+    public SpecialEnderChest(Player p, boolean online) {
         this(p, ((CraftPlayer) p).getHandle().getEnderChest(), online);
     }
 
-    public SpecialEnderChest(Player p, InventoryEnderChest enderchest, boolean online) {
-        super(enderchest.getName(), enderchest.hasCustomName(), enderchest.getSize());
+    public SpecialEnderChest(Player p, InventoryEnderChest enderChest, boolean online) {
+        super(enderChest.getName(), enderChest.hasCustomName(), enderChest.getSize());
         this.owner = (CraftPlayer) p;
-        this.enderChest = enderchest;
-        this.items = enderChest.getContents();
+        this.enderChest = enderChest;
+        this.items = this.enderChest.getContents();
         this.playerOnline = online;
         OpenInv.enderChests.put(owner.getUniqueId(), this);
     }

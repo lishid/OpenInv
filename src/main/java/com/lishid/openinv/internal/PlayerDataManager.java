@@ -25,7 +25,7 @@ import org.bukkit.entity.Player;
 import com.lishid.openinv.OpenInv;
 import com.mojang.authlib.GameProfile;
 
-//Volatile
+// Volatile
 import net.minecraft.server.v1_8_R3.*;
 
 import org.bukkit.craftbukkit.v1_8_R3.*;
