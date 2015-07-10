@@ -40,33 +40,23 @@ public class UUIDUtil {
     }
 
     public static UUID getUUIDOf(String name) {
-        UUID uuid;
         Player player = getPlayer(name);
 
         if (player != null) {
-            uuid = player.getUniqueId();
+            return player.getUniqueId();
         }
-        else {
-            if (Bukkit.getServer().getOnlineMode()) {
-                if (!Bukkit.getServer().isPrimaryThread()) {
-                    UUIDFetcher fetcher = new UUIDFetcher(Arrays.asList(name));
-                    Map<String, UUID> response;
 
-                    try {
-                        response = fetcher.call();
-                        uuid = response.get(name.toLowerCase());
-                    }
-                    catch (Exception e) {
-                        uuid = getUUIDLocally(name);
-                    }
-                } else {
-                    uuid = getUUIDLocally(name);
-                }
-            } else {
-                uuid = getUUIDLocally(name);
+        if (Bukkit.getServer().getOnlineMode() && !Bukkit.getServer().isPrimaryThread()) {
+            UUIDFetcher fetcher = new UUIDFetcher(Arrays.asList(name));
+            try {
+                Map<String, UUID> response = fetcher.call();
+                return response.get(name.toLowerCase());
+            }
+            catch (Exception ignored) {
+                //Fallthrough to end of method
             }
         }
 
-        return uuid;
+        return getUUIDLocally(name);
     }
 }
