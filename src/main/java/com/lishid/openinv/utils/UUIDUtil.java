@@ -34,35 +34,36 @@ public class UUIDUtil {
     }
 
     @SuppressWarnings("deprecation")
+    private static UUID getUUIDLocally(String name) {
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
+        return offlinePlayer.hasPlayedBefore() ? offlinePlayer.getUniqueId() : null;
+    }
+
     public static UUID getUUIDOf(String name) {
-        UUID uuid = null;
+        UUID uuid;
         Player player = getPlayer(name);
 
         if (player != null) {
-            // Player was found online
             uuid = player.getUniqueId();
         }
         else {
-            // Player was not found online. Fetch their UUID instead
-            UUIDFetcher fetcher = new UUIDFetcher(Arrays.asList(name));
-            Map<String, UUID> response;
+            if (Bukkit.getServer().getOnlineMode()) {
+                if (!Bukkit.getServer().isPrimaryThread()) {
+                    UUIDFetcher fetcher = new UUIDFetcher(Arrays.asList(name));
+                    Map<String, UUID> response;
 
-            try {
-                response = fetcher.call();
-                uuid = response.get(name.toLowerCase());
-            }
-            catch (Exception e) {
-                /*
-                Bukkit.getServer().getLogger().warning("Exception while running UUIDFetcher");
-                e.printStackTrace();
-                */
-
-                // Failed to retrieve with UUIDFetcher, server might be offline?
-                // Fallback on searching for the player via their name
-                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
-                if (offlinePlayer != null) {
-                    uuid = offlinePlayer.getUniqueId();
+                    try {
+                        response = fetcher.call();
+                        uuid = response.get(name.toLowerCase());
+                    }
+                    catch (Exception e) {
+                        uuid = getUUIDLocally(name);
+                    }
+                } else {
+                    uuid = getUUIDLocally(name);
                 }
+            } else {
+                uuid = getUUIDLocally(name);
             }
         }
 
