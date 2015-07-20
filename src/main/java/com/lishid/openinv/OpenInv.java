@@ -159,7 +159,7 @@ public class OpenInv extends JavaPlugin {
     }
 
     public static boolean getPlayerItemOpenInvStatus(Player player) {
-        return mainPlugin.getConfig().getBoolean("toggles.items.open-inv" + player.getUniqueId(), false);
+        return mainPlugin.getConfig().getBoolean("toggles.items.open-inv." + player.getUniqueId(), false);
     }
 
     public static void setPlayerItemOpenInvStatus(Player player, boolean status) {
