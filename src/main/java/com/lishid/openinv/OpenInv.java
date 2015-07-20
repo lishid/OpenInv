@@ -151,7 +151,7 @@ public class OpenInv extends JavaPlugin {
     }
 
     public static boolean getPlayerAnyChestStatus(Player player) {
-        return mainPlugin.getConfig().getBoolean("toggles.any-chest." + player.getUniqueId(), false);
+        return mainPlugin.getConfig().getBoolean("toggles.any-chest." + player.getUniqueId(), true);
     }
 
     public static void setPlayerAnyChestStatus(Player player, boolean status) {
