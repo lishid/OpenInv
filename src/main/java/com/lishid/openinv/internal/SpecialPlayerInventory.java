@@ -140,7 +140,7 @@ public class SpecialPlayerInventory extends PlayerInventory {
                 is[i] = null;
                 return itemstack;
             } else {
-                itemstack = is[i].a(j);
+                itemstack = is[i].cloneAndSubtract(j);
                 if (is[i].count == 0) {
                     is[i] = null;
                 }

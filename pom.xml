@@ -4,7 +4,7 @@
     <groupId>com.lishid</groupId>
     <artifactId>openinv</artifactId>
     <packaging>jar</packaging>
-    <version>2.3.3</version>
+    <version>2.3.4</version>
     <name>OpenInv</name>
     <url>http://dev.bukkit.org/bukkit-plugins/openinv/</url>
 
@@ -23,14 +23,14 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.8.7-R0.1-SNAPSHOT</version>
+            <version>1.8.8-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>craftbukkit</artifactId>
-            <version>1.8.7-R0.1-SNAPSHOT</version>
+            <version>1.8.8-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
