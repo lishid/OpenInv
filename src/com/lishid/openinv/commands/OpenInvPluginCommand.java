@@ -48,10 +48,6 @@ public class OpenInvPluginCommand implements CommandExecutor {
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
             return true;
         }
-        if (!OpenInv.hasPermission(sender, Permissions.PERM_OPENINV)) {
-            sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories");
-            return true;
-        }
 
         if (args.length > 0 && args[0].equalsIgnoreCase("?")) {
             OpenInv.ShowHelp((Player) sender);

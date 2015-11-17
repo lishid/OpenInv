@@ -23,20 +23,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
-import com.lishid.openinv.Permissions;
 
 public class SilentChestPluginCommand implements CommandExecutor {
     public SilentChestPluginCommand(OpenInv plugin) {
 
     }
 
+    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
-            return true;
-        }
-        if (!OpenInv.hasPermission(sender, Permissions.PERM_SILENT)) {
-            sender.sendMessage(ChatColor.RED + "You do not have permission to use silent chest.");
             return true;
         }
 

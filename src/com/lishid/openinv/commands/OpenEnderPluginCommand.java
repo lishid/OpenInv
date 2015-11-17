@@ -49,11 +49,6 @@ public class OpenEnderPluginCommand implements CommandExecutor {
             return true;
         }
 
-        if (!OpenInv.hasPermission(sender, Permissions.PERM_ENDERCHEST)) {
-            sender.sendMessage(ChatColor.RED + "You do not have permission to access player enderchest");
-            return true;
-        }
-
         if (args.length > 0 && args[0].equalsIgnoreCase("?")) {
             OpenInv.ShowHelp((Player) sender);
             return true;
