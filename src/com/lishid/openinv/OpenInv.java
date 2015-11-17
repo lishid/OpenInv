@@ -26,14 +26,18 @@ import org.bukkit.permissions.Permissible;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.lishid.openinv.commands.*;
+import com.lishid.openinv.commands.AnyChestPluginCommand;
+import com.lishid.openinv.commands.OpenEnderPluginCommand;
+import com.lishid.openinv.commands.OpenInvPluginCommand;
+import com.lishid.openinv.commands.SearchInvPluginCommand;
+import com.lishid.openinv.commands.SilentChestPluginCommand;
+import com.lishid.openinv.commands.ToggleOpenInvPluginCommand;
 import com.lishid.openinv.internal.IAnySilentChest;
 import com.lishid.openinv.internal.IInventoryAccess;
 import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import com.lishid.openinv.internal.InternalAccessor;
-import com.lishid.openinv.utils.UpdateManager;
 
 /**
  * Open other player's inventory
@@ -46,14 +50,13 @@ public class OpenInv extends JavaPlugin {
     public static HashMap<String, ISpecialPlayerInventory> inventories = new HashMap<String, ISpecialPlayerInventory>();
     public static HashMap<String, ISpecialEnderChest> enderChests = new HashMap<String, ISpecialEnderChest>();
 
-    private UpdateManager updater = new UpdateManager();
-
     public static OpenInv mainPlugin;
 
     public static IPlayerDataManager playerLoader;
     public static IInventoryAccess inventoryAccess;
     public static IAnySilentChest anySilentChest;
 
+    @Override
     public void onEnable() {
         // Get plugin manager
         PluginManager pm = getServer().getPluginManager();
@@ -74,7 +77,6 @@ public class OpenInv extends JavaPlugin {
 
         mainPlugin = this;
         FileConfiguration config = getConfig();
-        config.set("CheckForUpdates", config.getBoolean("CheckForUpdates", true));
         config.set("NotifySilentChest", config.getBoolean("NotifySilentChest", true));
         config.set("NotifyAnyChest", config.getBoolean("NotifyAnyChest", true));
         config.set("ItemOpenInvItemID", config.getInt("ItemOpenInvItemID", 280));
@@ -96,7 +98,6 @@ public class OpenInv extends JavaPlugin {
         getCommand("anychest").setExecutor(new AnyChestPluginCommand(this));
         getCommand("openender").setExecutor(new OpenEnderPluginCommand(this));
 
-        updater.Initialize(this, getFile());
     }
 
     public static boolean NotifySilentChest() {
