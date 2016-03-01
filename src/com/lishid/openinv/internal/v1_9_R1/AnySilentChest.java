@@ -48,8 +48,7 @@ public class AnySilentChest implements IAnySilentChest {
         if (world.getType(new BlockPosition(x, y + 1, z)).l() || hasOcelotOnTop(world, x, y, z))
             return true;
 
-        BlockPosition position = new BlockPosition(x, y, z);
-        int id = Block.getId(world.getType(position).getBlock());
+        int id = Block.getId(world.getType(new BlockPosition(x, y, z)).getBlock());
 
         // If block next to chest is chest and has a block or ocelot on top
         if (isBlockedChest(world, id, x - 1, y, z))

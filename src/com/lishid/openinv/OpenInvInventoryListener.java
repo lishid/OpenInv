@@ -20,6 +20,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 
 public class OpenInvInventoryListener implements Listener {
     @EventHandler(priority = EventPriority.NORMAL)
@@ -31,5 +32,12 @@ public class OpenInvInventoryListener implements Listener {
             event.setCancelled(true);
         }
         // }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onInventoryDrag(InventoryDragEvent event) {
+        if (!OpenInv.inventoryAccess.check(event.getInventory(), event.getWhoClicked())) {
+            event.setCancelled(true);
+        }
     }
 }
