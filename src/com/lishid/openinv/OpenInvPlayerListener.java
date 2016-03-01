@@ -121,13 +121,5 @@ public class OpenInvPlayerListener implements Listener {
                 ex.printStackTrace();
             }
         }
-
-        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (!(player.getItemInHand().getType().getId() == OpenInv.GetItemOpenInvItem()) || (!OpenInv.GetPlayerItemOpenInvStatus(player.getName())) || !OpenInv.hasPermission(player, Permissions.PERM_OPENINV)) {
-                return;
-            }
-
-            player.performCommand("openinv");
-        }
     }
 }

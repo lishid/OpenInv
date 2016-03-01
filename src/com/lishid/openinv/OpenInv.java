@@ -31,7 +31,6 @@ import com.lishid.openinv.commands.OpenEnderPluginCommand;
 import com.lishid.openinv.commands.OpenInvPluginCommand;
 import com.lishid.openinv.commands.SearchInvPluginCommand;
 import com.lishid.openinv.commands.SilentChestPluginCommand;
-import com.lishid.openinv.commands.ToggleOpenInvPluginCommand;
 import com.lishid.openinv.internal.IAnySilentChest;
 import com.lishid.openinv.internal.IInventoryAccess;
 import com.lishid.openinv.internal.IPlayerDataManager;
@@ -79,21 +78,16 @@ public class OpenInv extends JavaPlugin {
         FileConfiguration config = getConfig();
         config.set("NotifySilentChest", config.getBoolean("NotifySilentChest", true));
         config.set("NotifyAnyChest", config.getBoolean("NotifyAnyChest", true));
-        config.set("ItemOpenInvItemID", config.getInt("ItemOpenInvItemID", 280));
-        config.addDefault("ItemOpenInvItemID", 280);
-        config.addDefault("CheckForUpdates", true);
         config.addDefault("NotifySilentChest", true);
         config.addDefault("NotifyAnyChest", true);
         config.options().copyDefaults(true);
         saveConfig();
 
         pm.registerEvents(new OpenInvPlayerListener(), this);
-        pm.registerEvents(new OpenInvEntityListener(), this);
         pm.registerEvents(new OpenInvInventoryListener(), this);
 
         getCommand("openinv").setExecutor(new OpenInvPluginCommand(this));
         getCommand("searchinv").setExecutor(new SearchInvPluginCommand());
-        getCommand("toggleopeninv").setExecutor(new ToggleOpenInvPluginCommand());
         getCommand("silentchest").setExecutor(new SilentChestPluginCommand(this));
         getCommand("anychest").setExecutor(new AnyChestPluginCommand(this));
         getCommand("openender").setExecutor(new OpenEnderPluginCommand(this));

@@ -1,6 +1,6 @@
 name: OpenInv
 main: com.lishid.openinv.OpenInv
-version: 2.2.10
+version: 2.3.0
 author: lishid
 authors: [Jikoo]
 description: >
@@ -25,12 +25,6 @@ commands:
     permission: OpenInv.search
     usage: |
            /<command> <Item> [MinAmount] - Item can be the Item ID or the CraftBukkit Item Name, MinAmount is the minimum amount to be considered.
-  toggleopeninv:
-    aliases: [toi, toggleoi, toggleinv]
-    description: Toggle item openinv function
-    permission: OpenInv.openinv
-    usage: |
-           /<command> [Check] - Checks whether item openinv is enabled
   silentchest:
     aliases: [sc, silent]
     description: Toggle silent chest function, which hides the animation of a chest when opened or closed, and suppresses the sound.
