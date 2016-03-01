@@ -14,7 +14,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_8_R3;
+package com.lishid.openinv.internal.v1_9_R1;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -23,13 +26,13 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 
 //Volatile
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
 
-import net.minecraft.server.v1_8_R3.EntityHuman;
-import net.minecraft.server.v1_8_R3.ItemStack;
-import net.minecraft.server.v1_8_R3.PlayerInventory;
+import net.minecraft.server.v1_9_R1.EntityHuman;
+import net.minecraft.server.v1_9_R1.ItemStack;
+import net.minecraft.server.v1_9_R1.PlayerInventory;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
     CraftPlayer owner;
@@ -41,9 +44,28 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         super(((CraftPlayer) p).getHandle());
         this.owner = ((CraftPlayer) p);
         this.playerOnline = online;
-        this.items = player.inventory.items;
-        this.armor = player.inventory.armor;
+        setItemArrays(this, player.inventory.items, player.inventory.armor, player.inventory.extraSlots);
         OpenInv.inventories.put(owner.getName().toLowerCase(), this);
+    }
+
+    private void setItemArrays(PlayerInventory inventory, ItemStack[] items, ItemStack[] armor,
+            ItemStack[] extraSlots) {
+        try {
+            Field field = inventory.getClass().getField("items");
+            Field modifiers = Field.class.getDeclaredField("modifiers");
+            modifiers.setAccessible(true);
+            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(inventory, items);
+            field = inventory.getClass().getField("armor");
+            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(inventory, armor);
+            field = inventory.getClass().getField("extraSlots");
+            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+                | IllegalAccessException e) {
+            // Unable to set final fields to item arrays, we're screwed. Noisily fail.
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -63,8 +85,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     public void PlayerGoOnline(Player player) {
         if (!playerOnline) {
             CraftPlayer p = (CraftPlayer) player;
-            p.getHandle().inventory.items = this.items;
-            p.getHandle().inventory.armor = this.armor;
+            setItemArrays(p.getHandle().inventory, items, armor, extraSlots);
             p.saveData();
             playerOnline = true;
         }

@@ -14,12 +14,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_8_R3;
+package com.lishid.openinv.internal.v1_9_R1;
 
 //Volatile
-import net.minecraft.server.v1_8_R3.ContainerChest;
-import net.minecraft.server.v1_8_R3.EntityHuman;
-import net.minecraft.server.v1_8_R3.IInventory;
+import net.minecraft.server.v1_9_R1.ContainerChest;
+import net.minecraft.server.v1_9_R1.EntityHuman;
+import net.minecraft.server.v1_9_R1.IInventory;
 
 public class SilentContainerChest extends ContainerChest {
     public IInventory inv;

@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_8_R3;
+package com.lishid.openinv.internal.v1_9_R1;
 
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -23,17 +23,17 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IAnySilentChest;
 
 //Volatile
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 
-import net.minecraft.server.v1_8_R3.Block;
-import net.minecraft.server.v1_8_R3.BlockPosition;
-import net.minecraft.server.v1_8_R3.EntityPlayer;
-import net.minecraft.server.v1_8_R3.IInventory;
-import net.minecraft.server.v1_8_R3.ITileInventory;
-import net.minecraft.server.v1_8_R3.InventoryLargeChest;
-import net.minecraft.server.v1_8_R3.PacketPlayOutOpenWindow;
-import net.minecraft.server.v1_8_R3.TileEntityChest;
-import net.minecraft.server.v1_8_R3.World;
+import net.minecraft.server.v1_9_R1.Block;
+import net.minecraft.server.v1_9_R1.BlockPosition;
+import net.minecraft.server.v1_9_R1.EntityPlayer;
+import net.minecraft.server.v1_9_R1.IInventory;
+import net.minecraft.server.v1_9_R1.ITileInventory;
+import net.minecraft.server.v1_9_R1.InventoryLargeChest;
+import net.minecraft.server.v1_9_R1.PacketPlayOutOpenWindow;
+import net.minecraft.server.v1_9_R1.TileEntityChest;
+import net.minecraft.server.v1_9_R1.World;
 
 public class AnySilentChest implements IAnySilentChest {
     @Override
@@ -42,19 +42,19 @@ public class AnySilentChest implements IAnySilentChest {
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
         // If block on top
-        if (world.getType(new BlockPosition(x, y + 1, z)).getBlock().c())
+        if (world.getType(new BlockPosition(x, y + 1, z)).l())
             return true;
 
         int id = Block.getId(world.getType(new BlockPosition(x, y, z)).getBlock());
 
         // If block next to chest is chest and has a block on top
-        if ((Block.getId(world.getType(new BlockPosition(x - 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x - 1, y + 1, z)).getBlock().c()))
+        if ((Block.getId(world.getType(new BlockPosition(x - 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x - 1, y + 1, z)).l()))
             return true;
-        if ((Block.getId(world.getType(new BlockPosition(x + 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x + 1, y + 1, z)).getBlock().c()))
+        if ((Block.getId(world.getType(new BlockPosition(x + 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x + 1, y + 1, z)).l()))
             return true;
-        if ((Block.getId(world.getType(new BlockPosition(x, y, z - 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z - 1)).getBlock().c()))
+        if ((Block.getId(world.getType(new BlockPosition(x, y, z - 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z - 1)).l()))
             return true;
-        if ((Block.getId(world.getType(new BlockPosition(x, y, z + 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z + 1)).getBlock().c()))
+        if ((Block.getId(world.getType(new BlockPosition(x, y, z + 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z + 1)).l()))
             return true;
 
         return false;
@@ -71,15 +71,15 @@ public class AnySilentChest implements IAnySilentChest {
         int id = Block.getId(world.getType(new BlockPosition(x, y, z)).getBlock());
 
         if (!anychest) {
-            if (world.getType(new BlockPosition(x, y + 1, z)).getBlock().c())
+            if (world.getType(new BlockPosition(x, y + 1, z)).l())
                 return true;
-            if ((Block.getId(world.getType(new BlockPosition(x - 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x - 1, y + 1, z)).getBlock().c()))
+            if ((Block.getId(world.getType(new BlockPosition(x - 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x - 1, y + 1, z)).l()))
                 return true;
-            if ((Block.getId(world.getType(new BlockPosition(x + 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x + 1, y + 1, z)).getBlock().c()))
+            if ((Block.getId(world.getType(new BlockPosition(x + 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x + 1, y + 1, z)).l()))
                 return true;
-            if ((Block.getId(world.getType(new BlockPosition(x, y, z - 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z - 1)).getBlock().c()))
+            if ((Block.getId(world.getType(new BlockPosition(x, y, z - 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z - 1)).l()))
                 return true;
-            if ((Block.getId(world.getType(new BlockPosition(x, y, z + 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z + 1)).getBlock().c()))
+            if ((Block.getId(world.getType(new BlockPosition(x, y, z + 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z + 1)).l()))
                 return true;
         }
 

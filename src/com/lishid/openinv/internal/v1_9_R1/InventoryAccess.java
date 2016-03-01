@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_8_R3;
+package com.lishid.openinv.internal.v1_9_R1;
 
 import java.lang.reflect.Field;
 
@@ -26,9 +26,9 @@ import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.IInventoryAccess;
 
 //Volatile
-import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
 
-import net.minecraft.server.v1_8_R3.IInventory;
+import net.minecraft.server.v1_9_R1.IInventory;
 
 public class InventoryAccess implements IInventoryAccess {
     @Override
