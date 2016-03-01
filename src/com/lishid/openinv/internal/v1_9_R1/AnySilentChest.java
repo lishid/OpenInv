@@ -25,8 +25,11 @@ import com.lishid.openinv.internal.IAnySilentChest;
 //Volatile
 import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 
+import net.minecraft.server.v1_9_R1.AxisAlignedBB;
 import net.minecraft.server.v1_9_R1.Block;
 import net.minecraft.server.v1_9_R1.BlockPosition;
+import net.minecraft.server.v1_9_R1.Entity;
+import net.minecraft.server.v1_9_R1.EntityOcelot;
 import net.minecraft.server.v1_9_R1.EntityPlayer;
 import net.minecraft.server.v1_9_R1.IInventory;
 import net.minecraft.server.v1_9_R1.ITileInventory;
@@ -41,21 +44,47 @@ public class AnySilentChest implements IAnySilentChest {
         // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
-        // If block on top
-        if (world.getType(new BlockPosition(x, y + 1, z)).l())
+        // If block or ocelot on top
+        if (world.getType(new BlockPosition(x, y + 1, z)).l() || hasOcelotOnTop(world, x, y, z))
             return true;
 
-        int id = Block.getId(world.getType(new BlockPosition(x, y, z)).getBlock());
+        BlockPosition position = new BlockPosition(x, y, z);
+        int id = Block.getId(world.getType(position).getBlock());
 
-        // If block next to chest is chest and has a block on top
-        if ((Block.getId(world.getType(new BlockPosition(x - 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x - 1, y + 1, z)).l()))
+        // If block next to chest is chest and has a block or ocelot on top
+        if (isBlockedChest(world, id, x - 1, y, z))
             return true;
-        if ((Block.getId(world.getType(new BlockPosition(x + 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x + 1, y + 1, z)).l()))
+        if (isBlockedChest(world, id, x + 1, y, z))
             return true;
-        if ((Block.getId(world.getType(new BlockPosition(x, y, z - 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z - 1)).l()))
+        if (isBlockedChest(world, id, x, y, z - 1))
             return true;
-        if ((Block.getId(world.getType(new BlockPosition(x, y, z + 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z + 1)).l()))
+        if (isBlockedChest(world, id, x, y, z + 1))
             return true;
+
+        return false;
+    }
+
+    private boolean isBlockedChest(World world, int id, int x, int y, int z) {
+        BlockPosition position = new BlockPosition(x, y, z);
+        if (Block.getId(world.getType(position).getBlock()) != id) {
+            return false;
+        }
+
+        if (world.getType(position).l()) {
+            return true;
+        }
+
+        return hasOcelotOnTop(world, x, y, z);
+    }
+
+    private boolean hasOcelotOnTop(World world, int x, int y, int z) {
+        for (Entity localEntity : world.a(EntityOcelot.class,
+                new AxisAlignedBB(x, y + 1, z, x + 1, y + 2, z + 1))) {
+            EntityOcelot localEntityOcelot = (EntityOcelot) localEntity;
+            if (localEntityOcelot.isSitting()) {
+                return true;
+            }
+        }
 
         return false;
     }
