@@ -60,9 +60,6 @@ public class AnySilentChest {
     }
 
     private boolean blockOnTop(World world, BlockPosition position) {
-        // return world.getType(position.up()).getBlock().isOccluding();
-
-        // TODO: Does this work?
         Block block = world.getType(position.up()).getBlock();
         return block.isOccluding(block.getBlockData());
     }
