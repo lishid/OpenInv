@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 lishid.  All rights reserved.
+ * Copyright (C) 2011-2016 lishid.  All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,21 +30,26 @@ import org.bukkit.craftbukkit.v1_9_R1.inventory.*;
 /*
  * -----------------------------------------------
  * This class still needs to be updated for 1.9.
+ *
+ * It has been partially updated, but is very buggy
+ * and does not work correctly.
  * -----------------------------------------------
  */
 public class SpecialPlayerInventory extends PlayerInventory {
     private final CraftInventory inventory = new CraftInventory(this);
     private final ItemStack[] extra = new ItemStack[5];
+    private final ItemStack[][] g;
     private final CraftPlayer owner;
     private boolean playerOnline;
 
     public SpecialPlayerInventory(Player p, boolean online) {
         super(((CraftPlayer) p).getHandle());
         this.owner = (CraftPlayer) p;
-        this.items = player.inventory.items;
-        this.armor = player.inventory.armor;
+        System.arraycopy(player.inventory.items, 0, this.items, 0, this.items.length);
+        System.arraycopy(player.inventory.armor, 0, this.armor, 0, this.armor.length);
+        this.g = new ItemStack[][]{this.items, this.armor, this.extra};
         this.playerOnline = online;
-        OpenInv.inventories.put(owner.getUniqueId(), this);
+        // OpenInv.inventories.put(owner.getUniqueId(), this);
     }
 
     public Inventory getBukkitInventory() {
@@ -52,15 +57,19 @@ public class SpecialPlayerInventory extends PlayerInventory {
     }
 
     private void saveOnExit() {
+        if (playerOnline) {
+            linkInventory(player.inventory);
+        }
+
         if (transaction.isEmpty() && !playerOnline) {
             owner.saveData();
-            OpenInv.inventories.remove(owner.getUniqueId());
+            // OpenInv.inventories.remove(owner.getUniqueId());
         }
     }
 
     private void linkInventory(PlayerInventory inventory) {
-        inventory.items = this.items;
-        inventory.armor = this.armor;
+        System.arraycopy(this.items, 0, inventory.items, 0, inventory.items.length);
+        System.arraycopy(this.armor, 0, inventory.armor, 0, inventory.armor.length);
     }
 
     public void playerOnline(Player player) {
@@ -87,99 +96,100 @@ public class SpecialPlayerInventory extends PlayerInventory {
 
     @Override
     public ItemStack[] getContents() {
-        ItemStack[] C = new ItemStack[getSize()];
-        System.arraycopy(items, 0, C, 0, items.length);
-        System.arraycopy(armor, 0, C, items.length, armor.length);
-        return C;
+        ItemStack[] contents = new ItemStack[getSize()];
+        System.arraycopy(this.items, 0, contents, 0, this.items.length);
+        System.arraycopy(this.armor, 0, contents, this.items.length, this.armor.length);
+        return contents;
     }
 
     @Override
     public int getSize() {
-        return super.getSize() + 5;
+        return super.getSize() + 5; // super.getSize() - this.extraSlots.length + 5;
     }
 
     @Override
     public ItemStack getItem(int i) {
-        ItemStack[] is = this.items;
+        ItemStack[] is = null;
+        ItemStack[][] contents = this.g;
+        int j = contents.length;
 
-        if (i >= is.length) {
-            i -= is.length;
-            is = this.armor;
-        } else {
-            i = getReversedItemSlotNum(i);
+        for (int k = 0; k < j; ++k) {
+            ItemStack[] is2 = contents[k];
+            if (i < is2.length) {
+                is = is2;
+                break;
+            }
+
+            i -= is2.length;
         }
 
-        if (i >= is.length) {
-            i -= is.length;
-            is = this.extra;
+        if (is == this.items) {
+            i = getReversedItemSlotNum(i);
         } else if (is == this.armor) {
             i = getReversedArmorSlotNum(i);
+        } else if (is == this.extra) {
+            // Do nothing
         }
 
-        return is[i];
+        return is == null ? null : is[i];
     }
 
     @Override
     public ItemStack splitStack(int i, int j) {
-        ItemStack[] is = this.items;
+        ItemStack[] is = null;
+        ItemStack[][] contents = this.g;
+        int k = contents.length;
 
-        if (i >= is.length) {
-            i -= is.length;
-            is = this.armor;
-        } else {
-            i = getReversedItemSlotNum(i);
+        for (int l = 0; l < k; ++l) {
+            ItemStack[] is2 = contents[l];
+            if (i < is2.length) {
+                is = is2;
+                break;
+            }
+
+            i -= is2.length;
         }
 
-        if (i >= is.length) {
-            i -= is.length;
-            is = this.extra;
+        if (is == this.items) {
+            i = getReversedItemSlotNum(i);
         } else if (is == this.armor) {
             i = getReversedArmorSlotNum(i);
+        } else if (is == this.extra) {
+            // Do nothing
         }
 
-        if (is[i] != null) {
-            ItemStack itemstack;
-
-            if (is[i].count <= j) {
-                itemstack = is[i];
-                is[i] = null;
-                return itemstack;
-            } else {
-                itemstack = is[i].cloneAndSubtract(j);
-                if (is[i].count == 0) {
-                    is[i] = null;
-                }
-
-                return itemstack;
-            }
-        } else {
-            return null;
-        }
+        return is != null && is[i] != null ? ContainerUtil.a(is, i, j) : null;
     }
 
     @Override
     public ItemStack splitWithoutUpdate(int i) {
-        ItemStack[] is = this.items;
+        ItemStack[] is = null;
+        ItemStack[][] contents = this.g;
+        int j = contents.length;
 
-        if (i >= is.length) {
-            i -= is.length;
-            is = this.armor;
-        } else {
-            i = getReversedItemSlotNum(i);
+        for (int object = 0; object < j; ++object) {
+            ItemStack[] is2 = contents[object];
+            if (i < is2.length) {
+                is = is2;
+                break;
+            }
+
+            i -= is2.length;
         }
 
-        if (i >= is.length) {
-            i -= is.length;
-            is = this.extra;
-        } else if (is == this.armor) {
-            i = getReversedArmorSlotNum(i);
-        }
 
-        if (is[i] != null) {
-            ItemStack itemstack = is[i];
+        if (is != null && is[i] != null) {
+            if (is == this.items) {
+                i = getReversedItemSlotNum(i);
+            } else if (is == this.armor) {
+                i = getReversedArmorSlotNum(i);
+            } else if (is == this.extra) {
+                // Do nothing
+            }
 
+            Object object = is[i];
             is[i] = null;
-            return itemstack;
+            return (ItemStack) object;
         } else {
             return null;
         }
@@ -187,31 +197,34 @@ public class SpecialPlayerInventory extends PlayerInventory {
 
     @Override
     public void setItem(int i, ItemStack itemStack) {
-        ItemStack[] is = this.items;
+        ItemStack[] is = null;
+        ItemStack[][] contents = this.g;
+        int j = contents.length;
 
-        if (i >= is.length) {
-            i -= is.length;
-            is = this.armor;
-        } else {
-            i = getReversedItemSlotNum(i);
+        for (int k = 0; k < j; ++k) {
+            ItemStack[] is2 = contents[k];
+            if (i < is2.length) {
+                is = is2;
+                break;
+            }
+
+            i -= is2.length;
         }
 
-        if (i >= is.length) {
-            i -= is.length;
-            is = this.extra;
-        } else if (is == this.armor) {
-            i = getReversedArmorSlotNum(i);
+        if (is != null) {
+            if (is == this.items) {
+                i = getReversedItemSlotNum(i);
+            } else if (is == this.armor) {
+                i = getReversedArmorSlotNum(i);
+            } else if (is == this.extra) {
+                owner.getHandle().drop(itemStack, true);
+                itemStack = null;
+            }
+
+            is[i] = itemStack;
+
+            // owner.getHandle().defaultContainer.b();
         }
-
-        // Effects
-        if (is == this.extra) {
-            owner.getHandle().drop(itemStack, true);
-            itemStack = null;
-        }
-
-        is[i] = itemStack;
-
-        owner.getHandle().defaultContainer.b();
     }
 
     private int getReversedItemSlotNum(int i) {
