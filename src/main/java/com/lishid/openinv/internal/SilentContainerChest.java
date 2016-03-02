@@ -17,7 +17,7 @@
 package com.lishid.openinv.internal;
 
 // Volatile
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
 
 public class SilentContainerChest extends ContainerChest {
     public IInventory inv;

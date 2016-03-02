@@ -23,10 +23,10 @@ import org.bukkit.inventory.InventoryHolder;
 import com.lishid.openinv.OpenInv;
 
 // Volatile
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
 
-import org.bukkit.craftbukkit.v1_8_R3.entity.*;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.*;
+import org.bukkit.craftbukkit.v1_9_R1.entity.*;
+import org.bukkit.craftbukkit.v1_9_R1.inventory.*;
 
 public class SpecialEnderChest extends InventorySubcontainer {
     private final CraftInventory inventory = new CraftInventory(this);

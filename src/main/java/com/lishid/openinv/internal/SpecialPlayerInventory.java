@@ -22,11 +22,16 @@ import org.bukkit.inventory.Inventory;
 import com.lishid.openinv.OpenInv;
 
 // Volatile
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
 
-import org.bukkit.craftbukkit.v1_8_R3.entity.*;
-import org.bukkit.craftbukkit.v1_8_R3.inventory.*;
+import org.bukkit.craftbukkit.v1_9_R1.entity.*;
+import org.bukkit.craftbukkit.v1_9_R1.inventory.*;
 
+/*
+ * -----------------------------------------------
+ * This class still needs to be updated for 1.9.
+ * -----------------------------------------------
+ */
 public class SpecialPlayerInventory extends PlayerInventory {
     private final CraftInventory inventory = new CraftInventory(this);
     private final ItemStack[] extra = new ItemStack[5];

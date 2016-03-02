@@ -23,9 +23,10 @@ import org.bukkit.entity.Player;
 import com.lishid.openinv.OpenInv;
 
 // Volatile
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
+import net.minecraft.server.v1_9_R1.BlockChest.Type;
 
-import org.bukkit.craftbukkit.v1_8_R3.entity.*;
+import org.bukkit.craftbukkit.v1_9_R1.entity.*;
 
 public class AnySilentChest {
     public boolean isAnyChestNeeded(Player p, int x, int y, int z) {
@@ -33,7 +34,7 @@ public class AnySilentChest {
         BlockPosition position = new BlockPosition(x, y, z);
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
-        BlockChest chest = (BlockChest) (((BlockChest) world.getType(position).getBlock()).b == 1 ?
+        BlockChest chest = (BlockChest) (((BlockChest) world.getType(position).getBlock()).g == Type.TRAP ?
                 Block.getByName("trapped_chest") : Block.getByName("chest"));
 
         // If block on top
@@ -59,7 +60,11 @@ public class AnySilentChest {
     }
 
     private boolean blockOnTop(World world, BlockPosition position) {
-        return world.getType(position.up()).getBlock().isOccluding();
+        // return world.getType(position.up()).getBlock().isOccluding();
+
+        // TODO: Does this work?
+        Block block = world.getType(position.up()).getBlock();
+        return block.isOccluding(block.getBlockData());
     }
 
     private boolean ocelotOnTop(World world, BlockPosition position) {
@@ -89,7 +94,7 @@ public class AnySilentChest {
             return true;
         }
 
-        BlockChest chest = (BlockChest) (((BlockChest) world.getType(position).getBlock()).b == 1 ?
+        BlockChest chest = (BlockChest) (((BlockChest) world.getType(position).getBlock()).g == Type.TRAP ?
                 Block.getByName("trapped_chest") : Block.getByName("chest"));
 
         TileEntity tileEntity = world.getTileEntity(position);

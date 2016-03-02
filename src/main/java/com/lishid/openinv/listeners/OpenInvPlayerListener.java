@@ -143,7 +143,7 @@ public class OpenInvPlayerListener implements Listener {
                 }
             case RIGHT_CLICK_AIR:
                 // OpenInv item
-                if (player.getItemInHand().getType() == OpenInv.getOpenInvItem() && OpenInv.getPlayerItemOpenInvStatus(player) && OpenInv.hasPermission(player, Permissions.PERM_OPENINV)) {
+                if (player.getInventory().getItemInMainHand().getType() == OpenInv.getOpenInvItem() && OpenInv.getPlayerItemOpenInvStatus(player) && OpenInv.hasPermission(player, Permissions.PERM_OPENINV)) {
                     player.performCommand("openinv");
                 }
         }

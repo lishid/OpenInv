@@ -2,12 +2,13 @@ package com.lishid.openinv.internal;
 
 import java.util.List;
 
-import org.bukkit.craftbukkit.v1_8_R3.entity.CraftHumanEntity;
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftHumanEntity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 
 // Volatile
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
 
 public class SilentInventory implements ITileInventory {
     public ITileInventory inv;
@@ -17,8 +18,8 @@ public class SilentInventory implements ITileInventory {
     }
 
     @Override
-    public boolean r_() {
-        return inv.r_();
+    public boolean x_() {
+        return inv.x_();
     }
 
     @Override
@@ -27,8 +28,8 @@ public class SilentInventory implements ITileInventory {
     }
 
     @Override
-    public ChestLock i() {
-        return inv.i();
+    public ChestLock y_() {
+        return inv.y_();
     }
 
     @Override
@@ -92,8 +93,8 @@ public class SilentInventory implements ITileInventory {
     }
 
     @Override
-    public void b(int i, int i1) {
-        inv.b(i, i1);
+    public void setProperty(int i, int i1) {
+        inv.setProperty(i, i1);
     }
 
     @Override
@@ -134,6 +135,11 @@ public class SilentInventory implements ITileInventory {
     @Override
     public void setMaxStackSize(int i) {
         inv.setMaxStackSize(i);
+    }
+
+    @Override
+    public Location getLocation() {
+        return inv.getLocation();
     }
 
     @Override

@@ -25,9 +25,9 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 
 // Volatile
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
 
-import org.bukkit.craftbukkit.v1_8_R3.inventory.*;
+import org.bukkit.craftbukkit.v1_9_R1.inventory.*;
 
 public class InventoryAccess {
     public boolean check(Inventory inventory, HumanEntity player) {
@@ -49,16 +49,17 @@ public class InventoryAccess {
     }
     
     private IInventory grabInventory(Inventory inventory) {
-        if(inventory instanceof CraftInventory) {
+        if (inventory instanceof CraftInventory) {
             return ((CraftInventory) inventory).getInventory();
         }
         
         // Use reflection to find the inventory
         Class<? extends Inventory> clazz = inventory.getClass();
         IInventory result = null;
-        for(Field f : clazz.getDeclaredFields()) {
+        for (Field f : clazz.getDeclaredFields()) {
             f.setAccessible(true);
-            if(IInventory.class.isAssignableFrom(f.getDeclaringClass())) {
+            
+            if (IInventory.class.isAssignableFrom(f.getDeclaringClass())) {
                 try {
                     result = (IInventory) f.get(inventory);
                 }
