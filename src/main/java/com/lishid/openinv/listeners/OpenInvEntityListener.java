@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 lishid.  All rights reserved.
+ * Copyright (C) 2011-2016 lishid.  All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ public class OpenInvEntityListener implements Listener {
 
         Player player = (Player) attacker;
 
-        if (player.getItemInHand().getType() == OpenInv.getOpenInvItem()) {
+        if (player.getInventory().getItemInMainHand().getType() == OpenInv.getOpenInvItem()) {
             if (!OpenInv.getPlayerItemOpenInvStatus(player) || !OpenInv.hasPermission(player, Permissions.PERM_OPENINV)) {
                 return;
             }

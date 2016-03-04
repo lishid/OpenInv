@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 lishid.  All rights reserved.
+ * Copyright (C) 2011-2016 lishid.  All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,10 @@
 package com.lishid.openinv.internal;
 
 // Volatile
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
 
 public class SilentContainerChest extends ContainerChest {
+
     public IInventory inv;
 
     public SilentContainerChest(IInventory i1, IInventory i2, EntityHuman human) {

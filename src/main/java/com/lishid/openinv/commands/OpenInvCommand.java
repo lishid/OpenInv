@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 lishid.  All rights reserved.
+ * Copyright (C) 2011-2016 lishid.  All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ import com.lishid.openinv.internal.SpecialPlayerInventory;
 import com.lishid.openinv.utils.UUIDUtil;
 
 public class OpenInvCommand implements CommandExecutor {
+
     private final OpenInv plugin;
     private final Map<UUID, UUID> openInvHistory = new ConcurrentHashMap<UUID, UUID>();
 
@@ -147,10 +148,14 @@ public class OpenInvCommand implements CommandExecutor {
         openInvHistory.put(player.getUniqueId(), target.getUniqueId());
 
         // Create the inventory
+        /*
         SpecialPlayerInventory inv = OpenInv.inventories.get(target.getUniqueId());
         if (inv == null) {
             inv = new SpecialPlayerInventory(target, target.isOnline());
         }
+        */
+
+        SpecialPlayerInventory inv = new SpecialPlayerInventory(target, target.isOnline());
 
         // Open the inventory
         player.openInventory(inv.getBukkitInventory());

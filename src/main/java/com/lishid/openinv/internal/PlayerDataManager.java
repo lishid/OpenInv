@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 lishid.  All rights reserved.
+ * Copyright (C) 2011-2016 lishid.  All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,17 +26,19 @@ import com.lishid.openinv.OpenInv;
 import com.mojang.authlib.GameProfile;
 
 // Volatile
-import net.minecraft.server.v1_8_R3.*;
+import net.minecraft.server.v1_9_R1.*;
 
-import org.bukkit.craftbukkit.v1_8_R3.*;
+import org.bukkit.craftbukkit.v1_9_R1.*;
 
 public class PlayerDataManager {
+
     public Player loadPlayer(UUID uuid) {
         try {
             OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
             if (player == null || !player.hasPlayedBefore()) {
                 return null;
             }
+
             GameProfile profile = new GameProfile(uuid, player.getName());
             MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
             // Create an entity to load the player data
@@ -44,14 +46,15 @@ public class PlayerDataManager {
 
             // Get the bukkit entity
             Player target = entity.getBukkitEntity();
+
             if (target != null) {
                 // Load data
                 target.loadData();
+
                 // Return the entity
                 return target;
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             OpenInv.log(e);
         }
 

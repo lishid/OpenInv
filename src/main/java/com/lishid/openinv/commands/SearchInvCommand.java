@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 lishid.  All rights reserved.
+ * Copyright (C) 2011-2016 lishid.  All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 
 public class SearchInvCommand implements CommandExecutor {
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("searchinv")) {
@@ -46,11 +47,11 @@ public class SearchInvCommand implements CommandExecutor {
                 gData = args[0].split(":");
                 material = Material.matchMaterial(gData[0]);
             }
+
             if (args.length >= 2) {
                 try {
                     count = Integer.parseInt(args[1]);
-                }
-                catch (NumberFormatException ex) {
+                } catch (NumberFormatException e) {
                     sender.sendMessage(ChatColor.RED + "'" + args[1] + "' is not a number!");
                     return false;
                 }

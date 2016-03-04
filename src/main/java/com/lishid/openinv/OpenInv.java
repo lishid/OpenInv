@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2014 lishid.  All rights reserved.
+ * Copyright (C) 2011-2016 lishid.  All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
@@ -44,12 +45,8 @@ import com.lishid.openinv.listeners.OpenInvEntityListener;
 import com.lishid.openinv.listeners.OpenInvInventoryListener;
 import com.lishid.openinv.listeners.OpenInvPlayerListener;
 
-/**
- * Open other player's inventory
- *
- * @author lishid
- */
 public class OpenInv extends JavaPlugin {
+
     public static final Map<UUID, SpecialPlayerInventory> inventories = new HashMap<UUID, SpecialPlayerInventory>();
     public static final Map<UUID, SpecialEnderChest> enderChests = new HashMap<UUID, SpecialEnderChest>();
 
@@ -113,11 +110,11 @@ public class OpenInv extends JavaPlugin {
 
     public static Object getFromConfig(String path, Object defaultValue) {
         Object val = mainPlugin.getConfig().get(path);
+
         if (val == null) {
             mainPlugin.getConfig().set(path, defaultValue);
             return defaultValue;
-        }
-        else {
+        } else {
             return val;
         }
     }
@@ -215,12 +212,15 @@ public class OpenInv extends JavaPlugin {
     public static boolean hasPermission(Permissible player, String permission) {
         String[] parts = permission.split("\\.");
         String perm = "";
+
         for (int i = 0; i < parts.length; i++) {
             if (player.hasPermission(perm + "*")) {
                 return true;
             }
+
             perm += parts[i] + ".";
         }
+
         return player.hasPermission(permission);
     }
 }

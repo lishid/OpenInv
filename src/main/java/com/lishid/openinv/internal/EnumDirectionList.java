@@ -4,16 +4,17 @@ import java.util.Iterator;
 
 import com.google.common.collect.Iterators;
 
-import net.minecraft.server.v1_8_R3.EnumDirection;
-import net.minecraft.server.v1_8_R3.EnumDirection.EnumDirectionLimit;
+import net.minecraft.server.v1_9_R1.EnumDirection;
+import net.minecraft.server.v1_9_R1.EnumDirection.EnumDirectionLimit;
 
 public enum EnumDirectionList implements Iterable<EnumDirection> {
+
     HORIZONTAL(EnumDirectionLimit.HORIZONTAL),
     VERTICAL(EnumDirectionLimit.VERTICAL);
 
     private final EnumDirectionLimit list;
 
-    private EnumDirectionList(EnumDirectionLimit list) {
+    EnumDirectionList(EnumDirectionLimit list) {
         this.list = list;
     }
 
