@@ -22,7 +22,6 @@ import java.lang.reflect.Modifier;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 
 //Volatile
@@ -45,7 +44,6 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         this.owner = ((CraftPlayer) p);
         this.playerOnline = online;
         setItemArrays(this, player.inventory.items, player.inventory.armor, player.inventory.extraSlots);
-        OpenInv.inventories.put(owner.getName().toLowerCase(), this);
     }
 
     private void setItemArrays(PlayerInventory inventory, ItemStack[] items, ItemStack[] armor,
@@ -61,28 +59,26 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             field.set(inventory, armor);
             field = inventory.getClass().getField("extraSlots");
             modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-                | IllegalAccessException e) {
+        } catch (NoSuchFieldException e) {
             // Unable to set final fields to item arrays, we're screwed. Noisily fail.
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
 
-    @Override
     public Inventory getBukkitInventory() {
         return inventory;
     }
 
-    @Override
-    public void InventoryRemovalCheck() {
+    public boolean inventoryRemovalCheck() {
         owner.saveData();
-        if (transaction.isEmpty() && !playerOnline) {
-            OpenInv.inventories.remove(owner.getName().toLowerCase());
-        }
+        return transaction.isEmpty() && !playerOnline;
     }
 
-    @Override
-    public void PlayerGoOnline(Player player) {
+    public void setPlayerOnline(Player player) {
         if (!playerOnline) {
             CraftPlayer p = (CraftPlayer) player;
             setItemArrays(p.getHandle().inventory, items, armor, extraSlots);
@@ -91,16 +87,15 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         }
     }
 
-    @Override
-    public void PlayerGoOffline() {
+    public boolean setPlayerOffline() {
         playerOnline = false;
-        this.InventoryRemovalCheck();
+        return this.inventoryRemovalCheck();
     }
 
     @Override
     public void onClose(CraftHumanEntity who) {
         super.onClose(who);
-        this.InventoryRemovalCheck();
+        this.inventoryRemovalCheck();
     }
 
     @Override

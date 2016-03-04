@@ -25,7 +25,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 
 //Volatile
@@ -53,24 +52,18 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
         this.enderChest = player.getHandle().getEnderChest();
         this.owner = player;
         this.items = enderChest.getContents();
-        OpenInv.enderChests.put(owner.getName().toLowerCase(), this);
     }
 
-    @Override
     public Inventory getBukkitInventory() {
         return inventory;
     }
 
-    @Override
-    public void InventoryRemovalCheck() {
+    public boolean inventoryRemovalCheck() {
         owner.saveData();
-        if (transaction.isEmpty() && !playerOnline) {
-            OpenInv.enderChests.remove(owner.getName().toLowerCase());
-        }
+        return transaction.isEmpty() && !playerOnline;
     }
 
-    @Override
-    public void PlayerGoOnline(Player p) {
+    public void setPlayerOnline(Player p) {
         if (!playerOnline) {
             try {
                 InventoryEnderChest playerEnderChest = ((CraftPlayer) p).getHandle().getEnderChest();
@@ -84,9 +77,9 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
         }
     }
 
-    @Override
-    public void PlayerGoOffline() {
+    public boolean setPlayerOffline() {
         playerOnline = false;
+        return inventoryRemovalCheck();
     }
 
     @Override
@@ -102,7 +95,7 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     @Override
     public void onClose(CraftHumanEntity who) {
         transaction.remove(who);
-        this.InventoryRemovalCheck();
+        this.inventoryRemovalCheck();
     }
 
     @Override

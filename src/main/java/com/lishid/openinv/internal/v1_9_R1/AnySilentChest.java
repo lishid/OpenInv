@@ -19,7 +19,6 @@ package com.lishid.openinv.internal.v1_9_R1;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IAnySilentChest;
 
 //Volatile
@@ -39,8 +38,7 @@ import net.minecraft.server.v1_9_R1.TileEntityChest;
 import net.minecraft.server.v1_9_R1.World;
 
 public class AnySilentChest implements IAnySilentChest {
-    @Override
-    public boolean IsAnyChestNeeded(Player p, int x, int y, int z) {
+    public boolean isAnyChestNeeded(Player p, int x, int y, int z) {
         // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
@@ -88,8 +86,7 @@ public class AnySilentChest implements IAnySilentChest {
         return false;
     }
 
-    @Override
-    public boolean ActivateChest(Player p, boolean anychest, boolean silentchest, int x, int y, int z) {
+    public boolean activateChest(Player p, boolean anychest, boolean silentchest, int x, int y, int z) {
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
         Object chest = world.getTileEntity(new BlockPosition(x, y, z));
@@ -132,19 +129,12 @@ public class AnySilentChest implements IAnySilentChest {
                 player.activeContainer = silentContainerChest;
                 player.activeContainer.windowId = windowId;
                 player.activeContainer.addSlotListener(player);
-                if (OpenInv.NotifySilentChest()) {
-                    p.sendMessage("You are opening a chest silently.");
-                }
                 returnValue = false;
             }
             catch (Exception e) {
                 e.printStackTrace();
                 p.sendMessage(ChatColor.RED + "Error while sending silent chest.");
             }
-        }
-
-        if (anychest && OpenInv.NotifyAnyChest()) {
-            p.sendMessage("You are opening a blocked chest.");
         }
 
         return returnValue;

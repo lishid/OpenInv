@@ -18,7 +18,6 @@ package com.lishid.openinv.commands;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -32,7 +31,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.ISpecialEnderChest;
-import com.lishid.openinv.internal.InternalAccessor;
 
 public class OpenEnderPluginCommand implements CommandExecutor {
     private final OpenInv plugin;
@@ -42,7 +40,6 @@ public class OpenEnderPluginCommand implements CommandExecutor {
         this.plugin = plugin;
     }
 
-    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
@@ -74,17 +71,16 @@ public class OpenEnderPluginCommand implements CommandExecutor {
             name = args[0];
         }
 
-        final UUID senderID = player.getUniqueId();
         new BukkitRunnable() {
-            @Override
             public void run() {
                 List<Player> matches = Bukkit.matchPlayer(name);
+                final OfflinePlayer offlinePlayer;
                 if (!matches.isEmpty()) {
-                    openInventory(player, matches.get(0).getUniqueId());
-                    return;
+                    offlinePlayer = matches.get(0);
+                } else {
+                    offlinePlayer = Bukkit.getOfflinePlayer(name);
                 }
-                final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
-                if (Bukkit.getPlayer(senderID) == null) {
+                if (!player.isOnline()) {
                     return;
                 }
                 if (offlinePlayer == null || !offlinePlayer.hasPlayedBefore()) {
@@ -92,12 +88,11 @@ public class OpenEnderPluginCommand implements CommandExecutor {
                     return;
                 }
                 new BukkitRunnable() {
-                    @Override
                     public void run() {
-                        if (Bukkit.getPlayer(senderID) == null) {
+                        if (!player.isOnline()) {
                             return;
                         }
-                        openInventory(player, offlinePlayer.getUniqueId());
+                        openInventory(player, offlinePlayer);
                     }
                 }.runTask(plugin);
             }
@@ -106,34 +101,32 @@ public class OpenEnderPluginCommand implements CommandExecutor {
         return true;
     }
 
-    private void openInventory(Player player, UUID uuid) {
+    private void openInventory(Player player, OfflinePlayer target) {
 
-        Player target = this.plugin.getServer().getPlayer(uuid);
-
-        if (target == null) {
+        Player onlineTarget;
+        if (!target.isOnline()) {
             // Try loading the player's data
-            target = OpenInv.playerLoader.loadPlayer(uuid);
+            onlineTarget = plugin.getPlayerLoader().loadPlayer(target);
 
-            if (target == null) {
+            if (onlineTarget == null) {
                 player.sendMessage(ChatColor.RED + "Player not found!");
                 return;
             }
+        } else {
+            onlineTarget = target.getPlayer();
         }
 
 
-        if (target != player && !OpenInv.hasPermission(player, Permissions.PERM_ENDERCHEST_ALL)) {
+        if (!onlineTarget.equals(player) && !OpenInv.hasPermission(player, Permissions.PERM_ENDERCHEST_ALL)) {
             player.sendMessage(ChatColor.RED + "You do not have permission to access other player's enderchest");
             return;
         }
 
         // Record the target
-        openEnderHistory.put(player, target.getName());
+        openEnderHistory.put(player, onlineTarget.getName());
 
         // Create the inventory
-        ISpecialEnderChest chest = OpenInv.enderChests.get(target.getName().toLowerCase());
-        if (chest == null) {
-            chest = InternalAccessor.Instance.newSpecialEnderChest(target, !target.isOnline());
-        }
+        ISpecialEnderChest chest = plugin.getOrCreateEnderChestFor(onlineTarget, !target.isOnline());
 
         // Open the inventory
         player.openInventory(chest.getBukkitInventory());

@@ -20,11 +20,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 public interface ISpecialPlayerInventory {
+
     public Inventory getBukkitInventory();
 
-    public void InventoryRemovalCheck();
+    public boolean inventoryRemovalCheck();
 
-    public void PlayerGoOnline(Player p);
+    public void setPlayerOnline(Player player);
 
-    public void PlayerGoOffline();
+    /**
+     * Sets the Player associated with this ISpecialPlayerInventory offline.
+     * 
+     * @return true if the ISpecialPlayerInventory is eligible for removal
+     */
+    public boolean setPlayerOffline();
 }

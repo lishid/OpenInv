@@ -24,29 +24,33 @@ import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
 
-public class AnyChestPluginCommand implements CommandExecutor {
-    public AnyChestPluginCommand(OpenInv plugin) {
+public class SilentChestPluginCommand implements CommandExecutor {
 
+    private final OpenInv plugin;
+
+    public SilentChestPluginCommand(OpenInv plugin) {
+        this.plugin = plugin;
     }
 
-    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
             return true;
         }
 
+        Player player = (Player) sender;
+
         if (args.length > 0) {
             if (args[0].equalsIgnoreCase("check")) {
-                if (OpenInv.GetPlayerAnyChestStatus(sender.getName()))
-                    sender.sendMessage("AnyChest is ON.");
+                if (plugin.getPlayerSilentChestStatus(player))
+                    sender.sendMessage("SilentChest is ON.");
                 else
-                    sender.sendMessage("AnyChest is OFF.");
+                    sender.sendMessage("SilentChest is OFF.");
             }
         }
 
-        OpenInv.SetPlayerAnyChestStatus(sender.getName(), !OpenInv.GetPlayerAnyChestStatus(sender.getName()));
-        sender.sendMessage("AnyChest is now " + (OpenInv.GetPlayerAnyChestStatus(sender.getName()) ? "On" : "Off") + ".");
+        plugin.setPlayerSilentChestStatus(player, !plugin.getPlayerSilentChestStatus(player));
+        sender.sendMessage("SilentChest is now " + (plugin.getPlayerSilentChestStatus(player) ? "On" : "Off") + ".");
 
         return true;
     }

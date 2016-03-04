@@ -23,12 +23,19 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 
 public class OpenInvInventoryListener implements Listener {
+
+    private final OpenInv plugin;
+
+    public OpenInvInventoryListener(OpenInv plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler(priority = EventPriority.NORMAL)
     public void onInventoryClick(InventoryClickEvent event) {
         // If this is the top inventory
         // if (event.getView().convertSlot(event.getRawSlot()) == event.getRawSlot())
         // {
-        if (!OpenInv.inventoryAccess.check(event.getInventory(), event.getWhoClicked())) {
+        if (!plugin.getInventoryAccess().check(event.getInventory(), event.getWhoClicked())) {
             event.setCancelled(true);
         }
         // }
@@ -36,7 +43,7 @@ public class OpenInvInventoryListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onInventoryDrag(InventoryDragEvent event) {
-        if (!OpenInv.inventoryAccess.check(event.getInventory(), event.getWhoClicked())) {
+        if (!plugin.getInventoryAccess().check(event.getInventory(), event.getWhoClicked())) {
             event.setCancelled(true);
         }
     }

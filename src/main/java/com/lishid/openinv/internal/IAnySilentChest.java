@@ -19,7 +19,7 @@ package com.lishid.openinv.internal;
 import org.bukkit.entity.Player;
 
 public interface IAnySilentChest {
-    public boolean IsAnyChestNeeded(Player p, int x, int y, int z);
+    public boolean isAnyChestNeeded(Player player, int x, int y, int z);
 
-    public boolean ActivateChest(Player p, boolean anychest, boolean silentchest, int x, int y, int z);
+    public boolean activateChest(Player player, boolean anychest, boolean silentchest, int x, int y, int z);
 }

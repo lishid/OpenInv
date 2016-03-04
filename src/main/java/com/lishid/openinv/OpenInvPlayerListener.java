@@ -18,7 +18,6 @@ package com.lishid.openinv;
 
 import org.bukkit.ChatColor;
 import org.bukkit.block.Chest;
-import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
@@ -33,30 +32,41 @@ import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 
 public class OpenInvPlayerListener implements Listener {
+
+    private final OpenInv plugin;
+
+    public OpenInvPlayerListener(OpenInv plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        ISpecialPlayerInventory inventory = OpenInv.inventories.get(event.getPlayer().getName().toLowerCase());
+        ISpecialPlayerInventory inventory = plugin.getInventoryFor(event.getPlayer());
 
         if (inventory != null) {
-            inventory.PlayerGoOnline(event.getPlayer());
+            inventory.setPlayerOnline(event.getPlayer());
         }
 
-        ISpecialEnderChest chest = OpenInv.enderChests.get(event.getPlayer().getName().toLowerCase());
+        ISpecialEnderChest chest = plugin.getEnderChestFor(event.getPlayer());
 
         if (chest != null) {
-            chest.PlayerGoOnline(event.getPlayer());
+            chest.setPlayerOnline(event.getPlayer());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
-        ISpecialPlayerInventory inventory = OpenInv.inventories.get(event.getPlayer().getName().toLowerCase());
+        ISpecialPlayerInventory inventory = plugin.getInventoryFor(event.getPlayer());
         if (inventory != null) {
-            inventory.PlayerGoOffline();
+            if (inventory.setPlayerOffline()) {
+                plugin.removeLoadedInventory(event.getPlayer());
+            }
         }
-        ISpecialEnderChest chest = OpenInv.enderChests.get(event.getPlayer().getName().toLowerCase());
+        ISpecialEnderChest chest = plugin.getEnderChestFor(event.getPlayer());
         if (chest != null) {
-            chest.PlayerGoOffline();
+            if (chest.setPlayerOffline()) {
+                plugin.removeLoadedEnderChest(event.getPlayer());
+            }
         }
     }
 
@@ -73,7 +83,7 @@ public class OpenInvPlayerListener implements Listener {
         }
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == org.bukkit.Material.ENDER_CHEST) {
-            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.GetPlayerSilentChestStatus(player.getName())) {
+            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && plugin.getPlayerSilentChestStatus(player)) {
                 event.setCancelled(true);
                 player.openInventory(player.getEnderChest());
             }
@@ -86,13 +96,13 @@ public class OpenInvPlayerListener implements Listener {
             int y = event.getClickedBlock().getY();
             int z = event.getClickedBlock().getZ();
 
-            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && OpenInv.GetPlayerSilentChestStatus(player.getName())) {
+            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && plugin.getPlayerSilentChestStatus(player)) {
                 silentchest = true;
             }
 
-            if (OpenInv.hasPermission(player, Permissions.PERM_ANYCHEST) && OpenInv.GetPlayerAnyChestStatus(player.getName())) {
+            if (OpenInv.hasPermission(player, Permissions.PERM_ANYCHEST) && plugin.getPlayerAnyChestStatus(player)) {
                 try {
-                    anychest = OpenInv.anySilentChest.IsAnyChestNeeded(player, x, y, z);
+                    anychest = plugin.getAnySilentChest().isAnyChestNeeded(player, x, y, z);
                 }
                 catch (Exception e) {
                     player.sendMessage(ChatColor.RED + "Error while executing openinv. Unsupported CraftBukkit.");
@@ -102,24 +112,17 @@ public class OpenInvPlayerListener implements Listener {
 
             // If the anychest or silentchest is active
             if (anychest || silentchest) {
-                if (!OpenInv.anySilentChest.ActivateChest(player, anychest, silentchest, x, y, z)) {
+                if (!plugin.getAnySilentChest().activateChest(player, anychest, silentchest, x, y, z)) {
+                    if (silentchest && plugin.notifySilentChest()) {
+                        player.sendMessage("You are opening a chest silently.");
+                    }
+                    if (anychest && plugin.notifyAnyChest()) {
+                        player.sendMessage("You are opening a blocked chest.");
+                    }
                     event.setCancelled(true);
                 }
             }
         }
-
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getState() instanceof Sign) {
-            try {
-                Sign sign = ((Sign) event.getClickedBlock().getState());
-                if (OpenInv.hasPermission(player, Permissions.PERM_OPENINV) && sign.getLine(0).equalsIgnoreCase("[openinv]")) {
-                    String text = sign.getLine(1).trim() + sign.getLine(2).trim() + sign.getLine(3).trim();
-                    player.performCommand("openinv " + text);
-                }
-            }
-            catch (Exception ex) {
-                player.sendMessage("Internal Error.");
-                ex.printStackTrace();
-            }
-        }
     }
+
 }

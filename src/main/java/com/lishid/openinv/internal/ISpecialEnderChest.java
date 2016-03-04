@@ -20,12 +20,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 public interface ISpecialEnderChest {
+
     public Inventory getBukkitInventory();
 
-    public void InventoryRemovalCheck();
+    public boolean inventoryRemovalCheck();
 
-    public void PlayerGoOnline(Player p);
+    public void setPlayerOnline(Player p);
 
-    public void PlayerGoOffline();
+    /**
+     * Sets the Player associated with this ISpecialEnderChest offline.
+     * 
+     * @return true if the ISpecialEnderChest is eligible for removal
+     */
+    public boolean setPlayerOffline();
 
 }

@@ -22,19 +22,28 @@ import org.bukkit.entity.Player;
 import com.lishid.openinv.OpenInv;
 
 public class InternalAccessor {
-    public static InternalAccessor Instance;
+
+    private final OpenInv plugin;
+
     private String version;
 
-    /*
-     * Returns false if version not supported
+    public InternalAccessor(OpenInv plugin) {
+        this.plugin = plugin;
+    }
+
+    /**
+     * Check if the current server version is supported, and, if it is, prepare to load version-specific code.
+     * 
+     * @param server the Server
+     * 
+     * @return true if supported
      */
-    public static boolean Initialize(Server server) {
-        Instance = new InternalAccessor();
+    public boolean initialize(Server server) {
         String packageName = server.getClass().getPackage().getName();
-        Instance.version = packageName.substring(packageName.lastIndexOf('.') + 1);
+        version = packageName.substring(packageName.lastIndexOf('.') + 1);
 
         try {
-            Class.forName("com.lishid.openinv.internal." + Instance.version + ".AnySilentChest");
+            Class.forName("com.lishid.openinv.internal." + version + ".AnySilentChest");
             return true;
         }
         catch (Exception e) {
@@ -42,8 +51,8 @@ public class InternalAccessor {
         }
     }
 
-    public void PrintError() {
-        OpenInv.log("OpenInv encountered an error with the CraftBukkit version \"" + Instance.version + "\". Please look for an updated version of OpenInv.");
+    private void printErrorMessage() {
+        plugin.getLogger().warning("OpenInv encountered an error with the CraftBukkit version \"" + version + "\". Please look for an updated version of OpenInv.");
     }
 
     public IPlayerDataManager newPlayerDataManager() {
@@ -66,8 +75,8 @@ public class InternalAccessor {
             }
         }
         catch (Exception e) {
-            PrintError();
-            OpenInv.log(e);
+            printErrorMessage();
+            e.printStackTrace();
         }
 
         return null;
@@ -81,8 +90,8 @@ public class InternalAccessor {
             }
         }
         catch (Exception e) {
-            PrintError();
-            OpenInv.log(e);
+            printErrorMessage();
+            e.printStackTrace();
         }
 
         return null;
@@ -96,8 +105,8 @@ public class InternalAccessor {
             }
         }
         catch (Exception e) {
-            PrintError();
-            OpenInv.log(e);
+            printErrorMessage();
+            e.printStackTrace();
         }
 
         return null;

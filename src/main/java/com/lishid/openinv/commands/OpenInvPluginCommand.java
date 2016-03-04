@@ -18,7 +18,6 @@ package com.lishid.openinv.commands;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -32,7 +31,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
-import com.lishid.openinv.internal.InternalAccessor;
 
 public class OpenInvPluginCommand implements CommandExecutor {
     private final OpenInv plugin;
@@ -42,7 +40,6 @@ public class OpenInvPluginCommand implements CommandExecutor {
         this.plugin = plugin;
     }
 
-    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
@@ -74,17 +71,16 @@ public class OpenInvPluginCommand implements CommandExecutor {
             name = args[0];
         }
 
-        final UUID senderID = player.getUniqueId();
         new BukkitRunnable() {
-            @Override
             public void run() {
                 List<Player> matches = Bukkit.matchPlayer(name);
+                final OfflinePlayer offlinePlayer;
                 if (!matches.isEmpty()) {
-                    openInventory(player, matches.get(0).getUniqueId());
-                    return;
+                    offlinePlayer = matches.get(0);
+                } else {
+                    offlinePlayer = Bukkit.getOfflinePlayer(name);
                 }
-                final OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(name);
-                if (Bukkit.getPlayer(senderID) == null) {
+                if (!player.isOnline()) {
                     return;
                 }
                 if (offlinePlayer == null || !offlinePlayer.hasPlayedBefore()) {
@@ -92,12 +88,11 @@ public class OpenInvPluginCommand implements CommandExecutor {
                     return;
                 }
                 new BukkitRunnable() {
-                    @Override
                     public void run() {
-                        if (Bukkit.getPlayer(senderID) == null) {
+                        if (!player.isOnline()) {
                             return;
                         }
-                        openInventory(player, offlinePlayer.getUniqueId());
+                        openInventory(player, offlinePlayer);
                     }
                 }.runTask(plugin);
             }
@@ -106,46 +101,46 @@ public class OpenInvPluginCommand implements CommandExecutor {
         return true;
     }
 
-    private void openInventory(Player player, UUID uuid) {
+    private void openInventory(Player player, OfflinePlayer target) {
 
-        Player target = this.plugin.getServer().getPlayer(uuid);
 
-        if (target == null) {
+        Player onlineTarget;
+
+        if (!target.isOnline()) {
             // Try loading the player's data
-            target = OpenInv.playerLoader.loadPlayer(uuid);
+            onlineTarget = plugin.getPlayerLoader().loadPlayer(target);
 
-            if (target == null) {
+            if (onlineTarget == null) {
                 player.sendMessage(ChatColor.RED + "Player not found!");
                 return;
             }
+        } else {
+            onlineTarget = target.getPlayer();
         }
 
         // Permissions checks
-        if (!OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE) && OpenInv.hasPermission(target, Permissions.PERM_EXEMPT)) {
-            player.sendMessage(ChatColor.RED + target.getDisplayName() + "'s inventory is protected!");
+        if (!OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE) && OpenInv.hasPermission(onlineTarget, Permissions.PERM_EXEMPT)) {
+            player.sendMessage(ChatColor.RED + onlineTarget.getDisplayName() + "'s inventory is protected!");
             return;
         }
 
         // Crosswork check
-        if ((!OpenInv.hasPermission(player, Permissions.PERM_CROSSWORLD) && !OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE)) && target.getWorld() != player.getWorld()) {
-            player.sendMessage(ChatColor.RED + target.getDisplayName() + " is not in your world!");
+        if ((!OpenInv.hasPermission(player, Permissions.PERM_CROSSWORLD) && !OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE)) && onlineTarget.getWorld() != player.getWorld()) {
+            player.sendMessage(ChatColor.RED + onlineTarget.getDisplayName() + " is not in your world!");
             return;
         }
 
         // Self-open check
-        if (!OpenInv.hasPermission(player, Permissions.PERM_OPENSELF) && target.equals(player)) {
+        if (!OpenInv.hasPermission(player, Permissions.PERM_OPENSELF) && onlineTarget.equals(player)) {
             player.sendMessage(ChatColor.RED + "You're not allowed to openinv yourself.");
             return;
         }
 
         // Record the target
-        openInvHistory.put(player, target.getName());
+        openInvHistory.put(player, onlineTarget.getName());
 
         // Create the inventory
-        ISpecialPlayerInventory inv = OpenInv.inventories.get(target.getName().toLowerCase());
-        if (inv == null) {
-            inv = InternalAccessor.Instance.newSpecialPlayerInventory(target, !target.isOnline());
-        }
+        ISpecialPlayerInventory inv = plugin.getOrCreateInventoryFor(onlineTarget, !target.isOnline());
 
         // Open the inventory
         player.openInventory(inv.getBukkitInventory());

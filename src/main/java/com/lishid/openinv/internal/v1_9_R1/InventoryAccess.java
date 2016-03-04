@@ -31,7 +31,6 @@ import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
 import net.minecraft.server.v1_9_R1.IInventory;
 
 public class InventoryAccess implements IInventoryAccess {
-    @Override
     public boolean check(Inventory inventory, HumanEntity player) {
         IInventory inv = grabInventory(inventory);
         
@@ -65,7 +64,7 @@ public class InventoryAccess implements IInventoryAccess {
                     result = (IInventory) f.get(inventory);
                 }
                 catch (Exception e) {
-                    OpenInv.log(e);
+                    e.printStackTrace();
                 }
             }
         }
