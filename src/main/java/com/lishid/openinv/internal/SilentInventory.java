@@ -11,6 +11,7 @@ import org.bukkit.inventory.InventoryHolder;
 import net.minecraft.server.v1_9_R1.*;
 
 public class SilentInventory implements ITileInventory {
+
     public ITileInventory inv;
 
     public SilentInventory(ITileInventory inv) {

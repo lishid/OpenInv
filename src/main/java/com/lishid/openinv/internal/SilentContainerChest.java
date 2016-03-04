@@ -20,6 +20,7 @@ package com.lishid.openinv.internal;
 import net.minecraft.server.v1_9_R1.*;
 
 public class SilentContainerChest extends ContainerChest {
+
     public IInventory inv;
 
     public SilentContainerChest(IInventory i1, IInventory i2, EntityHuman human) {

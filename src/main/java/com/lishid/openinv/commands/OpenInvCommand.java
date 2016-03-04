@@ -33,6 +33,7 @@ import com.lishid.openinv.internal.SpecialPlayerInventory;
 import com.lishid.openinv.utils.UUIDUtil;
 
 public class OpenInvCommand implements CommandExecutor {
+
     private final OpenInv plugin;
     private final Map<UUID, UUID> openInvHistory = new ConcurrentHashMap<UUID, UUID>();
 

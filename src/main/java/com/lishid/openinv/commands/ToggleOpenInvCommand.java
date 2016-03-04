@@ -26,6 +26,7 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 
 public class ToggleOpenInvCommand implements CommandExecutor {
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("toggleopeninv")) {

@@ -30,6 +30,7 @@ import net.minecraft.server.v1_9_R1.*;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.*;
 
 public class InventoryAccess {
+
     public boolean check(Inventory inventory, HumanEntity player) {
         IInventory inv = grabInventory(inventory);
         
@@ -62,12 +63,12 @@ public class InventoryAccess {
             if (IInventory.class.isAssignableFrom(f.getDeclaringClass())) {
                 try {
                     result = (IInventory) f.get(inventory);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     OpenInv.log(e);
                 }
             }
         }
+
         return result;
     }
 }

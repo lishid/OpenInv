@@ -29,6 +29,7 @@ import org.bukkit.craftbukkit.v1_9_R1.entity.*;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.*;
 
 public class SpecialEnderChest extends InventorySubcontainer {
+
     private final CraftInventory inventory = new CraftInventory(this);
     private final InventoryEnderChest enderChest;
     private final CraftPlayer owner;

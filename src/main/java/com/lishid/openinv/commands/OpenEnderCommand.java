@@ -33,6 +33,7 @@ import com.lishid.openinv.internal.SpecialEnderChest;
 import com.lishid.openinv.utils.UUIDUtil;
 
 public class OpenEnderCommand implements CommandExecutor {
+
     private final OpenInv plugin;
     private final Map<UUID, UUID> openEnderHistory = new ConcurrentHashMap<UUID, UUID>();
 
@@ -73,8 +74,7 @@ public class OpenEnderCommand implements CommandExecutor {
             if (args.length < 1) {
                 if (history != null) {
                     uuid = history;
-                }
-                else {
+                } else {
                     sender.sendMessage(ChatColor.RED + "OpenEnder history is empty!");
                     return true;
                 }
@@ -111,6 +111,7 @@ public class OpenEnderCommand implements CommandExecutor {
                                 if (player == null) {
                                     return;
                                 }
+
                                 openInventory(player, target);
                             }
                         });

@@ -13,6 +13,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import com.lishid.openinv.utils.UUIDUtil;
 
 public class ConfigUpdater {
+
     private final OpenInv plugin;
 
     private static final int CONFIG_VERSION = 2;
@@ -33,8 +34,7 @@ public class ConfigUpdater {
         if (isConfigOutdated()) {
             plugin.getLogger().info("[Config] Update found! Performing update...");
             performUpdate();
-        }
-        else {
+        } else {
             plugin.getLogger().info("[Config] Update not required.");
         }
     }
@@ -137,6 +137,7 @@ public class ConfigUpdater {
 
         for (String playerName : keys) {
             UUID uuid = UUIDUtil.getUUIDOf(playerName);
+
             if (uuid != null) {
                 boolean toggled = section.getBoolean(playerName + ".toggle", false);
                 toggles.put(uuid, toggled);
@@ -152,9 +153,11 @@ public class ConfigUpdater {
     @SuppressWarnings("deprecation")
     private Material getMaterialById(int id) {
         Material material = Material.getMaterial(id);
+
         if (material == null) {
             material = Material.STICK;
         }
+
         return material;
     }
 }

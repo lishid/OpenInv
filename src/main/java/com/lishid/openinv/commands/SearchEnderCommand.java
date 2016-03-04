@@ -12,6 +12,7 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 
 public class SearchEnderCommand implements CommandExecutor {
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("searchender")) {
@@ -30,11 +31,11 @@ public class SearchEnderCommand implements CommandExecutor {
                 gData = args[0].split(":");
                 material = Material.matchMaterial(gData[0]);
             }
+
             if (args.length >= 2) {
                 try {
                     count = Integer.parseInt(args[1]);
-                }
-                catch (NumberFormatException ex) {
+                } catch (NumberFormatException e) {
                     sender.sendMessage(ChatColor.RED + "'" + args[1] + "' is not a number!");
                     return false;
                 }

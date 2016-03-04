@@ -8,6 +8,7 @@ import net.minecraft.server.v1_9_R1.EnumDirection;
 import net.minecraft.server.v1_9_R1.EnumDirection.EnumDirectionLimit;
 
 public enum EnumDirectionList implements Iterable<EnumDirection> {
+
     HORIZONTAL(EnumDirectionLimit.HORIZONTAL),
     VERTICAL(EnumDirectionLimit.VERTICAL);
 
