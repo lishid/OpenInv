@@ -40,7 +40,6 @@ public class SpecialPlayerInventory extends PlayerInventory {
     public SpecialPlayerInventory(Player p, boolean online) {
         super(((CraftPlayer) p).getHandle());
         this.owner = (CraftPlayer) p;
-        // applyContents();
         reflectContents(getClass().getSuperclass(), player.inventory, this);
         this.arrays = new ItemStack[][] { this.items, this.armor, this.extra };
         this.playerOnline = online;
