@@ -36,7 +36,7 @@ import net.minecraft.server.v1_9_R1.PlayerInventory;
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
     CraftPlayer owner;
     public boolean playerOnline = false;
-    private final ItemStack[] extra = new ItemStack[5];
+    private final ItemStack[] extra = new ItemStack[4];
     private final CraftInventory inventory = new CraftInventory(this);
 
     public SpecialPlayerInventory(Player p, Boolean online) {
@@ -59,6 +59,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             field.set(inventory, armor);
             field = inventory.getClass().getField("extraSlots");
             modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(inventory, extraSlots);
         } catch (NoSuchFieldException e) {
             // Unable to set final fields to item arrays, we're screwed. Noisily fail.
             e.printStackTrace();
@@ -69,15 +70,18 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         }
     }
 
+    @Override
     public Inventory getBukkitInventory() {
         return inventory;
     }
 
+    @Override
     public boolean inventoryRemovalCheck() {
         owner.saveData();
         return transaction.isEmpty() && !playerOnline;
     }
 
+    @Override
     public void setPlayerOnline(Player player) {
         if (!playerOnline) {
             CraftPlayer p = (CraftPlayer) player;
@@ -87,6 +91,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         }
     }
 
+    @Override
     public boolean setPlayerOffline() {
         playerOnline = false;
         return this.inventoryRemovalCheck();
@@ -103,6 +108,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         ItemStack[] C = new ItemStack[getSize()];
         System.arraycopy(items, 0, C, 0, items.length);
         System.arraycopy(armor, 0, C, items.length, armor.length);
+        System.arraycopy(extraSlots, 0, C, items.length + armor.length, extraSlots.length);
         return C;
     }
 
