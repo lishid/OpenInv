@@ -25,12 +25,13 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.IInventoryAccess;
 
-//Volatile
-import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
-
+// Volatile
 import net.minecraft.server.v1_9_R1.IInventory;
 
+import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
+
 public class InventoryAccess implements IInventoryAccess {
+    @Override
     public boolean check(Inventory inventory, HumanEntity player) {
         IInventory inv = grabInventory(inventory);
         

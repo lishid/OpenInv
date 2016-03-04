@@ -23,104 +23,16 @@ import org.bukkit.entity.Player;
 import com.lishid.openinv.internal.IPlayerDataManager;
 import com.mojang.authlib.GameProfile;
 
-//Volatile
-import org.bukkit.craftbukkit.v1_9_R1.CraftServer;
-
+// Volatile
 import net.minecraft.server.v1_9_R1.EntityPlayer;
 import net.minecraft.server.v1_9_R1.MinecraftServer;
 import net.minecraft.server.v1_9_R1.PlayerInteractManager;
 
-public class PlayerDataManager implements IPlayerDataManager {
-//    public Player loadPlayer(String name) {
-//        try {
-//            UUID uuid = matchUser(name);
-//            if (uuid == null) {
-//                return null;
-//            }
-//
-//            // Default player folder
-//            File playerfolder = new File(Bukkit.getWorlds().get(0).getWorldFolder(), "playerdata");
-//            if (!playerfolder.exists()) {
-//                return null;
-//            }
-//
-//            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-//            if (player == null) {
-//                return null;
-//            }
-//            GameProfile profile = new GameProfile(uuid, player.getName());
-//            MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
-//            // Create an entity to load the player data
-//            EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), profile, new PlayerInteractManager(server.getWorldServer(0)));
-//
-//            // Get the bukkit entity
-//            Player target = (entity == null) ? null : entity.getBukkitEntity();
-//            if (target != null) {
-//                // Load data
-//                target.loadData();
-//                // Return the entity
-//                return target;
-//            }
-//        }
-//        catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//
-//        return null;
-//    }
-//
-//    private static UUID matchUser(String search) {
-//        UUID found = null;
-//
-//        String lowerSearch = search.toLowerCase();
-//        int delta = 2147483647;
-//
-//        OfflinePlayer[] offlinePlayers = Bukkit.getOfflinePlayers();
-//        for (OfflinePlayer player : offlinePlayers) {
-//            String name = player.getName();
-//           
-//            if (name == null){
-//                continue;
-//            }
-//            if (name.equalsIgnoreCase(search)){
-//                return player.getUniqueId();
-//            }
-//            if (name.toLowerCase().startsWith(lowerSearch)) {
-//                int curDelta = name.length() - lowerSearch.length();
-//                if (curDelta < delta) {
-//                    found = player.getUniqueId();
-//                    delta = curDelta;
-//                }
-//                if (curDelta == 0) {
-//                    break;
-//                }
-//            }
-//        }
-//
-//        return found;
-//    }
-//
-//    public Player loadPlayer(UUID uuid) {
-//        OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-//        if (player == null || !player.hasPlayedBefore()) {
-//            return null;
-//        }
-//        GameProfile profile = new GameProfile(uuid, player.getName());
-//        MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
-//        // Create an entity to load the player data
-//        EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), profile, new PlayerInteractManager(server.getWorldServer(0)));
-//
-//        // Get the bukkit entity
-//        Player target = (entity == null) ? null : entity.getBukkitEntity();
-//        if (target != null) {
-//            // Load data
-//            target.loadData();
-//            // Return the entity
-//            return target;
-//        }
-//        return null;
-//    }
+import org.bukkit.craftbukkit.v1_9_R1.CraftServer;
 
+public class PlayerDataManager implements IPlayerDataManager {
+
+    @Override
     public Player loadPlayer(OfflinePlayer offline) {
         if (offline == null || !offline.hasPlayedBefore()) {
             return null;
@@ -141,6 +53,7 @@ public class PlayerDataManager implements IPlayerDataManager {
         return null;
     }
 
+    @Override
     public String getPlayerDataID(OfflinePlayer player) {
         return player.getUniqueId().toString();
     }

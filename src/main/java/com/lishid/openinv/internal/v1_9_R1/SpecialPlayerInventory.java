@@ -24,14 +24,14 @@ import org.bukkit.inventory.Inventory;
 
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 
-//Volatile
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
-
+// Volatile
 import net.minecraft.server.v1_9_R1.EntityHuman;
 import net.minecraft.server.v1_9_R1.ItemStack;
 import net.minecraft.server.v1_9_R1.PlayerInventory;
+
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
     CraftPlayer owner;

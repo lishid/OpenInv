@@ -21,9 +21,7 @@ import org.bukkit.entity.Player;
 
 import com.lishid.openinv.internal.IAnySilentChest;
 
-//Volatile
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
-
+// Volatile
 import net.minecraft.server.v1_9_R1.AxisAlignedBB;
 import net.minecraft.server.v1_9_R1.Block;
 import net.minecraft.server.v1_9_R1.BlockPosition;
@@ -37,7 +35,10 @@ import net.minecraft.server.v1_9_R1.PacketPlayOutOpenWindow;
 import net.minecraft.server.v1_9_R1.TileEntityChest;
 import net.minecraft.server.v1_9_R1.World;
 
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
+
 public class AnySilentChest implements IAnySilentChest {
+    @Override
     public boolean isAnyChestNeeded(Player p, int x, int y, int z) {
         // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
         EntityPlayer player = ((CraftPlayer) p).getHandle();
@@ -86,6 +87,7 @@ public class AnySilentChest implements IAnySilentChest {
         return false;
     }
 
+    @Override
     public boolean activateChest(Player p, boolean anychest, boolean silentchest, int x, int y, int z) {
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;

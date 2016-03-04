@@ -27,16 +27,16 @@ import org.bukkit.inventory.InventoryHolder;
 
 import com.lishid.openinv.internal.ISpecialEnderChest;
 
-//Volatile
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
-
+// Volatile
 import net.minecraft.server.v1_9_R1.EntityHuman;
 import net.minecraft.server.v1_9_R1.IInventory;
 import net.minecraft.server.v1_9_R1.InventoryEnderChest;
 import net.minecraft.server.v1_9_R1.InventorySubcontainer;
 import net.minecraft.server.v1_9_R1.ItemStack;
+
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
 
 public class SpecialEnderChest extends InventorySubcontainer implements IInventory, ISpecialEnderChest {
     public List<HumanEntity> transaction = new ArrayList<HumanEntity>();
@@ -54,15 +54,18 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
         this.items = enderChest.getContents();
     }
 
+    @Override
     public Inventory getBukkitInventory() {
         return inventory;
     }
 
+    @Override
     public boolean inventoryRemovalCheck() {
         owner.saveData();
         return transaction.isEmpty() && !playerOnline;
     }
 
+    @Override
     public void setPlayerOnline(Player p) {
         if (!playerOnline) {
             try {
@@ -77,6 +80,7 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
         }
     }
 
+    @Override
     public boolean setPlayerOffline() {
         playerOnline = false;
         return inventoryRemovalCheck();
