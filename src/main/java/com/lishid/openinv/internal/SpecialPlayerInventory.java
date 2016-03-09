@@ -32,7 +32,7 @@ import com.lishid.openinv.OpenInv;
 public class SpecialPlayerInventory extends PlayerInventory {
 
     private final CraftInventory inventory = new CraftInventory(this);
-    private final ItemStack[] extra = new ItemStack[5];
+    private final ItemStack[] extra = new ItemStack[4];
     private final ItemStack[][] arrays;
     private final CraftPlayer owner;
     private boolean playerOnline;
@@ -41,32 +41,24 @@ public class SpecialPlayerInventory extends PlayerInventory {
         super(((CraftPlayer) p).getHandle());
         this.owner = (CraftPlayer) p;
         reflectContents(getClass().getSuperclass(), player.inventory, this);
-        this.arrays = new ItemStack[][] { this.items, this.armor, this.extra };
+        this.arrays = new ItemStack[][] { this.items, this.armor, this.extraSlots, this.extra };
         this.playerOnline = online;
         OpenInv.inventories.put(owner.getUniqueId(), this);
     }
 
     private void reflectContents(Class clazz, PlayerInventory src, PlayerInventory dest) {
-        // Items
         try {
             Field itemsField = clazz.getDeclaredField("items");
             itemsField.setAccessible(true);
             itemsField.set(dest, src.items);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
 
-        // Armor
-        try {
             Field armorField = clazz.getDeclaredField("armor");
             armorField.setAccessible(true);
             armorField.set(dest, src.armor);
+
+            Field extraSlotsField = clazz.getDeclaredField("extraSlots");
+            extraSlotsField.setAccessible(true);
+            extraSlotsField.set(dest, src.extraSlots);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
@@ -120,12 +112,13 @@ public class SpecialPlayerInventory extends PlayerInventory {
         ItemStack[] contents = new ItemStack[getSize()];
         System.arraycopy(this.items, 0, contents, 0, this.items.length);
         System.arraycopy(this.armor, 0, contents, this.items.length, this.armor.length);
+        System.arraycopy(this.extraSlots, 0, contents, this.items.length + this.armor.length, this.extraSlots.length);
         return contents;
     }
 
     @Override
     public int getSize() {
-        return super.getSize() - this.extraSlots.length + 5;
+        return super.getSize() + 4;
     }
 
     @Override
@@ -149,6 +142,8 @@ public class SpecialPlayerInventory extends PlayerInventory {
             i = getReversedItemSlotNum(i);
         } else if (is == this.armor) {
             i = getReversedArmorSlotNum(i);
+        } else if (is == this.extraSlots) {
+            // Do nothing
         } else if (is == this.extra) {
             // Do nothing
         }
@@ -177,6 +172,8 @@ public class SpecialPlayerInventory extends PlayerInventory {
             i = getReversedItemSlotNum(i);
         } else if (is == this.armor) {
             i = getReversedArmorSlotNum(i);
+        } else if (is == this.extraSlots) {
+            // Do nothing
         } else if (is == this.extra) {
             // Do nothing
         }
@@ -206,6 +203,8 @@ public class SpecialPlayerInventory extends PlayerInventory {
                 i = getReversedItemSlotNum(i);
             } else if (is == this.armor) {
                 i = getReversedArmorSlotNum(i);
+            } else if (is == this.extraSlots) {
+                // Do nothing
             } else if (is == this.extra) {
                 // Do nothing
             }
@@ -240,6 +239,8 @@ public class SpecialPlayerInventory extends PlayerInventory {
                 i = getReversedItemSlotNum(i);
             } else if (is == this.armor) {
                 i = getReversedArmorSlotNum(i);
+            } else if (is == this.extraSlots) {
+                // Do nothing
             } else if (is == this.extra) {
                 owner.getHandle().drop(itemStack, true);
                 itemStack = null;
