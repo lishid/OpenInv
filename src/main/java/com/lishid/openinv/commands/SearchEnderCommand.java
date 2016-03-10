@@ -13,12 +13,6 @@ import com.lishid.openinv.Permissions;
 
 public class SearchEnderCommand implements CommandExecutor {
 
-    private OpenInv plugin;
-
-    public SearchEnderCommand(OpenInv plugin) {
-        this.plugin = plugin;
-    }
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("searchender")) {

@@ -56,9 +56,9 @@ public class OpenInvPlayerListener implements Listener {
             inventory.playerOnline(event.getPlayer());
         }
 
-        SpecialEnderChest chest = OpenInv.enderChests.get(player.getUniqueId());
-        if (chest != null) {
-            chest.playerOnline(event.getPlayer());
+        SpecialEnderChest enderChest = OpenInv.enderChests.get(player.getUniqueId());
+        if (enderChest != null) {
+            enderChest.playerOnline(event.getPlayer());
         }
     }
 
@@ -71,9 +71,9 @@ public class OpenInvPlayerListener implements Listener {
             inventory.playerOffline();
         }
 
-        SpecialEnderChest chest = OpenInv.enderChests.get(player.getUniqueId());
-        if (chest != null) {
-            chest.playerOffline();
+        SpecialEnderChest enderChest = OpenInv.enderChests.get(player.getUniqueId());
+        if (enderChest != null) {
+            enderChest.playerOffline();
         }
     }
 
@@ -118,8 +118,7 @@ public class OpenInvPlayerListener implements Listener {
                     if (OpenInv.hasPermission(player, Permissions.PERM_ANYCHEST) && configuration.getPlayerAnyChestStatus(player)) {
                         try {
                             anyChest = plugin.getAnySilentChest().isAnyChestNeeded(player, x, y, z);
-                        }
-                        catch (Exception e) {
+                        } catch (Exception e) {
                             player.sendMessage(ChatColor.RED + "Error while executing openinv. Unsupported CraftBukkit.");
                             e.printStackTrace();
                         }
@@ -139,13 +138,13 @@ public class OpenInvPlayerListener implements Listener {
                 if (block.getState() instanceof Sign) {
                     try {
                         Sign sign = (Sign) block.getState();
+
                         if (OpenInv.hasPermission(player, Permissions.PERM_OPENINV) && sign.getLine(0).equalsIgnoreCase("[openinv]")) {
                             String text = sign.getLine(1).trim() + sign.getLine(2).trim() + sign.getLine(3).trim();
                             player.performCommand("openinv " + text);
                         }
-                    }
-                    catch (Exception e) {
-                        player.sendMessage("Internal Error.");
+                    } catch (Exception e) {
+                        player.sendMessage(ChatColor.RED + "An internal error occured.");
                         e.printStackTrace();
                     }
 

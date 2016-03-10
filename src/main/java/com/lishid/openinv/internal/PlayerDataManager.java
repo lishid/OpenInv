@@ -32,7 +32,7 @@ import net.minecraft.server.v1_9_R1.PlayerInteractManager;
 
 public class PlayerDataManager {
 
-    private OpenInv plugin;
+    private final OpenInv plugin;
 
     public PlayerDataManager(OpenInv plugin) {
         this.plugin = plugin;

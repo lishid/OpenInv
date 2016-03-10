@@ -78,7 +78,7 @@ public class OpenInv extends JavaPlugin {
         getCommand("openinv").setExecutor(new OpenInvCommand(this));
         getCommand("openender").setExecutor(new OpenEnderCommand(this));
         getCommand("searchinv").setExecutor(new SearchInvCommand(this));
-        getCommand("searchender").setExecutor(new SearchEnderCommand(this));
+        getCommand("searchender").setExecutor(new SearchEnderCommand());
         getCommand("toggleopeninv").setExecutor(new ToggleOpenInvCommand(this));
         getCommand("anychest").setExecutor(new AnyChestCommand(this));
         getCommand("silentchest").setExecutor(new SilentChestCommand(this));

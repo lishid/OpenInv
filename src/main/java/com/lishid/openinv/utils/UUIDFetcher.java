@@ -15,6 +15,7 @@ import org.json.simple.parser.JSONParser;
 import com.google.common.collect.ImmutableList;
 
 public class UUIDFetcher implements Callable<Map<String, UUID>> {
+
     private static final double PROFILES_PER_REQUEST = 100;
     private static final String PROFILE_URL = "https://api.mojang.com/profiles/minecraft";
     private final JSONParser jsonParser = new JSONParser();
@@ -34,11 +35,13 @@ public class UUIDFetcher implements Callable<Map<String, UUID>> {
     public Map<String, UUID> call() throws Exception {
         Map<String, UUID> uuidMap = new HashMap<String, UUID>();
         int requests = (int) Math.ceil(names.size() / PROFILES_PER_REQUEST);
+
         for (int i = 0; i < requests; i++) {
             HttpURLConnection connection = createConnection();
             String body = JSONArray.toJSONString(names.subList(i * 100, Math.min((i + 1) * 100, names.size())));
             writeBody(connection, body);
             JSONArray array = (JSONArray) jsonParser.parse(new InputStreamReader(connection.getInputStream()));
+
             for (Object profile : array) {
                 JSONObject jsonProfile = (JSONObject) profile;
                 String id = (String) jsonProfile.get("id");
@@ -46,10 +49,12 @@ public class UUIDFetcher implements Callable<Map<String, UUID>> {
                 UUID uuid = UUIDFetcher.getUUID(id);
                 uuidMap.put(name.toLowerCase(), uuid);
             }
+
             if (rateLimiting && i != requests - 1) {
                 Thread.sleep(100L);
             }
         }
+
         return uuidMap;
     }
 
@@ -62,12 +67,14 @@ public class UUIDFetcher implements Callable<Map<String, UUID>> {
 
     private static HttpURLConnection createConnection() throws Exception {
         URL url = new URL(PROFILE_URL);
+
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setUseCaches(false);
         connection.setDoInput(true);
         connection.setDoOutput(true);
+
         return connection;
     }
 
@@ -79,6 +86,7 @@ public class UUIDFetcher implements Callable<Map<String, UUID>> {
         ByteBuffer byteBuffer = ByteBuffer.wrap(new byte[16]);
         byteBuffer.putLong(uuid.getMostSignificantBits());
         byteBuffer.putLong(uuid.getLeastSignificantBits());
+
         return byteBuffer.array();
     }
 
@@ -86,9 +94,11 @@ public class UUIDFetcher implements Callable<Map<String, UUID>> {
         if (array.length != 16) {
             throw new IllegalArgumentException("Illegal byte array length: " + array.length);
         }
+
         ByteBuffer byteBuffer = ByteBuffer.wrap(array);
         long mostSignificant = byteBuffer.getLong();
         long leastSignificant = byteBuffer.getLong();
+
         return new UUID(mostSignificant, leastSignificant);
     }
 
