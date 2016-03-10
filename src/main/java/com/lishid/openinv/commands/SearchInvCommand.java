@@ -64,7 +64,7 @@ public class SearchInvCommand implements CommandExecutor {
             }
 
             if (material == null) {
-                sender.sendMessage(ChatColor.RED + "Unknown item");
+                sender.sendMessage(ChatColor.RED + "Unknown item.");
                 return false;
             }
 
