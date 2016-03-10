@@ -47,12 +47,19 @@ public class Configuration {
     }
 
     /**
+     * Reloads OpenInv's config settings.
+     */
+    public void reload() {
+        load();
+    }
+
+    /**
      * Saves a value to the plugin config at the specified path.
      *
      * @param path the path to set the value to
      * @param value the value to set to the path
      */
-    public void saveToConfig(String path, Object value) {
+    private void saveToConfig(String path, Object value) {
         plugin.getConfig().set(path, value);
         plugin.saveConfig();
     }

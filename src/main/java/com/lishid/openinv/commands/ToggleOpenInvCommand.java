@@ -54,7 +54,7 @@ public class ToggleOpenInvCommand implements CommandExecutor {
             if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("check")) {
                     String status = configuration.getPlayerItemOpenInvStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
-                    plugin.sendMessage(player, "OpenInv with " + ChatColor.GRAY + configuration.getOpenInvItem() + ChatColor.RESET + status + ChatColor.RESET + ".");
+                    OpenInv.sendMessage(player, "OpenInv with " + ChatColor.GRAY + configuration.getOpenInvItem() + ChatColor.RESET + status + ChatColor.RESET + ".");
                     return true;
                 }
             }
@@ -62,7 +62,7 @@ public class ToggleOpenInvCommand implements CommandExecutor {
             configuration.setPlayerItemOpenInvStatus(player, !configuration.getPlayerItemOpenInvStatus(player));
 
             String status = configuration.getPlayerItemOpenInvStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
-            plugin.sendMessage(player, "OpenInv with " + ChatColor.GRAY + configuration.getOpenInvItem() + ChatColor.RESET + " is now " + status + ChatColor.RESET + ".");
+            OpenInv.sendMessage(player, "OpenInv with " + ChatColor.GRAY + configuration.getOpenInvItem() + ChatColor.RESET + " is now " + status + ChatColor.RESET + ".");
 
             return true;
         }

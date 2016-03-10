@@ -56,6 +56,9 @@ public class OpenInv extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        // Save the default config.yml if it doesn't already exist
+        saveDefaultConfig();
+
         // Config
         configuration = new Configuration(this);
 
@@ -63,9 +66,6 @@ public class OpenInv extends JavaPlugin {
         playerLoader = new PlayerDataManager(this);
         inventoryAccess = new InventoryAccess(this);
         anySilentChest = new AnySilentChest(this);
-
-        // Save the default config.yml if it doesn't already exist
-        saveDefaultConfig();
 
         // Register the plugin's events
         PluginManager pm = getServer().getPluginManager();
@@ -155,27 +155,27 @@ public class OpenInv extends JavaPlugin {
      * @param player the player to show help to
      */
     public static void showHelp(Player player) {
-        player.sendMessage(ChatColor.GREEN + "/openinv <player> - Open a player's inventory.");
+        player.sendMessage(ChatColor.GREEN + "/openinv <player> - Opens a player's inventory.");
         player.sendMessage(ChatColor.GREEN + "   (aliases: oi, inv, open)");
 
-        player.sendMessage(ChatColor.GREEN + "/openender <player> - Open a player's ender chest.");
+        player.sendMessage(ChatColor.GREEN + "/openender <player> - Opens a player's ender chest.");
         player.sendMessage(ChatColor.GREEN + "   (aliases: oe)");
 
         player.sendMessage(ChatColor.GREEN + "/searchinv <item> [minAmount] -");
-        player.sendMessage(ChatColor.GREEN + "   Search and list players having a specific item.");
+        player.sendMessage(ChatColor.GREEN + "   Searches and lists players that have a specific item in their inventory.");
         player.sendMessage(ChatColor.GREEN + "   (aliases: si)");
 
         player.sendMessage(ChatColor.GREEN + "/searchender <item> [minAmount] -");
-        player.sendMessage(ChatColor.GREEN + "   Search and list players having a specific item.");
+        player.sendMessage(ChatColor.GREEN + "   Searches and lists players that have a specific item in their ender chest.");
         player.sendMessage(ChatColor.GREEN + "   (aliases: se)");
 
-        player.sendMessage(ChatColor.GREEN + "/toggleopeninv - Toggle the item openinv function.");
+        player.sendMessage(ChatColor.GREEN + "/toggleopeninv - Toggles the item openinv function.");
         player.sendMessage(ChatColor.GREEN + "   (aliases: toi, toggleoi, toggleinv)");
 
-        player.sendMessage(ChatColor.GREEN + "/anychest - Toggle the any chest function.");
+        player.sendMessage(ChatColor.GREEN + "/anychest - Toggles the any chest function.");
         player.sendMessage(ChatColor.GREEN + "   (aliases: ac)");
 
-        player.sendMessage(ChatColor.GREEN + "/silentchest - Toggle the silent chest function.");
+        player.sendMessage(ChatColor.GREEN + "/silentchest - Toggles the silent chest function.");
         player.sendMessage(ChatColor.GREEN + "   (aliases: sc, silent)");
     }
 

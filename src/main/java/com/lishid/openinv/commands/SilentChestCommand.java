@@ -54,7 +54,7 @@ public class SilentChestCommand implements CommandExecutor {
             if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("check")) {
                     String status = configuration.getPlayerSilentChestStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
-                    plugin.sendMessage(player, "Silent Chest is " + status + ChatColor.RESET + ".");
+                    OpenInv.sendMessage(player, "Silent Chest is " + status + ChatColor.RESET + ".");
                     return true;
                 }
             }
@@ -62,7 +62,7 @@ public class SilentChestCommand implements CommandExecutor {
             configuration.setPlayerSilentChestStatus(player, !configuration.getPlayerSilentChestStatus(player));
 
             String status = configuration.getPlayerSilentChestStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
-            plugin.sendMessage(player, "Silent Chest is now " + status + ChatColor.RESET + ".");
+            OpenInv.sendMessage(player, "Silent Chest is now " + status + ChatColor.RESET + ".");
 
             return true;
         }

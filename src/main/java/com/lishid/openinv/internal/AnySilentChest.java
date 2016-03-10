@@ -152,7 +152,7 @@ public class AnySilentChest {
             tileInventory = new SilentInventory(tileInventory);
 
             if (plugin.getConfiguration().notifySilentChest()) {
-                plugin.sendMessage(p, "You are opening a chest silently.");
+                OpenInv.sendMessage(p, "You are opening a chest silently.");
             }
 
             returnValue = false;
@@ -161,7 +161,7 @@ public class AnySilentChest {
         player.openContainer(tileInventory);
 
         if (anyChest && plugin.getConfiguration().notifyAnyChest()) {
-            plugin.sendMessage(p, "You are opening a blocked chest.");
+            OpenInv.sendMessage(p, "You are opening a blocked chest.");
         }
 
         return returnValue;
