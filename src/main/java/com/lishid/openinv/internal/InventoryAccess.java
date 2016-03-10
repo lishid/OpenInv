@@ -18,18 +18,22 @@ package com.lishid.openinv.internal;
 
 import java.lang.reflect.Field;
 
+import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 
-// Volatile
-import net.minecraft.server.v1_9_R1.*;
-
-import org.bukkit.craftbukkit.v1_9_R1.inventory.*;
+import net.minecraft.server.v1_9_R1.IInventory;
 
 public class InventoryAccess {
+
+    private final OpenInv plugin;
+
+    public InventoryAccess(OpenInv plugin) {
+        this.plugin = plugin;
+    }
 
     public boolean check(Inventory inventory, HumanEntity player) {
         IInventory inv = grabInventory(inventory);
@@ -64,7 +68,7 @@ public class InventoryAccess {
                 try {
                     result = (IInventory) f.get(inventory);
                 } catch (Exception e) {
-                    OpenInv.log(e);
+                    plugin.log(e);
                 }
             }
         }

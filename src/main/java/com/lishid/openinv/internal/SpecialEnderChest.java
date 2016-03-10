@@ -16,17 +16,17 @@
 
 package com.lishid.openinv.internal;
 
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import com.lishid.openinv.OpenInv;
 
-// Volatile
-import net.minecraft.server.v1_9_R1.*;
-
-import org.bukkit.craftbukkit.v1_9_R1.entity.*;
-import org.bukkit.craftbukkit.v1_9_R1.inventory.*;
+import net.minecraft.server.v1_9_R1.InventoryEnderChest;
+import net.minecraft.server.v1_9_R1.InventorySubcontainer;
 
 public class SpecialEnderChest extends InventorySubcontainer {
 

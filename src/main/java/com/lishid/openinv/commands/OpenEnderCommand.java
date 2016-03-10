@@ -96,7 +96,7 @@ public class OpenEnderCommand implements CommandExecutor {
                     @Override
                     public void run() {
                         // Try loading the player's data asynchronously
-                        final Player target = OpenInv.getPlayerLoader().loadPlayer(uuid);
+                        final Player target = plugin.getPlayerLoader().loadPlayer(uuid);
                         if (target == null) {
                             player.sendMessage(ChatColor.RED + "Player not found!");
                             return;

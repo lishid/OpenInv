@@ -25,12 +25,19 @@ import org.bukkit.inventory.Inventory;
 import com.lishid.openinv.OpenInv;
 
 public class OpenInvInventoryListener implements Listener {
+
+    private final OpenInv plugin;
+
+    public OpenInvInventoryListener(OpenInv plugin) {
+        this.plugin = plugin;
+    }
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         Inventory inventory = event.getInventory();
         HumanEntity player = event.getWhoClicked();
 
-        if (!OpenInv.getInventoryAccess().check(inventory, player)) {
+        if (!plugin.getInventoryAccess().check(inventory, player)) {
             event.setCancelled(true);
         }
     }

@@ -25,8 +25,18 @@ import org.bukkit.event.Listener;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
+import com.lishid.openinv.Configuration;
 
 public class OpenInvEntityListener implements Listener {
+
+    private final OpenInv plugin;
+    private final Configuration configuration;
+
+    public OpenInvEntityListener(OpenInv plugin) {
+        this.plugin = plugin;
+        configuration = plugin.getConfiguration();
+    }
+
     @EventHandler(priority = EventPriority.LOWEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         Entity attacker = event.getDamager();
@@ -38,8 +48,8 @@ public class OpenInvEntityListener implements Listener {
 
         Player player = (Player) attacker;
 
-        if (player.getInventory().getItemInMainHand().getType() == OpenInv.getOpenInvItem()) {
-            if (!OpenInv.getPlayerItemOpenInvStatus(player) || !OpenInv.hasPermission(player, Permissions.PERM_OPENINV)) {
+        if (player.getInventory().getItemInMainHand().getType() == configuration.getOpenInvItem()) {
+            if (!configuration.getPlayerItemOpenInvStatus(player) || !OpenInv.hasPermission(player, Permissions.PERM_OPENINV)) {
                 return;
             }
 

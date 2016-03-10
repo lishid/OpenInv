@@ -24,8 +24,17 @@ import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
+import com.lishid.openinv.Configuration;
 
 public class AnyChestCommand implements CommandExecutor {
+
+    private final OpenInv plugin;
+    private final Configuration configuration;
+
+    public AnyChestCommand(OpenInv plugin) {
+        this.plugin = plugin;
+        configuration = plugin.getConfiguration();
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -44,15 +53,15 @@ public class AnyChestCommand implements CommandExecutor {
 
             if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("check")) {
-                    String status = OpenInv.getPlayerAnyChestStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
+                    String status = configuration.getPlayerAnyChestStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
                     OpenInv.sendMessage(player, "Any Chest is " + status + ChatColor.RESET + ".");
                     return true;
                 }
             }
 
-            OpenInv.setPlayerAnyChestStatus(player, !OpenInv.getPlayerAnyChestStatus(player));
+            configuration.setPlayerAnyChestStatus(player, !configuration.getPlayerAnyChestStatus(player));
 
-            String status = OpenInv.getPlayerAnyChestStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
+            String status = configuration.getPlayerAnyChestStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
             OpenInv.sendMessage(player, "Any Chest is now " + status + ChatColor.RESET + ".");
 
             return true;

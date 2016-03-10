@@ -20,9 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
@@ -50,140 +48,112 @@ public class OpenInv extends JavaPlugin {
     public static final Map<UUID, SpecialPlayerInventory> inventories = new HashMap<UUID, SpecialPlayerInventory>();
     public static final Map<UUID, SpecialEnderChest> enderChests = new HashMap<UUID, SpecialEnderChest>();
 
-    public static OpenInv mainPlugin;
+    private PlayerDataManager playerLoader;
+    private InventoryAccess inventoryAccess;
+    private AnySilentChest anySilentChest;
 
-    private static PlayerDataManager playerLoader;
-    private static InventoryAccess inventoryAccess;
-    private static AnySilentChest anySilentChest;
+    private Configuration configuration;
 
     @Override
     public void onEnable() {
-        // Plugin
-        mainPlugin = this;
-
-        // Config Updater
-        ConfigUpdater configUpdater = new ConfigUpdater(this);
-        configUpdater.checkForUpdates();
+        // Config
+        configuration = new Configuration(this);
 
         // Initialize
-        playerLoader = new PlayerDataManager();
-        inventoryAccess = new InventoryAccess();
-        anySilentChest = new AnySilentChest();
+        playerLoader = new PlayerDataManager(this);
+        inventoryAccess = new InventoryAccess(this);
+        anySilentChest = new AnySilentChest(this);
 
         // Save the default config.yml if it doesn't already exist
         saveDefaultConfig();
 
-        // Register the plugin's events & commands
-        registerEvents();
-        registerCommands();
-    }
-
-    private void registerEvents() {
+        // Register the plugin's events
         PluginManager pm = getServer().getPluginManager();
 
-        pm.registerEvents(new OpenInvPlayerListener(), this);
-        pm.registerEvents(new OpenInvEntityListener(), this);
-        pm.registerEvents(new OpenInvInventoryListener(), this);
-    }
+        pm.registerEvents(new OpenInvPlayerListener(this), this);
+        pm.registerEvents(new OpenInvEntityListener(this), this);
+        pm.registerEvents(new OpenInvInventoryListener(this), this);
 
-    private void registerCommands() {
+        // Register the plugin's commands
         getCommand("openinv").setExecutor(new OpenInvCommand(this));
         getCommand("openender").setExecutor(new OpenEnderCommand(this));
-        getCommand("searchinv").setExecutor(new SearchInvCommand());
-        getCommand("searchender").setExecutor(new SearchEnderCommand());
-        getCommand("toggleopeninv").setExecutor(new ToggleOpenInvCommand());
-        getCommand("anychest").setExecutor(new AnyChestCommand());
-        getCommand("silentchest").setExecutor(new SilentChestCommand());
+        getCommand("searchinv").setExecutor(new SearchInvCommand(this));
+        getCommand("searchender").setExecutor(new SearchEnderCommand(this));
+        getCommand("toggleopeninv").setExecutor(new ToggleOpenInvCommand(this));
+        getCommand("anychest").setExecutor(new AnyChestCommand(this));
+        getCommand("silentchest").setExecutor(new SilentChestCommand(this));
     }
 
-    public static PlayerDataManager getPlayerLoader() {
+    /**
+     * Returns the plugin Configuration.
+     *
+     * @return the plugin Configuration
+     */
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    /**
+     * Returns an instance of PlayerDataManager.
+     *
+     * @return an instance of PlayerDataManager
+     */
+    public PlayerDataManager getPlayerLoader() {
         return playerLoader;
     }
 
-    public static InventoryAccess getInventoryAccess() {
+    /**
+     * Returns an instance of InventoryAccess.
+     *
+     * @return an instance of InventoryAccess
+     */
+    public InventoryAccess getInventoryAccess() {
         return inventoryAccess;
     }
 
-    public static AnySilentChest getAnySilentChest() {
+    /**
+     * Returns an instance of AnySilentChest.
+     *
+     * @return an instance of AnySilentChest
+     */
+    public AnySilentChest getAnySilentChest() {
         return anySilentChest;
     }
 
-    public static Object getFromConfig(String path, Object defaultValue) {
-        Object val = mainPlugin.getConfig().get(path);
-
-        if (val == null) {
-            mainPlugin.getConfig().set(path, defaultValue);
-            return defaultValue;
-        } else {
-            return val;
-        }
+    /**
+     * Logs a message to console.
+     *
+     * @param text the message to log
+     */
+    public void log(String text) {
+        getLogger().info(text);
     }
 
-    public static void saveToConfig(String path, Object value) {
-        mainPlugin.getConfig().set(path, value);
-        mainPlugin.saveConfig();
-    }
-
-    public static Material getOpenInvItem() {
-        if (!mainPlugin.getConfig().isSet("items.open-inv")) {
-            saveToConfig("items.open-inv", "STICK");
-        }
-
-        String itemName = mainPlugin.getConfig().getString("items.open-inv", "STICK");
-        Material material = Material.getMaterial(itemName);
-        if (material == null) {
-            mainPlugin.getLogger().warning("OpenInv item '" + itemName + "' does not match to a valid item. Defaulting to stick.");
-            material = Material.STICK;
-        }
-
-        return material;
-    }
-
-    public static boolean notifySilentChest() {
-        return mainPlugin.getConfig().getBoolean("notify.silent-chest", true);
-    }
-
-    public static boolean notifyAnyChest() {
-        return mainPlugin.getConfig().getBoolean("notify.any-chest", true);
-    }
-
-    public static boolean getPlayerAnyChestStatus(Player player) {
-        return mainPlugin.getConfig().getBoolean("toggles.any-chest." + player.getUniqueId(), true);
-    }
-
-    public static void setPlayerAnyChestStatus(Player player, boolean status) {
-        saveToConfig("toggles.any-chest." + player.getUniqueId(), status);
-    }
-
-    public static boolean getPlayerItemOpenInvStatus(Player player) {
-        return mainPlugin.getConfig().getBoolean("toggles.items.open-inv." + player.getUniqueId(), false);
-    }
-
-    public static void setPlayerItemOpenInvStatus(Player player, boolean status) {
-        saveToConfig("toggles.items.open-inv." + player.getUniqueId(), status);
-    }
-
-    public static boolean getPlayerSilentChestStatus(Player player) {
-        return mainPlugin.getConfig().getBoolean("toggles.silent-chest." + player.getUniqueId(), false);
-    }
-
-    public static void setPlayerSilentChestStatus(Player player, boolean status) {
-        saveToConfig("toggles.silent-chest." + player.getUniqueId(), status);
-    }
-
-    public static void log(String text) {
-        mainPlugin.getLogger().info("[OpenInv] " + text);
-    }
-
-    public static void log(Throwable e) {
-        mainPlugin.getLogger().severe("[OpenInv] " + e.toString());
+    /**
+     * Logs a Throwable to console.
+     *
+     * @param e the Throwable to log
+     */
+    public void log(Throwable e) {
+        getLogger().severe(e.toString());
         e.printStackTrace();
     }
 
+    /**
+     * Sends an OpenInv message to a player.
+     *
+     * @param sender the CommandSender to message
+     * @param message the message to send
+     */
     public static void sendMessage(CommandSender sender, String message) {
         sender.sendMessage(ChatColor.AQUA + "[OpenInv] " + ChatColor.WHITE + message);
     }
 
+    /**
+     * Outputs OpenInv help information to a player.
+     *
+     * @param player the player to show help to
+     */
     public static void showHelp(Player player) {
         player.sendMessage(ChatColor.GREEN + "/openinv <player> - Open a player's inventory.");
         player.sendMessage(ChatColor.GREEN + "   (aliases: oi, inv, open)");
@@ -209,6 +179,13 @@ public class OpenInv extends JavaPlugin {
         player.sendMessage(ChatColor.GREEN + "   (aliases: sc, silent)");
     }
 
+    /**
+     * Returns whether or not a player has a permission.
+     *
+     * @param player the player to check
+     * @param permission the permission node to check for
+     * @return true if the player has the permission; false otherwise
+     */
     public static boolean hasPermission(Permissible player, String permission) {
         String[] parts = permission.split("\\.");
         String perm = "";

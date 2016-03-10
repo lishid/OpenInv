@@ -24,8 +24,17 @@ import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
+import com.lishid.openinv.Configuration;
 
 public class SilentChestCommand implements CommandExecutor {
+
+    private final OpenInv plugin;
+    private final Configuration configuration;
+
+    public SilentChestCommand(OpenInv plugin) {
+        this.plugin = plugin;
+        configuration = plugin.getConfiguration();
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -44,16 +53,16 @@ public class SilentChestCommand implements CommandExecutor {
 
             if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("check")) {
-                    String status = OpenInv.getPlayerSilentChestStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
-                    OpenInv.sendMessage(player, "Silent Chest is " + status + ChatColor.RESET + ".");
+                    String status = configuration.getPlayerSilentChestStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
+                    plugin.sendMessage(player, "Silent Chest is " + status + ChatColor.RESET + ".");
                     return true;
                 }
             }
 
-            OpenInv.setPlayerSilentChestStatus(player, !OpenInv.getPlayerSilentChestStatus(player));
+            configuration.setPlayerSilentChestStatus(player, !configuration.getPlayerSilentChestStatus(player));
 
-            String status = OpenInv.getPlayerSilentChestStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
-            OpenInv.sendMessage(player, "Silent Chest is now " + status + ChatColor.RESET + ".");
+            String status = configuration.getPlayerSilentChestStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
+            plugin.sendMessage(player, "Silent Chest is now " + status + ChatColor.RESET + ".");
 
             return true;
         }

@@ -48,6 +48,7 @@ public class OpenInvCommand implements CommandExecutor {
                 sender.sendMessage(ChatColor.RED + "You can't use this command from the console.");
                 return true;
             }
+
             if (!OpenInv.hasPermission(sender, Permissions.PERM_OPENINV)) {
                 sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories.");
                 return true;
@@ -90,7 +91,7 @@ public class OpenInvCommand implements CommandExecutor {
                     @Override
                     public void run() {
                         // Try loading the player's data asynchronously
-                        final Player target = OpenInv.getPlayerLoader().loadPlayer(uuid);
+                        final Player target = plugin.getPlayerLoader().loadPlayer(uuid);
                         if (target == null) {
                             player.sendMessage(ChatColor.RED + "Player not found!");
                             return;
@@ -148,14 +149,10 @@ public class OpenInvCommand implements CommandExecutor {
         openInvHistory.put(player.getUniqueId(), target.getUniqueId());
 
         // Create the inventory
-        /*
         SpecialPlayerInventory inv = OpenInv.inventories.get(target.getUniqueId());
         if (inv == null) {
             inv = new SpecialPlayerInventory(target, target.isOnline());
         }
-        */
-
-        SpecialPlayerInventory inv = new SpecialPlayerInventory(target, target.isOnline());
 
         // Open the inventory
         player.openInventory(inv.getBukkitInventory());

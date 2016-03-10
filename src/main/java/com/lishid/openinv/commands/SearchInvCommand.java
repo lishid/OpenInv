@@ -29,6 +29,12 @@ import com.lishid.openinv.Permissions;
 
 public class SearchInvCommand implements CommandExecutor {
 
+    private final OpenInv plugin;
+
+    public SearchInvCommand(OpenInv plugin) {
+        this.plugin = plugin;
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("searchinv")) {

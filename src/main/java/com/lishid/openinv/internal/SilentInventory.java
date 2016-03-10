@@ -7,8 +7,14 @@ import org.bukkit.craftbukkit.v1_9_R1.entity.CraftHumanEntity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 
-// Volatile
-import net.minecraft.server.v1_9_R1.*;
+import net.minecraft.server.v1_9_R1.ChestLock;
+import net.minecraft.server.v1_9_R1.Container;
+import net.minecraft.server.v1_9_R1.ContainerChest;
+import net.minecraft.server.v1_9_R1.EntityHuman;
+import net.minecraft.server.v1_9_R1.IChatBaseComponent;
+import net.minecraft.server.v1_9_R1.ITileInventory;
+import net.minecraft.server.v1_9_R1.ItemStack;
+import net.minecraft.server.v1_9_R1.PlayerInventory;
 
 public class SilentInventory implements ITileInventory {
 
