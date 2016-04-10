@@ -51,7 +51,6 @@ public class SpecialEnderChest extends InventorySubcontainer {
     private void saveOnExit() {
         if (transaction.isEmpty() && !playerOnline) {
             owner.saveData();
-            OpenInv.enderChests.remove(owner.getUniqueId());
         }
     }
 
@@ -82,6 +81,7 @@ public class SpecialEnderChest extends InventorySubcontainer {
     public void onClose(CraftHumanEntity who) {
         super.onClose(who);
         saveOnExit();
+        OpenInv.enderChests.remove(owner.getUniqueId());
     }
 
     @Override
