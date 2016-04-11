@@ -23,9 +23,9 @@ public interface ISpecialEnderChest {
 
     public Inventory getBukkitInventory();
 
-    public boolean inventoryRemovalCheck();
+    public boolean inventoryRemovalCheck(boolean save);
 
-    public void setPlayerOnline(Player p);
+    public void setPlayerOnline(Player player);
 
     /**
      * Sets the Player associated with this ISpecialEnderChest offline.

@@ -41,7 +41,7 @@ import org.bukkit.craftbukkit.v1_8_R3.inventory.CraftInventory;
 public class SpecialEnderChest extends InventorySubcontainer implements IInventory, ISpecialEnderChest {
     public List<HumanEntity> transaction = new ArrayList<HumanEntity>();
     public boolean playerOnline = false;
-    private final CraftPlayer owner;
+    private CraftPlayer owner;
     private final InventoryEnderChest enderChest;
     private int maxStack = MAX_STACK;
     private final CraftInventory inventory = new CraftInventory(this);
@@ -60,22 +60,25 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     }
 
     @Override
-    public boolean inventoryRemovalCheck() {
-        owner.saveData();
-        return transaction.isEmpty() && !playerOnline;
+    public boolean inventoryRemovalCheck(boolean save) {
+        boolean offline = transaction.isEmpty() && !playerOnline;
+        if (offline && save) {
+            owner.saveData();
+        }
+        return offline;
     }
 
     @Override
-    public void setPlayerOnline(Player p) {
+    public void setPlayerOnline(Player player) {
         if (!playerOnline) {
             try {
-                InventoryEnderChest playerEnderChest = ((CraftPlayer) p).getHandle().getEnderChest();
+                owner = (CraftPlayer) player;
+                InventoryEnderChest playerEnderChest = owner.getHandle().getEnderChest();
                 Field field = playerEnderChest.getClass().getField("items");
                 field.setAccessible(true);
                 field.set(playerEnderChest, this.items);
             }
             catch (Exception e) {}
-            p.saveData();
             playerOnline = true;
         }
     }
@@ -83,7 +86,7 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     @Override
     public boolean setPlayerOffline() {
         playerOnline = false;
-        return inventoryRemovalCheck();
+        return inventoryRemovalCheck(false);
     }
 
     @Override
@@ -99,7 +102,7 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     @Override
     public void onClose(CraftHumanEntity who) {
         transaction.remove(who);
-        this.inventoryRemovalCheck();
+        this.inventoryRemovalCheck(true);
     }
 
     @Override
