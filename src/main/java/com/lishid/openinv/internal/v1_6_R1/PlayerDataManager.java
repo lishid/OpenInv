@@ -29,10 +29,10 @@ import net.minecraft.server.v1_6_R1.PlayerInteractManager;
 
 import org.bukkit.craftbukkit.v1_6_R1.CraftServer;
 
-public class PlayerDataManager implements IPlayerDataManager {
+public class PlayerDataManager extends IPlayerDataManager {
 
     @Override
-    public Player loadPlayer(OfflinePlayer offline) {
+    public Player loadOfflinePlayer(OfflinePlayer offline) {
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
 
         // Create an entity to load the player data

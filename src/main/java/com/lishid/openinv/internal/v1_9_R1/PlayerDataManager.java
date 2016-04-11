@@ -30,10 +30,10 @@ import net.minecraft.server.v1_9_R1.PlayerInteractManager;
 
 import org.bukkit.craftbukkit.v1_9_R1.CraftServer;
 
-public class PlayerDataManager implements IPlayerDataManager {
+public class PlayerDataManager extends IPlayerDataManager {
 
     @Override
-    public Player loadPlayer(OfflinePlayer offline) {
+    public Player loadOfflinePlayer(OfflinePlayer offline) {
         if (offline == null || !offline.hasPlayedBefore()) {
             return null;
         }
