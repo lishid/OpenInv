@@ -23,7 +23,7 @@ public interface ISpecialPlayerInventory {
 
     public Inventory getBukkitInventory();
 
-    public boolean inventoryRemovalCheck();
+    public boolean inventoryRemovalCheck(boolean save);
 
     public void setPlayerOnline(Player player);
 

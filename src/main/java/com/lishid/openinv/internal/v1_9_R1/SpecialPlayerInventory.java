@@ -89,9 +89,12 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
-    public boolean inventoryRemovalCheck() {
-        owner.saveData();
-        return transaction.isEmpty() && !playerOnline;
+    public boolean inventoryRemovalCheck(boolean save) {
+        boolean offline = transaction.isEmpty() && !playerOnline;
+        if (offline && save) {
+            owner.saveData();
+        }
+        return offline;
     }
 
     @Override
@@ -100,7 +103,6 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             owner = (CraftPlayer) player;
             this.player = owner.getHandle();
             setItemArrays(this.player.inventory, items, armor, extraSlots);
-            owner.saveData();
             playerOnline = true;
         }
     }
@@ -108,13 +110,13 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     @Override
     public boolean setPlayerOffline() {
         playerOnline = false;
-        return this.inventoryRemovalCheck();
+        return this.inventoryRemovalCheck(false);
     }
 
     @Override
     public void onClose(CraftHumanEntity who) {
         super.onClose(who);
-        this.inventoryRemovalCheck();
+        this.inventoryRemovalCheck(true);
     }
 
     @Override
