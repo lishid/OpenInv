@@ -49,17 +49,30 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     private void setItemArrays(PlayerInventory inventory, ItemStack[] items, ItemStack[] armor,
             ItemStack[] extraSlots) {
         try {
-            Field field = inventory.getClass().getField("items");
+            // Prepare to remove final modifier
             Field modifiers = Field.class.getDeclaredField("modifiers");
             modifiers.setAccessible(true);
+
+            // Access and replace main inventory array
+            Field field = PlayerInventory.class.getField("items");
             modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
             field.set(inventory, items);
-            field = inventory.getClass().getField("armor");
+
+            // Access and replace armor inventory array
+            field = PlayerInventory.class.getField("armor");
             modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
             field.set(inventory, armor);
-            field = inventory.getClass().getField("extraSlots");
+
+            // Access and replace offhand inventory array
+            field = PlayerInventory.class.getField("extraSlots");
             modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
             field.set(inventory, extraSlots);
+
+            // Access and replace array containing all inventory arrays
+            field = PlayerInventory.class.getDeclaredField("g");
+            field.setAccessible(true);
+            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(inventory, new ItemStack[][] { items, armor, extraSlots });
         } catch (NoSuchFieldException e) {
             // Unable to set final fields to item arrays, we're screwed. Noisily fail.
             e.printStackTrace();
@@ -84,9 +97,10 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     @Override
     public void setPlayerOnline(Player player) {
         if (!playerOnline) {
-            CraftPlayer p = (CraftPlayer) player;
-            setItemArrays(p.getHandle().inventory, items, armor, extraSlots);
-            p.saveData();
+            owner = (CraftPlayer) player;
+            this.player = owner.getHandle();
+            setItemArrays(this.player.inventory, items, armor, extraSlots);
+            owner.saveData();
             playerOnline = true;
         }
     }

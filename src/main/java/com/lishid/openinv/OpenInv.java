@@ -165,15 +165,6 @@ public class OpenInv extends JavaPlugin {
         return getConfig().getBoolean("NotifyAnyChest", true);
     }
 
-    public boolean getPlayerItemOpenInvStatus(OfflinePlayer player) {
-        return getConfig().getBoolean("ItemOpenInv." + getPlayerLoader().getPlayerDataID(player) + ".toggle", false);
-    }
-
-    public void setPlayerItemOpenInvStatus(OfflinePlayer player, boolean status) {
-        getConfig().set("ItemOpenInv." + getPlayerLoader().getPlayerDataID(player) + ".toggle", status);
-        saveConfig();
-    }
-
     public boolean getPlayerSilentChestStatus(OfflinePlayer player) {
         return getConfig().getBoolean("SilentChest." + getPlayerLoader().getPlayerDataID(player) + ".toggle", false);
     }
