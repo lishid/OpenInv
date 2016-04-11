@@ -30,6 +30,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
@@ -40,7 +41,7 @@ public class OpenInvPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-
+        
         SpecialPlayerInventory inventory = OpenInv.inventories.get(player.getUniqueId());
         if (inventory != null) {
             inventory.playerOnline(event.getPlayer());
@@ -52,18 +53,28 @@ public class OpenInvPlayerListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
-        SpecialPlayerInventory inventory = OpenInv.inventories.get(player.getUniqueId());
+        final SpecialPlayerInventory inventory = OpenInv.inventories.get(player.getUniqueId());
         if (inventory != null) {
-            inventory.playerOffline();
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    inventory.playerOffline();
+                }
+            }.runTaskLater(OpenInv.mainPlugin, 1);
         }
 
-        SpecialEnderChest chest = OpenInv.enderChests.get(player.getUniqueId());
+        final SpecialEnderChest chest = OpenInv.enderChests.get(player.getUniqueId());
         if (chest != null) {
-            chest.playerOffline();
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    chest.playerOffline();
+                }
+            }.runTaskLater(OpenInv.mainPlugin, 1);
         }
     }
 
