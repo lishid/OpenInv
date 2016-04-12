@@ -1,6 +1,9 @@
 package com.lishid.openinv;
 
-public class Permissions {
+public final class Permissions {
+
+    private Permissions() {}
+
     public static final String PERM_OPENINV = "OpenInv.openinv";
     public static final String PERM_OVERRIDE = "OpenInv.override";
     public static final String PERM_EXEMPT = "OpenInv.exempt";

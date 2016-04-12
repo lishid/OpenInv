@@ -20,17 +20,23 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.craftbukkit.v1_9_R1.CraftServer;
 import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
 import com.mojang.authlib.GameProfile;
 
-// Volatile
-import net.minecraft.server.v1_9_R1.*;
-
-import org.bukkit.craftbukkit.v1_9_R1.*;
+import net.minecraft.server.v1_9_R1.EntityPlayer;
+import net.minecraft.server.v1_9_R1.MinecraftServer;
+import net.minecraft.server.v1_9_R1.PlayerInteractManager;
 
 public class PlayerDataManager {
+
+    private final OpenInv plugin;
+
+    public PlayerDataManager(OpenInv plugin) {
+        this.plugin = plugin;
+    }
 
     public Player loadPlayer(UUID uuid) {
         try {
@@ -55,7 +61,7 @@ public class PlayerDataManager {
                 return target;
             }
         } catch (Exception e) {
-            OpenInv.log(e);
+            plugin.log(e);
         }
 
         return null;

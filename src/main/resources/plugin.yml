@@ -1,7 +1,8 @@
 name: OpenInv
 main: com.lishid.openinv.OpenInv
-version: 2.3.6
+version: 2.3.7
 author: lishid
+authors: [ShadowRanger]
 description: >
              This plugin allows you to open a player's inventory as a chest and interact with it in real time.
 commands:

@@ -10,7 +10,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-public class UUIDUtil {
+public final class UUIDUtil {
+
+    private UUIDUtil() {}
+
     private static Player getPlayer(String name) {
         Validate.notNull(name, "Name cannot be null");
 
@@ -22,10 +25,12 @@ public class UUIDUtil {
         for (Player player : players) {
             if (player.getName().toLowerCase().startsWith(lowerName)) {
                 int curDelta = player.getName().length() - lowerName.length();
+
                 if (curDelta < delta) {
                     found = player;
                     delta = curDelta;
                 }
+
                 if (curDelta == 0) break;
             }
         }
@@ -39,14 +44,19 @@ public class UUIDUtil {
         return offlinePlayer.hasPlayedBefore() ? offlinePlayer.getUniqueId() : null;
     }
 
+    /**
+     * Returns the UUID of a player by their name.
+     *
+     * @param name the name of the player to get the UUID of
+     * @return the player's UUID or null
+     */
     public static UUID getUUIDOf(String name) {
         UUID uuid;
         Player player = getPlayer(name);
 
         if (player != null) {
             uuid = player.getUniqueId();
-        }
-        else {
+        } else {
             if (Bukkit.getServer().getOnlineMode()) {
                 if (!Bukkit.getServer().isPrimaryThread()) {
                     UUIDFetcher fetcher = new UUIDFetcher(Arrays.asList(name));
@@ -55,8 +65,7 @@ public class UUIDUtil {
                     try {
                         response = fetcher.call();
                         uuid = response.get(name.toLowerCase());
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         uuid = getUUIDLocally(name);
                     }
                 } else {

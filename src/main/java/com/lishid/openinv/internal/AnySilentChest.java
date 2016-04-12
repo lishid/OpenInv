@@ -18,17 +18,33 @@ package com.lishid.openinv.internal;
 
 import java.util.Iterator;
 
+import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
 
-// Volatile
-import net.minecraft.server.v1_9_R1.*;
+import net.minecraft.server.v1_9_R1.AxisAlignedBB;
+import net.minecraft.server.v1_9_R1.Block;
+import net.minecraft.server.v1_9_R1.BlockChest;
 import net.minecraft.server.v1_9_R1.BlockChest.Type;
-
-import org.bukkit.craftbukkit.v1_9_R1.entity.*;
+import net.minecraft.server.v1_9_R1.BlockPosition;
+import net.minecraft.server.v1_9_R1.Entity;
+import net.minecraft.server.v1_9_R1.EntityOcelot;
+import net.minecraft.server.v1_9_R1.EntityPlayer;
+import net.minecraft.server.v1_9_R1.EnumDirection;
+import net.minecraft.server.v1_9_R1.ITileInventory;
+import net.minecraft.server.v1_9_R1.InventoryLargeChest;
+import net.minecraft.server.v1_9_R1.TileEntity;
+import net.minecraft.server.v1_9_R1.TileEntityChest;
+import net.minecraft.server.v1_9_R1.World;
 
 public class AnySilentChest {
+
+    private final OpenInv plugin;
+
+    public AnySilentChest(OpenInv plugin) {
+        this.plugin = plugin;
+    }
 
     public boolean isAnyChestNeeded(Player p, int x, int y, int z) {
         // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
@@ -135,7 +151,7 @@ public class AnySilentChest {
         if (silentChest) {
             tileInventory = new SilentInventory(tileInventory);
 
-            if (OpenInv.notifySilentChest()) {
+            if (plugin.getConfiguration().notifySilentChest()) {
                 OpenInv.sendMessage(p, "You are opening a chest silently.");
             }
 
@@ -144,7 +160,7 @@ public class AnySilentChest {
 
         player.openContainer(tileInventory);
 
-        if (anyChest && OpenInv.notifyAnyChest()) {
+        if (anyChest && plugin.getConfiguration().notifyAnyChest()) {
             OpenInv.sendMessage(p, "You are opening a blocked chest.");
         }
 

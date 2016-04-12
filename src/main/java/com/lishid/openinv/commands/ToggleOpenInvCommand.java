@@ -24,8 +24,17 @@ import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
+import com.lishid.openinv.Configuration;
 
 public class ToggleOpenInvCommand implements CommandExecutor {
+
+    private final OpenInv plugin;
+    private final Configuration configuration;
+
+    public ToggleOpenInvCommand(OpenInv plugin) {
+        this.plugin = plugin;
+        configuration = plugin.getConfiguration();
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -44,16 +53,16 @@ public class ToggleOpenInvCommand implements CommandExecutor {
 
             if (args.length > 0) {
                 if (args[0].equalsIgnoreCase("check")) {
-                    String status = OpenInv.getPlayerItemOpenInvStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
-                    OpenInv.sendMessage(player, "OpenInv with " + ChatColor.GRAY + OpenInv.getOpenInvItem() + ChatColor.RESET + status + ChatColor.RESET + ".");
+                    String status = configuration.getPlayerItemOpenInvStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
+                    OpenInv.sendMessage(player, "OpenInv with " + ChatColor.GRAY + configuration.getOpenInvItem() + ChatColor.RESET + status + ChatColor.RESET + ".");
                     return true;
                 }
             }
 
-            OpenInv.setPlayerItemOpenInvStatus(player, !OpenInv.getPlayerItemOpenInvStatus(player));
+            configuration.setPlayerItemOpenInvStatus(player, !configuration.getPlayerItemOpenInvStatus(player));
 
-            String status = OpenInv.getPlayerItemOpenInvStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
-            OpenInv.sendMessage(player, "OpenInv with " + ChatColor.GRAY + OpenInv.getOpenInvItem() + ChatColor.RESET + " is now " + status + ChatColor.RESET + ".");
+            String status = configuration.getPlayerItemOpenInvStatus(player) ? ChatColor.GREEN + "ON" : ChatColor.RED + "OFF";
+            OpenInv.sendMessage(player, "OpenInv with " + ChatColor.GRAY + configuration.getOpenInvItem() + ChatColor.RESET + " is now " + status + ChatColor.RESET + ".");
 
             return true;
         }
