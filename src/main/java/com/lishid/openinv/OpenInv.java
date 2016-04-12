@@ -48,11 +48,11 @@ public class OpenInv extends JavaPlugin {
     public static final Map<UUID, SpecialPlayerInventory> inventories = new HashMap<UUID, SpecialPlayerInventory>();
     public static final Map<UUID, SpecialEnderChest> enderChests = new HashMap<UUID, SpecialEnderChest>();
 
+    private Configuration configuration;
+
     private PlayerDataManager playerLoader;
     private InventoryAccess inventoryAccess;
     private AnySilentChest anySilentChest;
-
-    private Configuration configuration;
 
     @Override
     public void onEnable() {

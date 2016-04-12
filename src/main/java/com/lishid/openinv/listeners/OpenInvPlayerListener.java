@@ -77,14 +77,9 @@ public class OpenInvPlayerListener implements Listener {
             }.runTaskLater(plugin, 1);
         }
 
-        final SpecialEnderChest enderChest = OpenInv.enderChests.get(player.getUniqueId());
+        SpecialEnderChest enderChest = OpenInv.enderChests.get(player.getUniqueId());
         if (enderChest != null) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    enderChest.playerOffline();
-                }
-            }.runTaskLater(plugin, 1);
+            enderChest.playerOffline();
         }
     }
 
