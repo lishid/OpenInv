@@ -106,6 +106,7 @@ public class OpenInvCommand implements CommandExecutor {
                                 if (player == null) {
                                     return;
                                 }
+
                                 openInventory(player, target);
                             }
                         });

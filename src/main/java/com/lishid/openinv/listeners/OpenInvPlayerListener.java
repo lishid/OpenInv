@@ -30,6 +30,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
@@ -62,18 +63,28 @@ public class OpenInvPlayerListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
-        SpecialPlayerInventory inventory = OpenInv.inventories.get(player.getUniqueId());
+        final SpecialPlayerInventory inventory = OpenInv.inventories.get(player.getUniqueId());
         if (inventory != null) {
-            inventory.playerOffline();
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    inventory.playerOffline();
+                }
+            }.runTaskLater(plugin, 1);
         }
 
-        SpecialEnderChest enderChest = OpenInv.enderChests.get(player.getUniqueId());
+        final SpecialEnderChest enderChest = OpenInv.enderChests.get(player.getUniqueId());
         if (enderChest != null) {
-            enderChest.playerOffline();
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    enderChest.playerOffline();
+                }
+            }.runTaskLater(plugin, 1);
         }
     }
 

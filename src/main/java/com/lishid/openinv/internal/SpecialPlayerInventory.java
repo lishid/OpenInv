@@ -35,15 +35,14 @@ public class SpecialPlayerInventory extends PlayerInventory {
 
     private final CraftInventory inventory = new CraftInventory(this);
     private final ItemStack[] extra = new ItemStack[4];
-    private final ItemStack[][] arrays;
     private final CraftPlayer owner;
+    private ItemStack[][] arrays;
     private boolean playerOnline;
 
     public SpecialPlayerInventory(Player p, boolean online) {
         super(((CraftPlayer) p).getHandle());
         this.owner = (CraftPlayer) p;
         reflectContents(getClass().getSuperclass(), player.inventory, this);
-        this.arrays = new ItemStack[][] { this.items, this.armor, this.extraSlots, this.extra };
         this.playerOnline = online;
         OpenInv.inventories.put(owner.getUniqueId(), this);
     }
@@ -70,6 +69,8 @@ public class SpecialPlayerInventory extends PlayerInventory {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
+
+        arrays = new ItemStack[][] { this.items, this.armor, this.extraSlots, this.extra };
     }
 
     public Inventory getBukkitInventory() {
@@ -79,7 +80,6 @@ public class SpecialPlayerInventory extends PlayerInventory {
     private void saveOnExit() {
         if (transaction.isEmpty() && !playerOnline) {
             owner.saveData();
-            OpenInv.inventories.remove(owner.getUniqueId());
         }
     }
 
@@ -107,6 +107,7 @@ public class SpecialPlayerInventory extends PlayerInventory {
     public void onClose(CraftHumanEntity who) {
         super.onClose(who);
         this.saveOnExit();
+        OpenInv.inventories.remove(owner.getUniqueId());
     }
 
     @Override
