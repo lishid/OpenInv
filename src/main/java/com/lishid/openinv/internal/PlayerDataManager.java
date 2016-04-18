@@ -19,7 +19,7 @@ package com.lishid.openinv.internal;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-public abstract class IPlayerDataManager {
+public abstract class PlayerDataManager {
     public final Player loadPlayer(OfflinePlayer offline) {
         if (offline.isOnline()) {
             return offline.getPlayer();

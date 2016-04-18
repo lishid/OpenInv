@@ -20,8 +20,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-import com.lishid.openinv.internal.IPlayerDataManager;
-
 // Volatile
 import net.minecraft.server.v1_7_R4.EntityPlayer;
 import net.minecraft.server.v1_7_R4.MinecraftServer;
@@ -30,7 +28,7 @@ import net.minecraft.util.com.mojang.authlib.GameProfile;
 
 import org.bukkit.craftbukkit.v1_7_R4.CraftServer;
 
-public class PlayerDataManager extends IPlayerDataManager {
+public class PlayerDataManager extends com.lishid.openinv.internal.PlayerDataManager {
 
     @Override
     public Player loadOfflinePlayer(OfflinePlayer offline) {

@@ -34,10 +34,10 @@ import com.lishid.openinv.commands.SearchInvPluginCommand;
 import com.lishid.openinv.commands.SilentChestPluginCommand;
 import com.lishid.openinv.internal.IAnySilentChest;
 import com.lishid.openinv.internal.IInventoryAccess;
-import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import com.lishid.openinv.internal.InternalAccessor;
+import com.lishid.openinv.internal.PlayerDataManager;
 
 /**
  * Open other player's inventory
@@ -50,7 +50,7 @@ public class OpenInv extends JavaPlugin {
     private final Map<String, ISpecialEnderChest> enderChests = new HashMap<String, ISpecialEnderChest>();
 
     private InternalAccessor accessor;
-    private IPlayerDataManager playerLoader;
+    private PlayerDataManager playerLoader;
     private IInventoryAccess inventoryAccess;
     private IAnySilentChest anySilentChest;
 
@@ -73,12 +73,26 @@ public class OpenInv extends JavaPlugin {
         anySilentChest = accessor.newAnySilentChest();
 
         FileConfiguration config = getConfig();
-        config.set("NotifySilentChest", config.getBoolean("NotifySilentChest", true));
-        config.set("NotifyAnyChest", config.getBoolean("NotifyAnyChest", true));
+        boolean dirtyConfig = false;
+        if (!config.isBoolean("NotifySilentChest")) {
+            config.set("NotifySilentChest", true);
+            dirtyConfig = true;
+        }
+        if (!config.isBoolean("NotifyAnyChest")) {
+            config.set("NotifyAnyChest", true);
+            dirtyConfig = true;
+        }
+        if (!config.isBoolean("DisableSaving")) {
+            config.set("DisableSaving", false);
+            dirtyConfig = true;
+        }
         config.addDefault("NotifySilentChest", true);
         config.addDefault("NotifyAnyChest", true);
+        config.addDefault("DisableSaving", false);
         config.options().copyDefaults(true);
-        saveConfig();
+        if (dirtyConfig) {
+            saveConfig();
+        }
 
         pm.registerEvents(new OpenInvPlayerListener(this), this);
         pm.registerEvents(new OpenInvInventoryListener(this), this);
@@ -95,7 +109,7 @@ public class OpenInv extends JavaPlugin {
         return this.accessor;
     }
 
-    public IPlayerDataManager getPlayerLoader() {
+    public PlayerDataManager getPlayerLoader() {
         return this.playerLoader;
     }
 
@@ -115,12 +129,12 @@ public class OpenInv extends JavaPlugin {
         return null;
     }
 
-    public ISpecialPlayerInventory getOrCreateInventoryFor(Player player, boolean offline) {
+    public ISpecialPlayerInventory getOrCreateInventoryFor(Player player, boolean online) {
         String id = getPlayerLoader().getPlayerDataID(player);
         if (inventories.containsKey(id)) {
             return inventories.get(id);
         }
-        ISpecialPlayerInventory inv = getInternalAccessor().newSpecialPlayerInventory(player, offline);
+        ISpecialPlayerInventory inv = getInternalAccessor().newSpecialPlayerInventory(player, online);
         inventories.put(id, inv);
         return inv;
     }
@@ -140,12 +154,12 @@ public class OpenInv extends JavaPlugin {
         return null;
     }
 
-    public ISpecialEnderChest getOrCreateEnderChestFor(Player player, boolean offline) {
+    public ISpecialEnderChest getOrCreateEnderChestFor(Player player, boolean online) {
         String id = getPlayerLoader().getPlayerDataID(player);
         if (enderChests.containsKey(id)) {
             return enderChests.get(id);
         }
-        ISpecialEnderChest inv = getInternalAccessor().newSpecialEnderChest(player, offline);
+        ISpecialEnderChest inv = getInternalAccessor().newSpecialEnderChest(player, online);
         enderChests.put(id, inv);
         return inv;
     }
@@ -155,6 +169,10 @@ public class OpenInv extends JavaPlugin {
         if (enderChests.containsKey(id)) {
             enderChests.remove(id);
         }
+    }
+
+    public boolean disableSaving() {
+        return getConfig().getBoolean("DisableSaving", false);
     }
 
     public boolean notifySilentChest() {

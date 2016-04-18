@@ -4,9 +4,10 @@ This fork of OpenInv was created when the lag caused by offline player lookups p
 ### Changes of Note
 - Removed updater
 - Removed wand
+- New configuration option `DisableSaving`: Inventory edits will not be saved unless the user is online.
 
 ## Previous Versions
-Any version of Minecraft this fork has been existent for should have a [release](https://github.com/Jikoo/OpenInv/releases) tagged. Features are not backported, however.
+This fork supports any version after 1.4.5. Binaries are available in the [releases tab](https://github.com/Jikoo/OpenInv/releases). Please allow a brief period after the release of a new version for updates.
 
 ## License
 ```

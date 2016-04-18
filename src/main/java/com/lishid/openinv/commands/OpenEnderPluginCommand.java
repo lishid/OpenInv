@@ -107,7 +107,9 @@ public class OpenEnderPluginCommand implements CommandExecutor {
     private void openInventory(Player player, OfflinePlayer target) {
 
         Player onlineTarget;
-        if (!target.isOnline()) {
+        boolean online = target.isOnline();
+
+        if (!online) {
             // Try loading the player's data
             onlineTarget = plugin.getPlayerLoader().loadPlayer(target);
 
@@ -129,7 +131,7 @@ public class OpenEnderPluginCommand implements CommandExecutor {
         openEnderHistory.put(player, onlineTarget.getName());
 
         // Create the inventory
-        ISpecialEnderChest chest = plugin.getOrCreateEnderChestFor(onlineTarget, !target.isOnline());
+        ISpecialEnderChest chest = plugin.getOrCreateEnderChestFor(onlineTarget, online);
 
         // Open the inventory
         player.openInventory(chest.getBukkitInventory());

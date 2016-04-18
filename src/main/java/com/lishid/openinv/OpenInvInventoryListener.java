@@ -32,13 +32,9 @@ public class OpenInvInventoryListener implements Listener {
 
     @EventHandler(priority = EventPriority.NORMAL)
     public void onInventoryClick(InventoryClickEvent event) {
-        // If this is the top inventory
-        // if (event.getView().convertSlot(event.getRawSlot()) == event.getRawSlot())
-        // {
         if (!plugin.getInventoryAccess().check(event.getInventory(), event.getWhoClicked())) {
             event.setCancelled(true);
         }
-        // }
     }
 
     @EventHandler(priority = EventPriority.NORMAL)

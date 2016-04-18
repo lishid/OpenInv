@@ -19,6 +19,7 @@ package com.lishid.openinv.internal.v1_4_5;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
+import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 
 // Volatile
@@ -31,13 +32,16 @@ import org.bukkit.craftbukkit.v1_4_5.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_4_5.inventory.CraftInventory;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
-    CraftPlayer owner;
-    public boolean playerOnline = false;
+
+    private final OpenInv plugin;
     private final ItemStack[] extra = new ItemStack[5];
     private final CraftInventory inventory = new CraftInventory(this);
+    private CraftPlayer owner;
+    private boolean playerOnline = false;
 
-    public SpecialPlayerInventory(Player p, Boolean online) {
+    public SpecialPlayerInventory(OpenInv plugin, Player p, Boolean online) {
         super(((CraftPlayer) p).getHandle());
+        this.plugin = plugin;
         this.owner = ((CraftPlayer) p);
         this.playerOnline = online;
         this.items = player.inventory.items;
@@ -52,7 +56,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     @Override
     public boolean inventoryRemovalCheck(boolean save) {
         boolean offline = transaction.isEmpty() && !playerOnline;
-        if (offline && save) {
+        if (offline && save && !plugin.disableSaving()) {
             owner.saveData();
         }
         return offline;

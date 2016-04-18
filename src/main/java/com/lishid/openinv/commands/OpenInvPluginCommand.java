@@ -108,8 +108,9 @@ public class OpenInvPluginCommand implements CommandExecutor {
 
 
         Player onlineTarget;
+        boolean online = target.isOnline();
 
-        if (!target.isOnline()) {
+        if (!online) {
             // Try loading the player's data
             onlineTarget = plugin.getPlayerLoader().loadPlayer(target);
 
@@ -143,7 +144,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
         openInvHistory.put(player, onlineTarget.getName());
 
         // Create the inventory
-        ISpecialPlayerInventory inv = plugin.getOrCreateInventoryFor(onlineTarget, !target.isOnline());
+        ISpecialPlayerInventory inv = plugin.getOrCreateInventoryFor(onlineTarget, online);
 
         // Open the inventory
         player.openInventory(inv.getBukkitInventory());

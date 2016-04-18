@@ -55,8 +55,8 @@ public class InternalAccessor {
         plugin.getLogger().warning("OpenInv encountered an error with the CraftBukkit version \"" + version + "\". Please look for an updated version of OpenInv.");
     }
 
-    public IPlayerDataManager newPlayerDataManager() {
-        return (IPlayerDataManager) createObject(IPlayerDataManager.class, "PlayerDataManager");
+    public PlayerDataManager newPlayerDataManager() {
+        return (PlayerDataManager) createObject(PlayerDataManager.class, "PlayerDataManager");
     }
 
     public IInventoryAccess newInventoryAccess() {
@@ -71,7 +71,9 @@ public class InternalAccessor {
         try {
             Class<?> internalClass = Class.forName("com.lishid.openinv.internal." + version + ".SpecialPlayerInventory");
             if (ISpecialPlayerInventory.class.isAssignableFrom(internalClass)) {
-                return (ISpecialPlayerInventory) internalClass.getConstructor(Player.class, Boolean.class).newInstance(player, offline);
+                return (ISpecialPlayerInventory) internalClass
+                        .getConstructor(OpenInv.class, Player.class, Boolean.class)
+                        .newInstance(this.plugin, player, offline);
             }
         }
         catch (Exception e) {
@@ -86,7 +88,9 @@ public class InternalAccessor {
         try {
             Class<?> internalClass = Class.forName("com.lishid.openinv.internal." + version + ".SpecialEnderChest");
             if (ISpecialEnderChest.class.isAssignableFrom(internalClass)) {
-                return (ISpecialEnderChest) internalClass.getConstructor(Player.class, Boolean.class).newInstance(player, offline);
+                return (ISpecialEnderChest) internalClass
+                        .getConstructor(OpenInv.class, Player.class, Boolean.class)
+                        .newInstance(this.plugin, player, offline);
             }
         }
         catch (Exception e) {
