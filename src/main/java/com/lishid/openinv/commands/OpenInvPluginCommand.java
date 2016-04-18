@@ -40,6 +40,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
         this.plugin = plugin;
     }
 
+    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
@@ -72,6 +73,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
         }
 
         new BukkitRunnable() {
+            @Override
             public void run() {
                 List<Player> matches = Bukkit.matchPlayer(name);
                 final OfflinePlayer offlinePlayer;
@@ -83,11 +85,12 @@ public class OpenInvPluginCommand implements CommandExecutor {
                 if (!player.isOnline()) {
                     return;
                 }
-                if (offlinePlayer == null || !offlinePlayer.hasPlayedBefore()) {
+                if (offlinePlayer == null || !offlinePlayer.hasPlayedBefore() && !offlinePlayer.isOnline()) {
                     player.sendMessage(ChatColor.RED + "Player not found!");
                     return;
                 }
                 new BukkitRunnable() {
+                    @Override
                     public void run() {
                         if (!player.isOnline()) {
                             return;
