@@ -123,6 +123,7 @@ public class OpenInvCommand implements CommandExecutor {
     }
 
     private void openInventory(Player player, Player target) {
+        // Null target check
         if (target == null) {
             player.sendMessage(ChatColor.RED + "Player not found!");
             return;
@@ -149,13 +150,8 @@ public class OpenInvCommand implements CommandExecutor {
         // Record the target
         openInvHistory.put(player.getUniqueId(), target.getUniqueId());
 
-        // Create the inventory
-        SpecialPlayerInventory inv = OpenInv.inventories.get(target.getUniqueId());
-        if (inv == null) {
-            inv = new SpecialPlayerInventory(target, target.isOnline());
-        }
-
-        // Open the inventory
-        player.openInventory(inv.getBukkitInventory());
+        // Get the inventory and open it
+        SpecialPlayerInventory inventory = plugin.getPlayerInventory(target, true);
+        player.openInventory(inventory.getBukkitInventory());
     }
 }

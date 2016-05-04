@@ -48,43 +48,48 @@ public class OpenInvPlayerListener implements Listener {
         configuration = plugin.getConfiguration();
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @SuppressWarnings("deprecation")
+    @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
+        final Player player = event.getPlayer();
 
-        SpecialPlayerInventory inventory = OpenInv.inventories.get(player.getUniqueId());
-        if (inventory != null) {
-            inventory.playerOnline(event.getPlayer());
-        }
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!player.isOnline()) {
+                    return;
+                }
 
-        SpecialEnderChest enderChest = OpenInv.enderChests.get(player.getUniqueId());
-        if (enderChest != null) {
-            enderChest.playerOnline(event.getPlayer());
-        }
+                SpecialPlayerInventory inventory = plugin.getPlayerInventory(player, false);
+                if (inventory != null) {
+                    inventory.playerOnline(player);
+                    player.updateInventory();
+                }
+
+                SpecialEnderChest chest = plugin.getPlayerEnderChest(player, false);
+                if (chest != null) {
+                    chest.playerOnline(player);
+                }
+            }
+        }.runTask(plugin);
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
 
-        final SpecialPlayerInventory inventory = OpenInv.inventories.get(player.getUniqueId());
+        SpecialPlayerInventory inventory = plugin.getPlayerInventory(player, false);
         if (inventory != null) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    inventory.playerOffline();
-                }
-            }.runTaskLater(plugin, 1);
+            if (inventory.playerOffline()) {
+                plugin.removeLoadedInventory(event.getPlayer());
+            }
         }
 
-        final SpecialEnderChest enderChest = OpenInv.enderChests.get(player.getUniqueId());
+        SpecialEnderChest enderChest = plugin.getPlayerEnderChest(player, false);
         if (enderChest != null) {
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    enderChest.playerOffline();
-                }
-            }.runTaskLater(plugin, 1);
+            if (enderChest.playerOffline()) {
+                plugin.removeLoadedEnderChest(event.getPlayer());
+            }
         }
     }
 

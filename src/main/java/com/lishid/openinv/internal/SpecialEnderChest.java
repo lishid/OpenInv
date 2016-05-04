@@ -32,7 +32,7 @@ public class SpecialEnderChest extends InventorySubcontainer {
 
     private final CraftInventory inventory = new CraftInventory(this);
     private final InventoryEnderChest enderChest;
-    private final CraftPlayer owner;
+    private CraftPlayer owner;
     private boolean playerOnline;
 
     public SpecialEnderChest(Player p, boolean online) {
@@ -45,7 +45,6 @@ public class SpecialEnderChest extends InventorySubcontainer {
         this.enderChest = enderChest;
         this.items = this.enderChest.getContents();
         this.playerOnline = online;
-        OpenInv.enderChests.put(owner.getUniqueId(), this);
     }
 
     private void saveOnExit() {
@@ -62,26 +61,38 @@ public class SpecialEnderChest extends InventorySubcontainer {
         return inventory;
     }
 
+    public boolean inventoryRemovalCheck(boolean save) {
+        boolean offline = transaction.isEmpty() && !playerOnline;
+        if (offline && save) {
+            owner.saveData();
+        }
+
+        return offline;
+    }
+
     public void playerOnline(Player p) {
         if (!playerOnline) {
+            owner = (CraftPlayer) p;
+            linkInventory(((CraftPlayer) p).getHandle().getEnderChest());
+            playerOnline = true;
+
+            /*
             linkInventory(((CraftPlayer) p).getHandle().getEnderChest());
             p.saveData();
             playerOnline = true;
+            */
         }
     }
 
-    public void playerOffline() {
+    public boolean playerOffline() {
         playerOnline = false;
-        owner.loadData();
-        linkInventory(owner.getHandle().getEnderChest());
-        saveOnExit();
+        return inventoryRemovalCheck(false);
     }
 
     @Override
     public void onClose(CraftHumanEntity who) {
         super.onClose(who);
-        saveOnExit();
-        OpenInv.enderChests.remove(owner.getUniqueId());
+        inventoryRemovalCheck(true);
     }
 
     @Override

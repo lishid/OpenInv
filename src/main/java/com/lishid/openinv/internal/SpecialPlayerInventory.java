@@ -35,16 +35,15 @@ public class SpecialPlayerInventory extends PlayerInventory {
 
     private final CraftInventory inventory = new CraftInventory(this);
     private final ItemStack[] extra = new ItemStack[4];
-    private final CraftPlayer owner;
+    private CraftPlayer owner;
     private ItemStack[][] arrays;
     private boolean playerOnline;
 
     public SpecialPlayerInventory(Player p, boolean online) {
         super(((CraftPlayer) p).getHandle());
         this.owner = (CraftPlayer) p;
-        reflectContents(getClass().getSuperclass(), player.inventory, this);
         this.playerOnline = online;
-        OpenInv.inventories.put(owner.getUniqueId(), this);
+        reflectContents(getClass().getSuperclass(), player.inventory, this);
     }
 
     private void reflectContents(Class clazz, PlayerInventory src, PlayerInventory dest) {
@@ -73,41 +72,41 @@ public class SpecialPlayerInventory extends PlayerInventory {
         arrays = new ItemStack[][] { this.items, this.armor, this.extraSlots, this.extra };
     }
 
-    public Inventory getBukkitInventory() {
-        return inventory;
-    }
-
-    private void saveOnExit() {
-        if (transaction.isEmpty() && !playerOnline) {
-            owner.saveData();
-        }
-    }
-
     private void linkInventory(PlayerInventory inventory) {
         reflectContents(inventory.getClass(), inventory, this);
     }
 
+    public Inventory getBukkitInventory() {
+        return inventory;
+    }
+
+    public boolean inventoryRemovalCheck(boolean save) {
+        boolean offline = transaction.isEmpty() && !playerOnline;
+        if (offline && save) {
+            owner.saveData();
+        }
+
+        return offline;
+    }
+
     public void playerOnline(Player player) {
         if (!playerOnline) {
-            CraftPlayer p = (CraftPlayer) player;
-            linkInventory(p.getHandle().inventory);
-            p.saveData();
+            owner = (CraftPlayer) player;
+            this.player = owner.getHandle();
+            linkInventory(owner.getHandle().inventory);
             playerOnline = true;
         }
     }
 
-    public void playerOffline() {
+    public boolean playerOffline() {
         playerOnline = false;
-        owner.loadData();
-        linkInventory(owner.getHandle().inventory);
-        saveOnExit();
+        return inventoryRemovalCheck(false);
     }
 
     @Override
     public void onClose(CraftHumanEntity who) {
         super.onClose(who);
-        this.saveOnExit();
-        OpenInv.inventories.remove(owner.getUniqueId());
+        inventoryRemovalCheck(true);
     }
 
     @Override

@@ -45,8 +45,8 @@ import com.lishid.openinv.listeners.OpenInvPlayerListener;
 
 public class OpenInv extends JavaPlugin {
 
-    public static final Map<UUID, SpecialPlayerInventory> inventories = new HashMap<UUID, SpecialPlayerInventory>();
-    public static final Map<UUID, SpecialEnderChest> enderChests = new HashMap<UUID, SpecialEnderChest>();
+    private final Map<UUID, SpecialPlayerInventory> inventories = new HashMap<UUID, SpecialPlayerInventory>();
+    private final Map<UUID, SpecialEnderChest> enderChests = new HashMap<UUID, SpecialEnderChest>();
 
     private Configuration configuration;
 
@@ -118,6 +118,62 @@ public class OpenInv extends JavaPlugin {
      */
     public AnySilentChest getAnySilentChest() {
         return anySilentChest;
+    }
+
+    /**
+     * Returns a player's SpecialPlayerInventory.
+     *
+     * @param player the player to get the SpecialPlayerInventory of
+     * @param createIfNull whether or not to create it if it doesn't exist
+     * @return the player's SpecialPlayerInventory or null
+     */
+    public SpecialPlayerInventory getPlayerInventory(Player player, boolean createIfNull) {
+        SpecialPlayerInventory inventory = inventories.get(player.getUniqueId());
+        if (inventory == null && createIfNull) {
+            inventory = new SpecialPlayerInventory(player, player.isOnline());
+            inventories.put(player.getUniqueId(), inventory);
+        }
+
+        return inventory;
+    }
+
+    /**
+     * Returns a player's SpecialEnderChest.
+     *
+     * @param player the player to get the SpecialEnderChest of
+     * @param createIfNull whether or not to create it if it doesn't exist
+     * @return the player's SpecialEnderChest or null
+     */
+    public SpecialEnderChest getPlayerEnderChest(Player player, boolean createIfNull) {
+        SpecialEnderChest enderChest = enderChests.get(player.getUniqueId());
+        if (enderChest == null && createIfNull) {
+            enderChest = new SpecialEnderChest(player, player.isOnline());
+            enderChests.put(player.getUniqueId(), enderChest);
+        }
+
+        return enderChest;
+    }
+
+    /**
+     * Removes a player's loaded inventory if it exists.
+     *
+     * @param player the player to remove the loaded inventory of
+     */
+    public void removeLoadedInventory(Player player) {
+        if (inventories.containsKey(player.getUniqueId())) {
+            inventories.remove(player.getUniqueId());
+        }
+    }
+
+    /**
+     * Removes a player's loaded ender chest if it exists.
+     *
+     * @param player the player to remove the loaded ender chest of
+     */
+    public void removeLoadedEnderChest(Player player) {
+        if (enderChests.containsKey(player.getUniqueId())) {
+            enderChests.remove(player.getUniqueId());
+        }
     }
 
     /**
