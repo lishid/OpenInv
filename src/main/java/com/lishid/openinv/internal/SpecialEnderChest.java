@@ -23,8 +23,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-import com.lishid.openinv.OpenInv;
-
 import net.minecraft.server.v1_9_R1.InventoryEnderChest;
 import net.minecraft.server.v1_9_R1.InventorySubcontainer;
 
@@ -75,12 +73,6 @@ public class SpecialEnderChest extends InventorySubcontainer {
             owner = (CraftPlayer) p;
             linkInventory(((CraftPlayer) p).getHandle().getEnderChest());
             playerOnline = true;
-
-            /*
-            linkInventory(((CraftPlayer) p).getHandle().getEnderChest());
-            p.saveData();
-            playerOnline = true;
-            */
         }
     }
 

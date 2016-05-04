@@ -24,8 +24,6 @@ import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import com.lishid.openinv.OpenInv;
-
 import net.minecraft.server.v1_9_R1.ContainerUtil;
 import net.minecraft.server.v1_9_R1.EntityHuman;
 import net.minecraft.server.v1_9_R1.ItemStack;
