@@ -66,9 +66,9 @@ public class OpenInvPlayerListener implements Listener {
                     player.updateInventory();
                 }
 
-                SpecialEnderChest chest = plugin.getPlayerEnderChest(player, false);
-                if (chest != null) {
-                    chest.playerOnline(player);
+                SpecialEnderChest enderChest = plugin.getPlayerEnderChest(player, false);
+                if (enderChest != null) {
+                    enderChest.playerOnline(player);
                 }
             }
         }.runTask(plugin);
