@@ -128,17 +128,18 @@ public class OpenEnderCommand implements CommandExecutor {
     }
 
     private void openInventory(Player player, Player target) {
+        // Null target check
         if (target == null) {
             player.sendMessage(ChatColor.RED + "Player not found!");
             return;
         }
 
+        // Permissions checks
         if (target != player && !OpenInv.hasPermission(player, Permissions.PERM_ENDERCHEST_ALL)) {
             player.sendMessage(ChatColor.RED + "You do not have permission to access other player's ender chests.");
             return;
         }
 
-        // Permissions checks
         if (!OpenInv.hasPermission(player, Permissions.PERM_OVERRIDE) && OpenInv.hasPermission(target, Permissions.PERM_EXEMPT)) {
             player.sendMessage(ChatColor.RED + target.getDisplayName() + "'s ender chest is protected!");
             return;
@@ -153,13 +154,8 @@ public class OpenEnderCommand implements CommandExecutor {
         // Record the target
         openEnderHistory.put(player.getUniqueId(), target.getUniqueId());
 
-        // Create the inventory
-        SpecialEnderChest chest = OpenInv.enderChests.get(target.getUniqueId());
-        if (chest == null) {
-            chest = new SpecialEnderChest(target, target.isOnline());
-        }
-
-        // Open the inventory
-        player.openInventory(chest.getBukkitInventory());
+        // Get the inventory and open it
+        SpecialEnderChest enderChest = plugin.getPlayerEnderChest(target, true);
+        player.openInventory(enderChest.getBukkitInventory());
     }
 }
