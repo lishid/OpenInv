@@ -3,18 +3,18 @@ package com.lishid.openinv.internal;
 import java.util.List;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_9_R2.entity.CraftHumanEntity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 
-import net.minecraft.server.v1_9_R1.ChestLock;
-import net.minecraft.server.v1_9_R1.Container;
-import net.minecraft.server.v1_9_R1.ContainerChest;
-import net.minecraft.server.v1_9_R1.EntityHuman;
-import net.minecraft.server.v1_9_R1.IChatBaseComponent;
-import net.minecraft.server.v1_9_R1.ITileInventory;
-import net.minecraft.server.v1_9_R1.ItemStack;
-import net.minecraft.server.v1_9_R1.PlayerInventory;
+import net.minecraft.server.v1_9_R2.ChestLock;
+import net.minecraft.server.v1_9_R2.Container;
+import net.minecraft.server.v1_9_R2.ContainerChest;
+import net.minecraft.server.v1_9_R2.EntityHuman;
+import net.minecraft.server.v1_9_R2.IChatBaseComponent;
+import net.minecraft.server.v1_9_R2.ITileInventory;
+import net.minecraft.server.v1_9_R2.ItemStack;
+import net.minecraft.server.v1_9_R2.PlayerInventory;
 
 public class SilentInventory implements ITileInventory {
 
