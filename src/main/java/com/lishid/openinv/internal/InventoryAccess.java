@@ -18,14 +18,14 @@ package com.lishid.openinv.internal;
 
 import java.lang.reflect.Field;
 
-import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_9_R2.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 
-import net.minecraft.server.v1_9_R1.IInventory;
+import net.minecraft.server.v1_9_R2.IInventory;
 
 public class InventoryAccess {
 
