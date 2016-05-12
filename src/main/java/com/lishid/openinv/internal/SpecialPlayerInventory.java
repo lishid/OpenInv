@@ -18,16 +18,16 @@ package com.lishid.openinv.internal;
 
 import java.lang.reflect.Field;
 
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_9_R2.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_9_R2.inventory.CraftInventory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import net.minecraft.server.v1_9_R1.ContainerUtil;
-import net.minecraft.server.v1_9_R1.EntityHuman;
-import net.minecraft.server.v1_9_R1.ItemStack;
-import net.minecraft.server.v1_9_R1.PlayerInventory;
+import net.minecraft.server.v1_9_R2.ContainerUtil;
+import net.minecraft.server.v1_9_R2.EntityHuman;
+import net.minecraft.server.v1_9_R2.ItemStack;
+import net.minecraft.server.v1_9_R2.PlayerInventory;
 
 public class SpecialPlayerInventory extends PlayerInventory {
 
