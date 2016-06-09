@@ -30,7 +30,7 @@ import org.bukkit.entity.Player;
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.SpecialEnderChest;
-import com.lishid.openinv.utils.UUIDUtil;
+import com.lishid.openinv.utils.UUIDUtils;
 
 public class OpenEnderCommand implements CommandExecutor {
 
@@ -55,7 +55,7 @@ public class OpenEnderCommand implements CommandExecutor {
             }
 
             if (args.length > 0 && args[0].equalsIgnoreCase("?")) {
-                OpenInv.showHelp((Player) sender);
+                OpenInv.showHelp(sender);
                 return true;
             }
 
@@ -80,7 +80,7 @@ public class OpenEnderCommand implements CommandExecutor {
                 }
             }
             else {
-                uuid = UUIDUtil.getUUIDOf(args[0]);
+                uuid = UUIDUtils.getPlayerUUID(args[0]);
                 if (uuid == null) {
                     player.sendMessage(ChatColor.RED + "Player not found!");
                     return true;

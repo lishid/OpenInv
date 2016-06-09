@@ -10,7 +10,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import com.lishid.openinv.utils.UUIDUtil;
+import com.lishid.openinv.utils.UUIDUtils;
 
 public class ConfigUpdater {
 
@@ -136,7 +136,7 @@ public class ConfigUpdater {
         int converted = 0;
 
         for (String playerName : keys) {
-            UUID uuid = UUIDUtil.getUUIDOf(playerName);
+            UUID uuid = UUIDUtils.getPlayerUUID(playerName);
 
             if (uuid != null) {
                 boolean toggled = section.getBoolean(playerName + ".toggle", false);

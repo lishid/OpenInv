@@ -25,12 +25,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.SpecialPlayerInventory;
-import com.lishid.openinv.utils.UUIDUtil;
+import com.lishid.openinv.utils.UUIDUtils;
 
 public class OpenInvCommand implements CommandExecutor {
 
@@ -55,7 +58,7 @@ public class OpenInvCommand implements CommandExecutor {
             }
 
             if (args.length > 0 && args[0].equalsIgnoreCase("?")) {
-                OpenInv.showHelp((Player) sender);
+                OpenInv.showHelp(sender);
                 return true;
             }
 
@@ -73,9 +76,8 @@ public class OpenInvCommand implements CommandExecutor {
             // Read from history if target is not named
             if (args.length < 1) {
                 uuid = history;
-            }
-            else {
-                uuid = UUIDUtil.getUUIDOf(args[0]);
+            } else {
+                uuid = UUIDUtils.getPlayerUUID(args[0]);
                 if (uuid == null) {
                     player.sendMessage(ChatColor.RED + "Player not found!");
                     return true;
