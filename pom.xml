@@ -8,6 +8,13 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot</artifactId>
+      <version>1.10-R0.1-SNAPSHOT</version>
+      <scope>provided</scope>
+      <classifier>v1_10_R1</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.spigotmc</groupId>
+      <artifactId>spigot</artifactId>
       <version>1.9.4-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
       <classifier>v1_9_R2</classifier>

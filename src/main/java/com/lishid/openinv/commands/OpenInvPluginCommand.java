@@ -112,7 +112,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
 
         if (!online) {
             // Try loading the player's data
-            onlineTarget = plugin.getPlayerLoader().loadPlayer(target);
+            onlineTarget = plugin.getPlayerLoader().loadPlayer(plugin, target);
 
             if (onlineTarget == null) {
                 player.sendMessage(ChatColor.RED + "Player not found!");

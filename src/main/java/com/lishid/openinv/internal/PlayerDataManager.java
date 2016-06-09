@@ -16,15 +16,55 @@
 
 package com.lishid.openinv.internal;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public abstract class PlayerDataManager {
-    public final Player loadPlayer(OfflinePlayer offline) {
+    public final Player loadPlayer(final Plugin plugin, final OfflinePlayer offline) {
         if (offline.isOnline()) {
             return offline.getPlayer();
         }
-        return this.loadOfflinePlayer(offline);
+        if (Bukkit.isPrimaryThread()) {
+            return this.loadOfflinePlayer(offline);
+        }
+
+
+        Future<Player> future = Bukkit.getScheduler().callSyncMethod(plugin,
+                new Callable<Player>() {
+                    @Override
+                    public Player call() throws Exception {
+                        return loadOfflinePlayer(offline);
+                    }
+                });
+
+        int ticks = 0;
+        while (!future.isDone() && !future.isCancelled() && ticks < 10) {
+            ++ticks;
+            try {
+                Thread.sleep(50L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        if (!future.isDone() || future.isCancelled()) {
+            return null;
+        }
+        try {
+            return future.get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+            return null;
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     protected abstract Player loadOfflinePlayer(OfflinePlayer offline);
