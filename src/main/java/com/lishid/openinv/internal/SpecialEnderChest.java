@@ -16,15 +16,18 @@
 
 package com.lishid.openinv.internal;
 
-import org.bukkit.craftbukkit.v1_9_R2.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_9_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_9_R2.inventory.CraftInventory;
+import java.lang.reflect.Field;
+
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftInventory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-import net.minecraft.server.v1_9_R2.InventoryEnderChest;
-import net.minecraft.server.v1_9_R2.InventorySubcontainer;
+import net.minecraft.server.v1_10_R1.InventoryEnderChest;
+import net.minecraft.server.v1_10_R1.InventorySubcontainer;
+import net.minecraft.server.v1_10_R1.ItemStack;
 
 public class SpecialEnderChest extends InventorySubcontainer {
 
@@ -41,8 +44,8 @@ public class SpecialEnderChest extends InventorySubcontainer {
         super(enderChest.getName(), enderChest.hasCustomName(), enderChest.getSize());
         this.owner = (CraftPlayer) p;
         this.enderChest = enderChest;
-        this.items = this.enderChest.getContents();
         this.playerOnline = online;
+        reflectContents(getClass().getSuperclass(), this, this.enderChest.getContents());
     }
 
     private void saveOnExit() {
@@ -51,8 +54,24 @@ public class SpecialEnderChest extends InventorySubcontainer {
         }
     }
 
+    private void reflectContents(Class clazz, InventorySubcontainer enderChest, ItemStack[] items) {
+        try {
+            Field itemsField = clazz.getDeclaredField("items");
+            itemsField.setAccessible(true);
+            itemsField.set(enderChest, items);
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void linkInventory(InventoryEnderChest inventory) {
-        inventory.items = this.items;
+        reflectContents(inventory.getClass(), inventory, this.items);
     }
 
     public Inventory getBukkitInventory() {
@@ -61,6 +80,7 @@ public class SpecialEnderChest extends InventorySubcontainer {
 
     public boolean inventoryRemovalCheck(boolean save) {
         boolean offline = transaction.isEmpty() && !playerOnline;
+
         if (offline && save) {
             owner.saveData();
         }

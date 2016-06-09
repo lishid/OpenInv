@@ -4,8 +4,8 @@ import java.util.Iterator;
 
 import com.google.common.collect.Iterators;
 
-import net.minecraft.server.v1_9_R2.EnumDirection;
-import net.minecraft.server.v1_9_R2.EnumDirection.EnumDirectionLimit;
+import net.minecraft.server.v1_10_R1.EnumDirection;
+import net.minecraft.server.v1_10_R1.EnumDirection.EnumDirectionLimit;
 
 public enum EnumDirectionList implements Iterable<EnumDirection> {
 

@@ -129,6 +129,7 @@ public class OpenInv extends JavaPlugin {
      */
     public SpecialPlayerInventory getPlayerInventory(Player player, boolean createIfNull) {
         SpecialPlayerInventory inventory = inventories.get(player.getUniqueId());
+
         if (inventory == null && createIfNull) {
             inventory = new SpecialPlayerInventory(player, player.isOnline());
             inventories.put(player.getUniqueId(), inventory);
@@ -146,6 +147,7 @@ public class OpenInv extends JavaPlugin {
      */
     public SpecialEnderChest getPlayerEnderChest(Player player, boolean createIfNull) {
         SpecialEnderChest enderChest = enderChests.get(player.getUniqueId());
+
         if (enderChest == null && createIfNull) {
             enderChest = new SpecialEnderChest(player, player.isOnline());
             enderChests.put(player.getUniqueId(), enderChest);
@@ -206,33 +208,33 @@ public class OpenInv extends JavaPlugin {
     }
 
     /**
-     * Outputs OpenInv help information to a player.
+     * Outputs OpenInv help information to a CommandSender.
      *
-     * @param player the player to show help to
+     * @param sender the CommandSender to show help to
      */
-    public static void showHelp(Player player) {
-        player.sendMessage(ChatColor.GREEN + "/openinv <player> - Opens a player's inventory.");
-        player.sendMessage(ChatColor.GREEN + "   (aliases: oi, inv, open)");
+    public static void showHelp(CommandSender sender) {
+        sender.sendMessage(ChatColor.GREEN + "/openinv <player> - Opens a player's inventory.");
+        sender.sendMessage(ChatColor.GREEN + "   (aliases: oi, inv, open)");
 
-        player.sendMessage(ChatColor.GREEN + "/openender <player> - Opens a player's ender chest.");
-        player.sendMessage(ChatColor.GREEN + "   (aliases: oe)");
+        sender.sendMessage(ChatColor.GREEN + "/openender <player> - Opens a player's ender chest.");
+        sender.sendMessage(ChatColor.GREEN + "   (aliases: oe)");
 
-        player.sendMessage(ChatColor.GREEN + "/searchinv <item> [minAmount] -");
-        player.sendMessage(ChatColor.GREEN + "   Searches and lists players that have a specific item in their inventory.");
-        player.sendMessage(ChatColor.GREEN + "   (aliases: si)");
+        sender.sendMessage(ChatColor.GREEN + "/searchinv <item> [minAmount] -");
+        sender.sendMessage(ChatColor.GREEN + "   Searches and lists players that have a specific item in their inventory.");
+        sender.sendMessage(ChatColor.GREEN + "   (aliases: si)");
 
-        player.sendMessage(ChatColor.GREEN + "/searchender <item> [minAmount] -");
-        player.sendMessage(ChatColor.GREEN + "   Searches and lists players that have a specific item in their ender chest.");
-        player.sendMessage(ChatColor.GREEN + "   (aliases: se)");
+        sender.sendMessage(ChatColor.GREEN + "/searchender <item> [minAmount] -");
+        sender.sendMessage(ChatColor.GREEN + "   Searches and lists players that have a specific item in their ender chest.");
+        sender.sendMessage(ChatColor.GREEN + "   (aliases: se)");
 
-        player.sendMessage(ChatColor.GREEN + "/toggleopeninv - Toggles the item openinv function.");
-        player.sendMessage(ChatColor.GREEN + "   (aliases: toi, toggleoi, toggleinv)");
+        sender.sendMessage(ChatColor.GREEN + "/toggleopeninv - Toggles the item openinv function.");
+        sender.sendMessage(ChatColor.GREEN + "   (aliases: toi, toggleoi, toggleinv)");
 
-        player.sendMessage(ChatColor.GREEN + "/anychest - Toggles the any chest function.");
-        player.sendMessage(ChatColor.GREEN + "   (aliases: ac)");
+        sender.sendMessage(ChatColor.GREEN + "/anychest - Toggles the any chest function.");
+        sender.sendMessage(ChatColor.GREEN + "   (aliases: ac)");
 
-        player.sendMessage(ChatColor.GREEN + "/silentchest - Toggles the silent chest function.");
-        player.sendMessage(ChatColor.GREEN + "   (aliases: sc, silent)");
+        sender.sendMessage(ChatColor.GREEN + "/silentchest - Toggles the silent chest function.");
+        sender.sendMessage(ChatColor.GREEN + "   (aliases: sc, silent)");
     }
 
     /**

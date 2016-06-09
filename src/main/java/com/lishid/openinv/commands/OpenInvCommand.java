@@ -25,12 +25,15 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.SpecialPlayerInventory;
-import com.lishid.openinv.utils.UUIDUtil;
+import com.lishid.openinv.utils.UUIDUtils;
 
 public class OpenInvCommand implements CommandExecutor {
 
@@ -42,12 +45,9 @@ public class OpenInvCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(final CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("openinv")) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage(ChatColor.RED + "You can't use this command from the console.");
-                return true;
-            }
+            final boolean isConsole = sender instanceof ConsoleCommandSender;
 
             if (!OpenInv.hasPermission(sender, Permissions.PERM_OPENINV)) {
                 sender.sendMessage(ChatColor.RED + "You do not have permission to access player inventories.");
@@ -55,34 +55,38 @@ public class OpenInvCommand implements CommandExecutor {
             }
 
             if (args.length > 0 && args[0].equalsIgnoreCase("?")) {
-                OpenInv.showHelp((Player) sender);
+                OpenInv.showHelp(sender);
                 return true;
             }
 
-            final Player player = (Player) sender;
-
-            // History management
-            UUID history = openInvHistory.get(player.getUniqueId());
-            if (history == null) {
-                history = player.getUniqueId();
-                openInvHistory.put(player.getUniqueId(), history);
-            }
-
+            Player player = isConsole ? null : (Player) sender;
             final UUID uuid;
 
             // Read from history if target is not named
             if (args.length < 1) {
+                if (isConsole) {
+                    // TODO: Should this output the command's usage instead?
+                    sender.sendMessage(ChatColor.RED + "Player not found!");
+                    return true;
+                }
+
+                // History management
+                UUID history = openInvHistory.get(player.getUniqueId());
+                if (history == null) {
+                    history = player.getUniqueId();
+                    openInvHistory.put(player.getUniqueId(), history);
+                }
+
                 uuid = history;
-            }
-            else {
-                uuid = UUIDUtil.getUUIDOf(args[0]);
+            } else {
+                uuid = UUIDUtils.getPlayerUUID(args[0]);
                 if (uuid == null) {
-                    player.sendMessage(ChatColor.RED + "Player not found!");
+                    sender.sendMessage(ChatColor.RED + "Player not found!");
                     return true;
                 }
             }
 
-            final UUID playerUUID = player.getUniqueId();
+            final UUID playerUUID = isConsole ? null : player.getUniqueId();
 
             Player target = Bukkit.getPlayer(uuid);
             if (target == null) {
@@ -93,33 +97,68 @@ public class OpenInvCommand implements CommandExecutor {
                         // Try loading the player's data asynchronously
                         final Player target = plugin.getPlayerLoader().loadPlayer(uuid);
                         if (target == null) {
-                            player.sendMessage(ChatColor.RED + "Player not found!");
+                            sender.sendMessage(ChatColor.RED + "Player not found!");
                             return;
                         }
 
-                        // Open target's inventory synchronously
-                        Bukkit.getScheduler().runTask(plugin, new Runnable() {
-                            @Override
-                            public void run() {
-                                Player player = Bukkit.getPlayer(playerUUID);
-                                // If sender is no longer online after loading the target, abort!
-                                if (player == null) {
-                                    return;
+                        // Open/output target's inventory synchronously
+                        if (isConsole) {
+                            Bukkit.getScheduler().runTask(plugin, new Runnable() {
+                                @Override
+                                public void run() {
+                                    outputInventory(sender, target);
                                 }
+                            });
+                        } else {
+                            Bukkit.getScheduler().runTask(plugin, new Runnable() {
+                                @Override
+                                public void run() {
+                                    Player player = Bukkit.getPlayer(playerUUID);
+                                    // If sender is no longer online after loading the target, abort!
+                                    if (player == null) {
+                                        return;
+                                    }
 
-                                openInventory(player, target);
-                            }
-                        });
+                                    openInventory(player, target);
+                                }
+                            });
+                        }
                     }
                 });
             } else {
-                openInventory(player, target);
+                if (isConsole) {
+                    outputInventory(sender, target);
+                } else {
+                    openInventory(player, target);
+                }
             }
 
             return true;
         }
 
         return false;
+    }
+
+    @SuppressWarnings("deprecation")
+    private void outputInventory(CommandSender sender, Player target) {
+        // Get the inventory and open it
+        SpecialPlayerInventory specialInv = plugin.getPlayerInventory(target, true);
+        Inventory inventory = specialInv.getBukkitInventory();
+
+        for (int slot = 0; slot < inventory.getSize(); slot++) {
+            ItemStack itemStack = inventory.getItem(slot);
+
+            if (itemStack != null) {
+                String itemID = (itemStack.getDurability() != -1)
+                        ? (itemStack.getTypeId() + ":" + itemStack.getDurability())
+                        : String.valueOf(itemStack.getTypeId());
+
+                sender.sendMessage(ChatColor.GREEN + "Slot " + slot + ": " + ChatColor.WHITE
+                        + itemStack.getType().toString() + "(" + itemID + ") x" + itemStack.getAmount());
+            } else {
+                sender.sendMessage(ChatColor.GREEN + "Slot " + slot + ": " + ChatColor.WHITE + "Empty");
+            }
+        }
     }
 
     private void openInventory(Player player, Player target) {

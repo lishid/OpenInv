@@ -10,9 +10,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
-public final class UUIDUtil {
+public final class UUIDUtils {
 
-    private UUIDUtil() {}
+    private UUIDUtils() {}
 
     private static Player getPlayer(String name) {
         Validate.notNull(name, "Name cannot be null");
@@ -50,7 +50,7 @@ public final class UUIDUtil {
      * @param name the name of the player to get the UUID of
      * @return the player's UUID or null
      */
-    public static UUID getUUIDOf(String name) {
+    public static UUID getPlayerUUID(String name) {
         UUID uuid;
         Player player = getPlayer(name);
 
