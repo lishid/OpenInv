@@ -58,7 +58,7 @@ public class OpenInvCommand implements CommandExecutor {
             }
 
             if (args.length > 0 && args[0].equalsIgnoreCase("?")) {
-                OpenInv.showHelp((Player) sender);
+                OpenInv.showHelp(sender);
                 return true;
             }
 
@@ -76,8 +76,7 @@ public class OpenInvCommand implements CommandExecutor {
             // Read from history if target is not named
             if (args.length < 1) {
                 uuid = history;
-            }
-            else {
+            } else {
                 uuid = UUIDUtils.getPlayerUUID(args[0]);
                 if (uuid == null) {
                     player.sendMessage(ChatColor.RED + "Player not found!");
