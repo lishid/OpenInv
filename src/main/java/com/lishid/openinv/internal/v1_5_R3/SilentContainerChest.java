@@ -20,6 +20,7 @@ package com.lishid.openinv.internal.v1_5_R3;
 import net.minecraft.server.v1_5_R3.ContainerChest;
 import net.minecraft.server.v1_5_R3.EntityHuman;
 import net.minecraft.server.v1_5_R3.IInventory;
+import net.minecraft.server.v1_5_R3.PlayerInventory;
 
 public class SilentContainerChest extends ContainerChest {
     public IInventory inv;
@@ -32,7 +33,13 @@ public class SilentContainerChest extends ContainerChest {
     }
 
     @Override
-    public void b(EntityHuman paramEntityHuman) {
+    public void b(EntityHuman entityHuman) {
         // Don't send close signal twice, might screw up
+        PlayerInventory playerinventory = entityHuman.inventory;
+
+        if (playerinventory.getCarried() != null) {
+            entityHuman.drop(playerinventory.getCarried());
+            playerinventory.setCarried(null);
+        }
     }
 }
