@@ -62,13 +62,12 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     private void setItemArrays(InventorySubcontainer subcontainer, ItemStack[] items) {
         try {
             // Prepare to remove final modifier
-            Field modifiers;
-                modifiers = Field.class.getDeclaredField("modifiers");
+            Field modifiers = Field.class.getDeclaredField("modifiers");
             modifiers.setAccessible(true);
             // Access and replace main inventory array
             Field field = InventorySubcontainer.class.getField("items");
             modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-            field.set(inventory, items);
+            field.set(subcontainer, items);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
