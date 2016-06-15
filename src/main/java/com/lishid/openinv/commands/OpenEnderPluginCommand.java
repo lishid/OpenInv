@@ -17,9 +17,7 @@
 package com.lishid.openinv.commands;
 
 import java.util.HashMap;
-import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -75,20 +73,13 @@ public class OpenEnderPluginCommand implements CommandExecutor {
         new BukkitRunnable() {
             @Override
             public void run() {
-                List<Player> matches = Bukkit.matchPlayer(name);
-                final OfflinePlayer offlinePlayer;
-                if (!matches.isEmpty()) {
-                    offlinePlayer = matches.get(0);
-                } else {
-                    offlinePlayer = Bukkit.getOfflinePlayer(name);
-                }
-                if (!player.isOnline()) {
-                    return;
-                }
+                final OfflinePlayer offlinePlayer = plugin.matchPlayer(name);
+
                 if (offlinePlayer == null || !offlinePlayer.hasPlayedBefore() && !offlinePlayer.isOnline()) {
                     player.sendMessage(ChatColor.RED + "Player not found!");
                     return;
                 }
+
                 new BukkitRunnable() {
                     @Override
                     public void run() {
@@ -98,6 +89,7 @@ public class OpenEnderPluginCommand implements CommandExecutor {
                         openInventory(player, offlinePlayer);
                     }
                 }.runTask(plugin);
+
             }
         }.runTaskAsynchronously(plugin);
 

@@ -201,6 +201,72 @@ public class OpenInv extends JavaPlugin {
         saveConfig();
     }
 
+    /**
+     * Get an OfflinePlayer by name.
+     * 
+     * @param name the name of the Player
+     * @return the OfflinePlayer, or null if no players have ever logged in
+     */
+    public OfflinePlayer matchPlayer(String name) {
+
+        // Warn if called on the main thread - if we resort to searching offline players, this may take several seconds.
+        if (getServer().isPrimaryThread()) {
+            getLogger().warning("Call to OpenInv#matchPlayer made on the main thread!");
+            getLogger().warning("This can cause the server to hang, potentially severely.");
+            getLogger().warning("Trace:");
+            for (StackTraceElement element : new Throwable().fillInStackTrace().getStackTrace()) {
+                getLogger().warning(element.toString());
+            }
+        }
+
+        OfflinePlayer player = getServer().getPlayerExact(name);
+
+        if (player != null) {
+            return player;
+        }
+
+        player = getServer().getOfflinePlayer(name);
+
+        /*
+         * Compatibility: Pre-UUID, getOfflinePlayer always returns an OfflinePlayer. Post-UUID,
+         * getOfflinePlayer will return null if no matching player is found. To preserve
+         * compatibility, only return the player if they have played before. Ignoring current online
+         * status is fine, they'd have been found by getPlayerExact otherwise.
+         */
+        if (player != null && player.hasPlayedBefore()) {
+            return player;
+        }
+
+        player = getServer().getPlayer(name);
+
+        if (player != null) {
+            return player;
+        }
+
+        int bestMatch = Integer.MAX_VALUE;
+        for (OfflinePlayer offline : getServer().getOfflinePlayers()) {
+            if (offline.getName() == null) {
+                // Loaded by UUID only, name has never been looked up.
+                continue;
+            }
+
+            // Compatibility: Lang3 is only bundled with 1.8+
+            int currentMatch = org.apache.commons.lang.StringUtils.getLevenshteinDistance(name, offline.getName());
+
+            if (currentMatch == 0) {
+                return offline;
+            }
+
+            if (currentMatch < bestMatch) {
+                bestMatch = currentMatch;
+                player = offline;
+            }
+        }
+
+        // Only null if no players have played ever, otherwise even the worst match will do.
+        return player;
+    }
+
     public static void ShowHelp(Player player) {
         player.sendMessage(ChatColor.GREEN + "/openinv <Player> - Open a player's inventory");
         player.sendMessage(ChatColor.GREEN + "   (aliases: oi, inv, open)");
