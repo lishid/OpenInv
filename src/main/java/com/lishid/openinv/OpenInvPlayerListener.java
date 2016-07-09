@@ -27,10 +27,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.scheduler.BukkitRunnable;
-
-import com.lishid.openinv.internal.ISpecialEnderChest;
-import com.lishid.openinv.internal.ISpecialPlayerInventory;
 
 public class OpenInvPlayerListener implements Listener {
 
@@ -42,39 +38,12 @@ public class OpenInvPlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerJoin(final PlayerJoinEvent event) {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (!event.getPlayer().isOnline()) {
-                    return;
-                }
-                ISpecialPlayerInventory inventory = plugin.getInventoryFor(event.getPlayer());
-                if (inventory != null) {
-                    inventory.setPlayerOnline(event.getPlayer());
-                    event.getPlayer().updateInventory();
-                }
-                ISpecialEnderChest chest = plugin.getEnderChestFor(event.getPlayer());
-                if (chest != null) {
-                    chest.setPlayerOnline(event.getPlayer());
-                }
-            }
-        }.runTask(plugin);
+        plugin.setPlayerOnline(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onPlayerQuit(PlayerQuitEvent event) {
-        ISpecialPlayerInventory inventory = plugin.getInventoryFor(event.getPlayer());
-        if (inventory != null) {
-            if (inventory.setPlayerOffline()) {
-                plugin.removeLoadedInventory(event.getPlayer());
-            }
-        }
-        ISpecialEnderChest chest = plugin.getEnderChestFor(event.getPlayer());
-        if (chest != null) {
-            if (chest.setPlayerOffline()) {
-                plugin.removeLoadedEnderChest(event.getPlayer());
-            }
-        }
+        plugin.setPlayerOffline(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

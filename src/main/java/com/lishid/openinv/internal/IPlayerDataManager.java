@@ -16,30 +16,27 @@
 
 package com.lishid.openinv.internal;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 
-public interface ISpecialPlayerInventory {
-
-    public Inventory getBukkitInventory();
+public interface IPlayerDataManager {
 
     /**
-     * Sets the Player associated with this ISpecialPlayerInventory online.
+     * Loads a Player for an OfflinePlayer.
+     * </p>
+     * This method is potentially blocking, and should not be called on the main thread.
      * 
-     * @param player the Player coming online
+     * @param offline
+     * @return
      */
-    public void setPlayerOnline(Player player);
+    public Player loadPlayer(OfflinePlayer offline);
 
     /**
-     * Sets the Player associated with this ISpecialPlayerInventory offline.
-     */
-    public void setPlayerOffline();
-
-    /**
-     * Gets whether or not this ISpecialPlayerInventory is in use.
+     * Gets a unique identifying string for an OfflinePlayer.
      * 
-     * @return true if the ISpecialPlayerInventory is in use
+     * @param player
+     * @return
      */
-    public boolean isInUse();
+    public String getPlayerDataID(OfflinePlayer player);
 
 }

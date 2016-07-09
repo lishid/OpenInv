@@ -19,14 +19,12 @@ package com.lishid.openinv.internal.v1_9_R2;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import com.lishid.openinv.internal.ISpecialPlayerInventory;
+
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import com.lishid.openinv.OpenInv;
-import com.lishid.openinv.internal.ISpecialPlayerInventory;
-
 // Volatile
-import net.minecraft.server.v1_9_R2.EntityHuman;
 import net.minecraft.server.v1_9_R2.ItemStack;
 import net.minecraft.server.v1_9_R2.PlayerInventory;
 
@@ -36,16 +34,12 @@ import org.bukkit.craftbukkit.v1_9_R2.inventory.CraftInventory;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
 
-    private final OpenInv plugin;
     private final ItemStack[] extra = new ItemStack[4];
     private final CraftInventory inventory = new CraftInventory(this);
-    private CraftPlayer owner;
     private boolean playerOnline = false;
 
-    public SpecialPlayerInventory(OpenInv plugin, Player p, Boolean online) {
-        super(((CraftPlayer) p).getHandle());
-        this.plugin = plugin;
-        this.owner = ((CraftPlayer) p);
+    public SpecialPlayerInventory(Player bukkitPlayer, Boolean online) {
+        super(((CraftPlayer) bukkitPlayer).getHandle());
         this.playerOnline = online;
         setItemArrays(this, player.inventory.items, player.inventory.armor, player.inventory.extraSlots);
     }
@@ -93,43 +87,36 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
-    public boolean inventoryRemovalCheck(boolean save) {
-        boolean offline = transaction.isEmpty() && !playerOnline;
-        if (offline && save && !plugin.disableSaving()) {
-            owner.saveData();
-        }
-        return offline;
-    }
-
-    @Override
     public void setPlayerOnline(Player player) {
         if (!playerOnline) {
-            owner = (CraftPlayer) player;
-            this.player = owner.getHandle();
+            this.player = ((CraftPlayer) player).getHandle();
             setItemArrays(this.player.inventory, items, armor, extraSlots);
             playerOnline = true;
         }
     }
 
     @Override
-    public boolean setPlayerOffline() {
+    public void setPlayerOffline() {
         playerOnline = false;
-        return this.inventoryRemovalCheck(false);
+    }
+
+    @Override
+    public boolean isInUse() {
+        return !this.getViewers().isEmpty();
     }
 
     @Override
     public void onClose(CraftHumanEntity who) {
         super.onClose(who);
-        this.inventoryRemovalCheck(true);
     }
 
     @Override
     public ItemStack[] getContents() {
-        ItemStack[] C = new ItemStack[getSize()];
-        System.arraycopy(items, 0, C, 0, items.length);
-        System.arraycopy(armor, 0, C, items.length, armor.length);
-        System.arraycopy(extraSlots, 0, C, items.length + armor.length, extraSlots.length);
-        return C;
+        ItemStack[] contents = new ItemStack[getSize()];
+        System.arraycopy(items, 0, contents, 0, items.length);
+        System.arraycopy(armor, 0, contents, items.length, armor.length);
+        System.arraycopy(extraSlots, 0, contents, items.length + armor.length, extraSlots.length);
+        return contents;
     }
 
     @Override
@@ -277,13 +264,13 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
 
         // Effects
         if (is == this.extra) {
-            owner.getHandle().drop(itemstack, true);
+            player.drop(itemstack, true);
             itemstack = null;
         }
 
         is[i] = itemstack;
 
-        owner.getHandle().defaultContainer.b();
+        player.defaultContainer.b();
     }
 
     private int getReversedItemSlotNum(int i) {
@@ -314,8 +301,4 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         return player.getName();
     }
 
-    @Override
-    public boolean a(EntityHuman entityhuman) {
-        return true;
-    }
 }

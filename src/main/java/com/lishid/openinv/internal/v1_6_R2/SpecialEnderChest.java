@@ -20,16 +20,14 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.lishid.openinv.internal.ISpecialEnderChest;
+
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-import com.lishid.openinv.OpenInv;
-import com.lishid.openinv.internal.ISpecialEnderChest;
-
 // Volatile
-import net.minecraft.server.v1_6_R2.EntityHuman;
 import net.minecraft.server.v1_6_R2.IInventory;
 import net.minecraft.server.v1_6_R2.InventoryEnderChest;
 import net.minecraft.server.v1_6_R2.InventorySubcontainer;
@@ -41,7 +39,6 @@ import org.bukkit.craftbukkit.v1_6_R2.inventory.CraftInventory;
 
 public class SpecialEnderChest extends InventorySubcontainer implements IInventory, ISpecialEnderChest {
 
-    private final OpenInv plugin;
     private final InventoryEnderChest enderChest;
     private final CraftInventory inventory = new CraftInventory(this);
     public List<HumanEntity> transaction = new ArrayList<HumanEntity>();
@@ -49,9 +46,8 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     private CraftPlayer owner;
     private int maxStack = MAX_STACK;
 
-    public SpecialEnderChest(OpenInv plugin, Player p, Boolean online) {
+    public SpecialEnderChest(Player p, Boolean online) {
         super(((CraftPlayer) p).getHandle().getEnderChest().getName(), ((CraftPlayer) p).getHandle().getEnderChest().c(), ((CraftPlayer) p).getHandle().getEnderChest().getSize());
-        this.plugin = plugin;
         CraftPlayer player = (CraftPlayer) p;
         this.enderChest = player.getHandle().getEnderChest();
         this.owner = player;
@@ -61,15 +57,6 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     @Override
     public Inventory getBukkitInventory() {
         return inventory;
-    }
-
-    @Override
-    public boolean inventoryRemovalCheck(boolean save) {
-        boolean offline = transaction.isEmpty() && !playerOnline;
-        if (offline && save && !plugin.disableSaving()) {
-            owner.saveData();
-        }
-        return offline;
     }
 
     @Override
@@ -88,9 +75,13 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     }
 
     @Override
-    public boolean setPlayerOffline() {
+    public void setPlayerOffline() {
         playerOnline = false;
-        return inventoryRemovalCheck(false);
+    }
+
+    @Override
+    public boolean isInUse() {
+        return !this.getViewers().isEmpty();
     }
 
     @Override
@@ -106,7 +97,6 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     @Override
     public void onClose(CraftHumanEntity who) {
         transaction.remove(who);
-        this.inventoryRemovalCheck(true);
     }
 
     @Override
@@ -130,21 +120,9 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     }
 
     @Override
-    public boolean a(EntityHuman entityhuman) {
-        return true;
-    }
-
-    @Override
-    public void startOpen() {
-
-    }
-
-    public void f() {
-
-    }
-
-    @Override
     public void update() {
+        super.update();
         enderChest.update();
     }
+
 }

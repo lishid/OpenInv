@@ -18,6 +18,10 @@ package com.lishid.openinv.commands;
 
 import java.util.HashMap;
 
+import com.lishid.openinv.OpenInv;
+import com.lishid.openinv.Permissions;
+import com.lishid.openinv.internal.ISpecialEnderChest;
+
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -25,10 +29,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import com.lishid.openinv.OpenInv;
-import com.lishid.openinv.Permissions;
-import com.lishid.openinv.internal.ISpecialEnderChest;
 
 public class OpenEnderPluginCommand implements CommandExecutor {
     private final OpenInv plugin;
@@ -103,7 +103,7 @@ public class OpenEnderPluginCommand implements CommandExecutor {
 
         if (!online) {
             // Try loading the player's data
-            onlineTarget = plugin.getPlayerLoader().loadPlayer(plugin, target);
+            onlineTarget = plugin.loadPlayer(target);
 
             if (onlineTarget == null) {
                 player.sendMessage(ChatColor.RED + "Player not found!");
@@ -123,7 +123,7 @@ public class OpenEnderPluginCommand implements CommandExecutor {
         openEnderHistory.put(player, onlineTarget.getName());
 
         // Create the inventory
-        ISpecialEnderChest chest = plugin.getOrCreateEnderChestFor(onlineTarget, online);
+        ISpecialEnderChest chest = plugin.getEnderChestFor(onlineTarget, online);
 
         // Open the inventory
         player.openInventory(chest.getBukkitInventory());

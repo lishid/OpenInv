@@ -16,33 +16,26 @@
 
 package com.lishid.openinv.internal.v1_5_R3;
 
+import com.lishid.openinv.internal.ISpecialPlayerInventory;
+
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import com.lishid.openinv.OpenInv;
-import com.lishid.openinv.internal.ISpecialPlayerInventory;
-
 // Volatile
-import net.minecraft.server.v1_5_R3.EntityHuman;
 import net.minecraft.server.v1_5_R3.ItemStack;
 import net.minecraft.server.v1_5_R3.PlayerInventory;
 
-import org.bukkit.craftbukkit.v1_5_R3.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_5_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_5_R3.inventory.CraftInventory;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
 
-    private final OpenInv plugin;
     private final ItemStack[] extra = new ItemStack[5];
     private final CraftInventory inventory = new CraftInventory(this);
-    private CraftPlayer owner;
     private boolean playerOnline = false;
 
-    public SpecialPlayerInventory(OpenInv plugin, Player p, Boolean online) {
-        super(((CraftPlayer) p).getHandle());
-        this.plugin = plugin;
-        this.owner = ((CraftPlayer) p);
+    public SpecialPlayerInventory(Player bukkitPlayer, Boolean online) {
+        super(((CraftPlayer) bukkitPlayer).getHandle());
         this.playerOnline = online;
         this.items = player.inventory.items;
         this.armor = player.inventory.armor;
@@ -54,19 +47,9 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
-    public boolean inventoryRemovalCheck(boolean save) {
-        boolean offline = transaction.isEmpty() && !playerOnline;
-        if (offline && save && !plugin.disableSaving()) {
-            owner.saveData();
-        }
-        return offline;
-    }
-
-    @Override
     public void setPlayerOnline(Player player) {
         if (!playerOnline) {
-            owner = (CraftPlayer) player;
-            this.player = owner.getHandle();
+            this.player = ((CraftPlayer) player).getHandle();
             this.player.inventory.items = this.items;
             this.player.inventory.armor = this.armor;
             playerOnline = true;
@@ -74,23 +57,21 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
-    public boolean setPlayerOffline() {
+    public void setPlayerOffline() {
         playerOnline = false;
-        return this.inventoryRemovalCheck(false);
     }
 
     @Override
-    public void onClose(CraftHumanEntity who) {
-        super.onClose(who);
-        this.inventoryRemovalCheck(true);
+    public boolean isInUse() {
+        return !this.getViewers().isEmpty();
     }
 
     @Override
     public ItemStack[] getContents() {
-        ItemStack[] C = new ItemStack[getSize()];
-        System.arraycopy(items, 0, C, 0, items.length);
-        System.arraycopy(items, 0, C, items.length, armor.length);
-        return C;
+        ItemStack[] contents = new ItemStack[getSize()];
+        System.arraycopy(items, 0, contents, 0, items.length);
+        System.arraycopy(armor, 0, contents, items.length, armor.length);
+        return contents;
     }
 
     @Override
@@ -216,13 +197,13 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
 
         // Effects
         if (is == this.extra) {
-            owner.getHandle().drop(itemstack);
+            player.drop(itemstack);
             itemstack = null;
         }
 
         is[i] = itemstack;
 
-        owner.getHandle().defaultContainer.b();
+        player.defaultContainer.b();
     }
 
     private int getReversedItemSlotNum(int i) {
@@ -247,14 +228,10 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
 
     @Override
     public String getName() {
-        if (player.name.length() > 16) {
-            return player.name.substring(0, 16);
+        if (player.getName().length() > 16) {
+            return player.getName().substring(0, 16);
         }
-        return player.name;
+        return player.getName();
     }
 
-    @Override
-    public boolean a(EntityHuman entityhuman) {
-        return true;
-    }
 }

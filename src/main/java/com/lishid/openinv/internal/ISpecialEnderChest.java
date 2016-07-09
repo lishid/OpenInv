@@ -23,15 +23,23 @@ public interface ISpecialEnderChest {
 
     public Inventory getBukkitInventory();
 
-    public boolean inventoryRemovalCheck(boolean save);
-
+    /**
+     * Sets the Player associated with this ISpecialEnderChest online.
+     * 
+     * @param player the Player coming online
+     */
     public void setPlayerOnline(Player player);
 
     /**
      * Sets the Player associated with this ISpecialEnderChest offline.
-     * 
-     * @return true if the ISpecialEnderChest is eligible for removal
      */
-    public boolean setPlayerOffline();
+    public void setPlayerOffline();
+
+    /**
+     * Gets whether or not this ISpecialEnderChest is in use.
+     * 
+     * @return true if the ISpecialEnderChest is in use
+     */
+    public boolean isInUse();
 
 }

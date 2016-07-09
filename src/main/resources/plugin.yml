@@ -1,6 +1,6 @@
 name: OpenInv
 main: com.lishid.openinv.OpenInv
-version: 2.4.9
+version: 2.5.0
 author: lishid
 authors: [Jikoo]
 description: >
@@ -9,31 +9,31 @@ commands:
   openinv:
     aliases: [oi, inv, open]
     description: Open a player's inventory
-    permission: OpenInv.openinv
+    permission: OpenInv.*;OpenInv.openinv
     usage: |
            /<command> - Open last person's inventory
            /<command> <Player> - Open a player's inventory
   openender:
     aliases: [oe]
     description: Opens the enderchest of a player
-    permission: OpenInv.openender
+    permission: OpenInv.*;OpenInv.openender
     usage: |
            /<command> <Player> - Opens a player's enderchest
   searchinv:
     aliases: [si]
     description: Search and list players having a specific item
-    permission: OpenInv.search
+    permission: OpenInv.*;OpenInv.search
     usage: |
            /<command> <Item> [MinAmount] - Item can be the Item ID or the CraftBukkit Item Name, MinAmount is the minimum amount to be considered.
   silentchest:
     aliases: [sc, silent]
     description: Toggle silent chest function, which hides the animation of a chest when opened or closed, and suppresses the sound.
-    permission: OpenInv.silent
+    permission: OpenInv.*;OpenInv.silent
     usage: |
            /<command> [Check] - Checks whether silent chest is enabled
   anychest:
     aliases: [ac]
     description: Toggle anychest function, which allows opening of blocked chests.
-    permission: OpenInv.anychest
+    permission: OpenInv.*;OpenInv.anychest
     usage: |
            /<command> [Check] - Checks whether anychest is enabled

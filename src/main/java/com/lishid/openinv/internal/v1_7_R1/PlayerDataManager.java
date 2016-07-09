@@ -16,6 +16,8 @@
 
 package com.lishid.openinv.internal.v1_7_R1;
 
+import com.lishid.openinv.internal.IPlayerDataManager;
+
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -28,10 +30,10 @@ import net.minecraft.util.com.mojang.authlib.GameProfile;
 
 import org.bukkit.craftbukkit.v1_7_R1.CraftServer;
 
-public class PlayerDataManager extends com.lishid.openinv.internal.PlayerDataManager {
+public class PlayerDataManager implements IPlayerDataManager {
 
     @Override
-    public Player loadOfflinePlayer(OfflinePlayer offline) {
+    public Player loadPlayer(OfflinePlayer offline) {
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
 
         GameProfile profile = new GameProfile(null, offline.getName());
@@ -53,4 +55,5 @@ public class PlayerDataManager extends com.lishid.openinv.internal.PlayerDataMan
     public String getPlayerDataID(OfflinePlayer player) {
         return player.getName();
     }
+
 }
