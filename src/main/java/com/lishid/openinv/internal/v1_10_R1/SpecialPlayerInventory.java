@@ -115,6 +115,11 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
+    public int getSize() {
+        return super.getSize() + 4;
+    }
+
+    @Override
     public ItemStack getItem(int i) {
         ItemStack[] is = this.items;
 

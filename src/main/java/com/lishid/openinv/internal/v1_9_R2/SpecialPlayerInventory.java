@@ -121,7 +121,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
 
     @Override
     public int getSize() {
-        return super.getSize() + 5;
+        return super.getSize() + 4;
     }
 
     @Override
