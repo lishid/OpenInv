@@ -20,6 +20,7 @@ package com.lishid.openinv.internal.v1_11_R1;
 import net.minecraft.server.v1_11_R1.ContainerChest;
 import net.minecraft.server.v1_11_R1.EntityHuman;
 import net.minecraft.server.v1_11_R1.IInventory;
+import net.minecraft.server.v1_11_R1.ItemStack;
 import net.minecraft.server.v1_11_R1.PlayerInventory;
 
 public class SilentContainerChest extends ContainerChest {
@@ -37,9 +38,9 @@ public class SilentContainerChest extends ContainerChest {
         // Don't send close signal twice, might screw up
         PlayerInventory playerinventory = entityHuman.inventory;
 
-        if (playerinventory.getCarried() != null) {
+        if (!playerinventory.getCarried().isEmpty()) {
             entityHuman.drop(playerinventory.getCarried(), false);
-            playerinventory.setCarried(null);
+            playerinventory.setCarried(ItemStack.a);
         }
     }
 }
