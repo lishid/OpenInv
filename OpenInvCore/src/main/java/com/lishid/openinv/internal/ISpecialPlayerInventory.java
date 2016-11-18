@@ -21,6 +21,11 @@ import org.bukkit.inventory.Inventory;
 
 public interface ISpecialPlayerInventory {
 
+    /**
+     * Gets the Inventory associated with this ISpecialPlayerInventory.
+     * 
+     * @return the Inventory
+     */
     public Inventory getBukkitInventory();
 
     /**

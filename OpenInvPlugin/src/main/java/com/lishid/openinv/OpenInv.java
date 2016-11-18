@@ -27,7 +27,7 @@ import com.lishid.openinv.commands.OpenEnderPluginCommand;
 import com.lishid.openinv.commands.OpenInvPluginCommand;
 import com.lishid.openinv.commands.SearchInvPluginCommand;
 import com.lishid.openinv.commands.SilentChestPluginCommand;
-import com.lishid.openinv.internal.IAnySilentChest;
+import com.lishid.openinv.internal.IAnySilentContainer;
 import com.lishid.openinv.internal.IInventoryAccess;
 import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialEnderChest;
@@ -97,7 +97,7 @@ public class OpenInv extends JavaPlugin {
     private InternalAccessor accessor;
     private IPlayerDataManager playerLoader;
     private IInventoryAccess inventoryAccess;
-    private IAnySilentChest anySilentChest;
+    private IAnySilentContainer anySilentContainer;
 
     @Override
     public void onEnable() {
@@ -115,7 +115,7 @@ public class OpenInv extends JavaPlugin {
 
         playerLoader = accessor.newPlayerDataManager();
         inventoryAccess = accessor.newInventoryAccess();
-        anySilentChest = accessor.newAnySilentChest();
+        anySilentContainer = accessor.newAnySilentContainer();
 
         FileConfiguration config = getConfig();
         boolean dirtyConfig = false;
@@ -164,8 +164,16 @@ public class OpenInv extends JavaPlugin {
         return this.inventoryAccess;
     }
 
-    public IAnySilentChest getAnySilentChest() {
-        return this.anySilentChest;
+    public IAnySilentContainer getAnySilentContainer() {
+        return this.anySilentContainer;
+    }
+
+    /**
+     * @deprecated Use {@link #getAnySilentContainer()}
+     */
+    @Deprecated
+    public com.lishid.openinv.internal.IAnySilentChest getAnySilentChest() {
+        return this.getAnySilentContainer();
     }
 
     public ISpecialPlayerInventory getInventoryFor(Player player, boolean online) {

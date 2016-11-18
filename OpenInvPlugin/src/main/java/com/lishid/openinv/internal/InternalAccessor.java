@@ -63,8 +63,16 @@ public class InternalAccessor {
         return (IInventoryAccess) createObject(IInventoryAccess.class, "InventoryAccess");
     }
 
+    public IAnySilentContainer newAnySilentContainer() {
+        return (IAnySilentContainer) createObject(IAnySilentContainer.class, "AnySilentContainer");
+    }
+
+    /**
+     * @deprecated Use {@link #newAnySilentContainer()}
+     */
+    @Deprecated
     public IAnySilentChest newAnySilentChest() {
-        return (IAnySilentChest) createObject(IAnySilentChest.class, "AnySilentChest");
+        return newAnySilentContainer();
     }
 
     public ISpecialPlayerInventory newSpecialPlayerInventory(Player player, boolean offline) {

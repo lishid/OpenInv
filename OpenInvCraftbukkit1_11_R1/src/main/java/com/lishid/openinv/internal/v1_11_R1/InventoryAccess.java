@@ -18,12 +18,12 @@ package com.lishid.openinv.internal.v1_11_R1;
 
 import java.lang.reflect.Field;
 
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.Inventory;
-
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.IInventoryAccess;
+
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.Inventory;
 
 // Volatile
 import net.minecraft.server.v1_11_R1.IInventory;
@@ -31,17 +31,16 @@ import net.minecraft.server.v1_11_R1.IInventory;
 import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
 
 public class InventoryAccess implements IInventoryAccess {
+
     @Override
     public boolean check(Inventory inventory, HumanEntity player) {
         IInventory inv = grabInventory(inventory);
-        
+
         if (inv instanceof SpecialPlayerInventory) {
             if (!OpenInv.hasPermission(player, Permissions.PERM_EDITINV)) {
                 return false;
             }
-        }
-
-        else if (inv instanceof SpecialEnderChest) {
+        } else if (inv instanceof SpecialEnderChest) {
             if (!OpenInv.hasPermission(player, Permissions.PERM_EDITENDER)) {
                 return false;
             }
@@ -49,22 +48,21 @@ public class InventoryAccess implements IInventoryAccess {
 
         return true;
     }
-    
+
     private IInventory grabInventory(Inventory inventory) {
-        if(inventory instanceof CraftInventory) {
+        if (inventory instanceof CraftInventory) {
             return ((CraftInventory) inventory).getInventory();
         }
-        
-        //Use reflection to find the iinventory
+
+        // Use reflection to find the iinventory
         Class<? extends Inventory> clazz = inventory.getClass();
         IInventory result = null;
-        for(Field f : clazz.getDeclaredFields()) {
+        for (Field f : clazz.getDeclaredFields()) {
             f.setAccessible(true);
-            if(IInventory.class.isAssignableFrom(f.getDeclaringClass())) {
+            if (IInventory.class.isAssignableFrom(f.getDeclaringClass())) {
                 try {
                     result = (IInventory) f.get(inventory);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

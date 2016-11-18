@@ -16,8 +16,6 @@
 
 package com.lishid.openinv;
 
-import org.bukkit.ChatColor;
-import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
@@ -46,53 +44,41 @@ public class OpenInvPlayerListener implements Listener {
         plugin.setPlayerOffline(event.getPlayer());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getPlayer().isSneaking()
+                || event.useInteractedBlock() == Result.DENY) {
+            return;
+        }
+
         Player player = event.getPlayer();
 
-        if (event.getPlayer().isSneaking()) {
-            return;
-        }
-
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.useInteractedBlock() == Result.DENY) {
-            return;
-        }
-
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getType() == org.bukkit.Material.ENDER_CHEST) {
-            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && plugin.getPlayerSilentChestStatus(player)) {
+        if (event.getClickedBlock().getType() == org.bukkit.Material.ENDER_CHEST) {
+            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT)
+                    && plugin.getPlayerSilentChestStatus(player)) {
                 event.setCancelled(true);
                 player.openInventory(player.getEnderChest());
             }
+            return;
         }
 
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getClickedBlock().getState() instanceof Chest) {
-            boolean silentchest = false;
-            boolean anychest = false;
+        if (plugin.getAnySilentContainer().isAnySilentContainer(event.getClickedBlock())) {
+
+            boolean silentchest = OpenInv.hasPermission(player, Permissions.PERM_SILENT) && plugin.getPlayerSilentChestStatus(player);
+            boolean anychest = OpenInv.hasPermission(player, Permissions.PERM_ANYCHEST) && plugin.getPlayerAnyChestStatus(player);
+
             int x = event.getClickedBlock().getX();
             int y = event.getClickedBlock().getY();
             int z = event.getClickedBlock().getZ();
 
-            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT) && plugin.getPlayerSilentChestStatus(player)) {
-                silentchest = true;
-            }
-
-            if (OpenInv.hasPermission(player, Permissions.PERM_ANYCHEST) && plugin.getPlayerAnyChestStatus(player)) {
-                try {
-                    anychest = plugin.getAnySilentChest().isAnyChestNeeded(player, x, y, z);
-                }
-                catch (Exception e) {
-                    player.sendMessage(ChatColor.RED + "Error while executing openinv. Unsupported CraftBukkit.");
-                    e.printStackTrace();
-                }
-            }
-
-            // If the anychest or silentchest is active
+            // If anychest or silentchest is active
             if (anychest || silentchest) {
-                if (!plugin.getAnySilentChest().activateChest(player, anychest, silentchest, x, y, z)) {
-                    if (silentchest && plugin.notifySilentChest()) {
+                if (plugin.getAnySilentContainer().activateContainer(player, anychest, silentchest, x, y, z)) {
+                    if (silentchest && plugin.notifySilentChest() && anychest && plugin.notifyAnyChest()) {
+                        player.sendMessage("You are opening a blocked chest silently.");
+                    } else if (silentchest && plugin.notifySilentChest()) {
                         player.sendMessage("You are opening a chest silently.");
-                    }
-                    if (anychest && plugin.notifyAnyChest()) {
+                    } else if (anychest && plugin.notifyAnyChest()) {
                         player.sendMessage("You are opening a blocked chest.");
                     }
                     event.setCancelled(true);

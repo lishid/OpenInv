@@ -18,8 +18,22 @@ package com.lishid.openinv.internal;
 
 import org.bukkit.entity.Player;
 
+/**
+ * @deprecated Use {@link IAnySilentContainer}
+ */
+@Deprecated
 public interface IAnySilentChest {
+
+    /**
+     * @deprecated Use {@link IAnySilentContainer#activateContainer(Player, boolean, boolean, int, int, int)}.
+     */
+    @Deprecated
+    public boolean activateChest(Player player, boolean anychest, boolean silentchest, int x, int y, int z);
+
+    /**
+     * @deprecated Use {@link IAnySilentContainer#isAnyContainerNeeded(Player, int, int, int)}.
+     */
+    @Deprecated
     public boolean isAnyChestNeeded(Player player, int x, int y, int z);
 
-    public boolean activateChest(Player player, boolean anychest, boolean silentchest, int x, int y, int z);
 }

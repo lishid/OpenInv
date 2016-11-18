@@ -20,5 +20,14 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 
 public interface IInventoryAccess {
+
+    /**
+     * Check if an entity has permission to modify the contents of an inventory.
+     * 
+     * @param inventory the Inventory
+     * @param player the HumanEntity
+     * @return true if the HumanEntity can modify the Inventory
+     */
     public boolean check(Inventory inventory, HumanEntity player);
+
 }

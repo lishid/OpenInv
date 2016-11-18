@@ -21,6 +21,11 @@ import org.bukkit.inventory.Inventory;
 
 public interface ISpecialEnderChest {
 
+    /**
+     * Gets the Inventory associated with this ISpecialEnderChest.
+     * 
+     * @return the Inventory
+     */
     public Inventory getBukkitInventory();
 
     /**

@@ -16,13 +16,16 @@
 
 package com.lishid.openinv.internal.v1_8_R2;
 
+import com.lishid.openinv.internal.IAnySilentContainer;
+
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import com.lishid.openinv.internal.IAnySilentChest;
-
+//Volatile
+import net.minecraft.server.v1_8_R2.AxisAlignedBB;
 import net.minecraft.server.v1_8_R2.Block;
 import net.minecraft.server.v1_8_R2.BlockPosition;
+import net.minecraft.server.v1_8_R2.EntityOcelot;
 import net.minecraft.server.v1_8_R2.EntityPlayer;
 import net.minecraft.server.v1_8_R2.IInventory;
 import net.minecraft.server.v1_8_R2.ITileInventory;
@@ -31,56 +34,28 @@ import net.minecraft.server.v1_8_R2.PacketPlayOutOpenWindow;
 import net.minecraft.server.v1_8_R2.TileEntityChest;
 import net.minecraft.server.v1_8_R2.World;
 
-//Volatile
 import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
 
-public class AnySilentChest implements IAnySilentChest {
+public class AnySilentContainer implements IAnySilentContainer {
+
     @Override
-    public boolean isAnyChestNeeded(Player p, int x, int y, int z) {
-        // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
-        EntityPlayer player = ((CraftPlayer) p).getHandle();
-        World world = player.world;
-        // If block on top
-        if (world.getType(new BlockPosition(x, y + 1, z)).getBlock().c())
-            return true;
-
-        int id = Block.getId(world.getType(new BlockPosition(x, y, z)).getBlock());
-
-        // If block next to chest is chest and has a block on top
-        if ((Block.getId(world.getType(new BlockPosition(x - 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x - 1, y + 1, z)).getBlock().c()))
-            return true;
-        if ((Block.getId(world.getType(new BlockPosition(x + 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x + 1, y + 1, z)).getBlock().c()))
-            return true;
-        if ((Block.getId(world.getType(new BlockPosition(x, y, z - 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z - 1)).getBlock().c()))
-            return true;
-        if ((Block.getId(world.getType(new BlockPosition(x, y, z + 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z + 1)).getBlock().c()))
-            return true;
-
-        return false;
+    public boolean isAnySilentContainer(org.bukkit.block.Block block) {
+        return block instanceof org.bukkit.block.Chest;
     }
 
     @Override
-    public boolean activateChest(Player p, boolean anychest, boolean silentchest, int x, int y, int z) {
+    public boolean activateContainer(Player p, boolean anychest, boolean silentchest, int x, int y, int z) {
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
         Object chest = world.getTileEntity(new BlockPosition(x, y, z));
         if (chest == null)
-            return true;
+            return false;
+
+        if (!anychest && isAnyContainerNeeded(p, x, y, z)) {
+            return false;
+        }
 
         int id = Block.getId(world.getType(new BlockPosition(x, y, z)).getBlock());
-
-        if (!anychest) {
-            if (world.getType(new BlockPosition(x, y + 1, z)).getBlock().c())
-                return true;
-            if ((Block.getId(world.getType(new BlockPosition(x - 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x - 1, y + 1, z)).getBlock().c()))
-                return true;
-            if ((Block.getId(world.getType(new BlockPosition(x + 1, y, z)).getBlock()) == id) && (world.getType(new BlockPosition(x + 1, y + 1, z)).getBlock().c()))
-                return true;
-            if ((Block.getId(world.getType(new BlockPosition(x, y, z - 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z - 1)).getBlock().c()))
-                return true;
-            if ((Block.getId(world.getType(new BlockPosition(x, y, z + 1)).getBlock()) == id) && (world.getType(new BlockPosition(x, y + 1, z + 1)).getBlock().c()))
-                return true;
-        }
 
         if (Block.getId(world.getType(new BlockPosition(x - 1, y, z)).getBlock()) == id)
             chest = new InventoryLargeChest("Large chest", (TileEntityChest) world.getTileEntity(new BlockPosition(x - 1, y, z)), (ITileInventory) chest);
@@ -91,11 +66,11 @@ public class AnySilentChest implements IAnySilentChest {
         if (Block.getId(world.getType(new BlockPosition(x, y, z + 1)).getBlock()) == id)
             chest = new InventoryLargeChest("Large chest", (ITileInventory) chest, (TileEntityChest) world.getTileEntity(new BlockPosition(x, y, z + 1)));
 
-        boolean returnValue = true;
+        boolean returnValue = false;
         if (!silentchest) {
             player.openContainer((IInventory) chest);
-        }
-        else {
+            returnValue = true;
+        } else {
             try {
                 SilentContainerChest silentContainerChest = new SilentContainerChest(player.inventory, ((IInventory) chest), player);
                 int windowId = player.nextContainerCounter();
@@ -103,9 +78,8 @@ public class AnySilentChest implements IAnySilentChest {
                 player.activeContainer = silentContainerChest;
                 player.activeContainer.windowId = windowId;
                 player.activeContainer.addSlotListener(player);
-                returnValue = false;
-            }
-            catch (Exception e) {
+                returnValue = true;
+            } catch (Exception e) {
                 e.printStackTrace();
                 p.sendMessage(ChatColor.RED + "Error while sending silent chest.");
             }
@@ -113,4 +87,64 @@ public class AnySilentChest implements IAnySilentChest {
 
         return returnValue;
     }
+
+    @Override
+    public boolean isAnyContainerNeeded(Player p, int x, int y, int z) {
+        // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
+        EntityPlayer player = ((CraftPlayer) p).getHandle();
+        World world = player.world;
+
+        // If block or ocelot on top
+        if (world.getType(new BlockPosition(x, y + 1, z)).getBlock().c() || hasOcelotOnTop(world, x, y, z))
+            return true;
+
+        int id = Block.getId(world.getType(new BlockPosition(x, y, z)).getBlock());
+
+        // If block next to chest is chest and has a block or ocelot on top
+        return isBlockedChest(world, id, x - 1, y, z) || isBlockedChest(world, id, x + 1, y, z)
+                || isBlockedChest(world, id, x, y, z - 1) || isBlockedChest(world, id, x, y, z + 1);
+    }
+
+    private boolean isBlockedChest(World world, int id, int x, int y, int z) {
+        if (Block.getId(world.getType(new BlockPosition(x, y, z)).getBlock()) != id) {
+            return false;
+        }
+
+        if (world.getType(new BlockPosition(x, y + 1, z)).getBlock().c()) {
+            return true;
+        }
+
+        return hasOcelotOnTop(world, x, y, z);
+    }
+
+    private boolean hasOcelotOnTop(World world, int x, int y, int z) {
+        for (Object localEntity : world.a(EntityOcelot.class,
+                AxisAlignedBB.a(x, y + 1, z, x + 1, y + 2, z + 1))) {
+            EntityOcelot localEntityOcelot = (EntityOcelot) localEntity;
+            if (localEntityOcelot.isSitting()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @deprecated Use {@link #activateContainer(Player, boolean, boolean, int, int, int)}.
+     */
+    @Deprecated
+    @Override
+    public boolean activateChest(Player player, boolean anychest, boolean silentchest, int x, int y, int z) {
+        return !activateContainer(player, anychest, silentchest, x, y, z);
+    }
+
+    /**
+     * @deprecated Use {@link #isAnyContainerNeeded(Player, int, int, int)}.
+     */
+    @Deprecated
+    @Override
+    public boolean isAnyChestNeeded(Player player, int x, int y, int z) {
+        return isAnyContainerNeeded(player, x, y, z);
+    }
+
 }
