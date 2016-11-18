@@ -23,9 +23,9 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.IInventoryAccess;
 
+// Volatile
 import net.minecraft.server.v1_4_6.IInventory;
 
-// Volatile
 import org.bukkit.craftbukkit.v1_4_6.inventory.CraftInventory;
 
 public class InventoryAccess implements IInventoryAccess {

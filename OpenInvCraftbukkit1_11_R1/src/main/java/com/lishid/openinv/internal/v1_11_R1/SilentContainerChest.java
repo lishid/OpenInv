@@ -24,13 +24,12 @@ import net.minecraft.server.v1_11_R1.ItemStack;
 import net.minecraft.server.v1_11_R1.PlayerInventory;
 
 public class SilentContainerChest extends ContainerChest {
-    public IInventory inv;
 
-    public SilentContainerChest(IInventory i1, IInventory i2, EntityHuman e1) {
-        super(i1, i2, e1);
-        inv = i2;
+    public SilentContainerChest(PlayerInventory playerInventory, IInventory iInventory,
+            EntityHuman entityHuman) {
+        super(playerInventory, iInventory, entityHuman);
         // close signal
-        inv.closeContainer(e1);
+        iInventory.closeContainer(entityHuman);
     }
 
     @Override

@@ -18,12 +18,12 @@ package com.lishid.openinv.internal.v1_9_R2;
 
 import java.lang.reflect.Field;
 
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.Inventory;
-
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.IInventoryAccess;
+
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.Inventory;
 
 // Volatile
 import net.minecraft.server.v1_9_R2.IInventory;
@@ -49,7 +49,7 @@ public class InventoryAccess implements IInventoryAccess {
 
         return true;
     }
-    
+
     private IInventory grabInventory(Inventory inventory) {
         if(inventory instanceof CraftInventory) {
             return ((CraftInventory) inventory).getInventory();

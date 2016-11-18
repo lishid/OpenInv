@@ -16,16 +16,16 @@
 
 package com.lishid.openinv.internal.v1_4_R1;
 
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.inventory.Inventory;
-
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.Permissions;
 import com.lishid.openinv.internal.IInventoryAccess;
 
-import net.minecraft.server.v1_4_R1.IInventory;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.inventory.Inventory;
 
 // Volatile
+import net.minecraft.server.v1_4_R1.IInventory;
+
 import org.bukkit.craftbukkit.v1_4_R1.inventory.CraftInventory;
 
 public class InventoryAccess implements IInventoryAccess {

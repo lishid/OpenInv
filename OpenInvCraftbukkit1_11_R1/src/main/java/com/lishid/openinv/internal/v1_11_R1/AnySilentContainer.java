@@ -33,6 +33,7 @@ import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.EntityOcelot;
 import net.minecraft.server.v1_11_R1.EntityPlayer;
 import net.minecraft.server.v1_11_R1.EnumDirection;
+import net.minecraft.server.v1_11_R1.IBlockData;
 import net.minecraft.server.v1_11_R1.IInventory;
 import net.minecraft.server.v1_11_R1.ITileInventory;
 import net.minecraft.server.v1_11_R1.InventoryLargeChest;
@@ -40,6 +41,7 @@ import net.minecraft.server.v1_11_R1.PacketPlayOutOpenWindow;
 import net.minecraft.server.v1_11_R1.StatisticList;
 import net.minecraft.server.v1_11_R1.TileEntity;
 import net.minecraft.server.v1_11_R1.TileEntityChest;
+import net.minecraft.server.v1_11_R1.TileEntityShulkerBox;
 import net.minecraft.server.v1_11_R1.World;
 
 import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
@@ -47,7 +49,7 @@ import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
 public class AnySilentContainer implements IAnySilentContainer {
 
     @Override
-    public boolean isAnySilentContainer(org.bukkit.block.Block block) {
+    public boolean isAnySilentContainer(org.bukkit.block.BlockState block) {
         return block instanceof org.bukkit.block.Chest || block instanceof org.bukkit.block.ShulkerBox;
     }
 
@@ -69,8 +71,8 @@ public class AnySilentContainer implements IAnySilentContainer {
         if (block instanceof BlockChest) {
             BlockChest blockChest = (BlockChest) block;
 
-            for (EnumDirection localEnumDirection : EnumDirection.EnumDirectionLimit.HORIZONTAL) {
-                BlockPosition localBlockPosition = blockPosition.shift(localEnumDirection);
+            for (EnumDirection enumDirection : EnumDirection.EnumDirectionLimit.HORIZONTAL) {
+                BlockPosition localBlockPosition = blockPosition.shift(enumDirection);
                 Block localBlock = world.getType(localBlockPosition).getBlock();
 
                 if (localBlock != block) {
@@ -86,7 +88,7 @@ public class AnySilentContainer implements IAnySilentContainer {
                     continue;
                 }
 
-                if ((localEnumDirection == EnumDirection.WEST) || (localEnumDirection == EnumDirection.NORTH)) {
+                if ((enumDirection == EnumDirection.WEST) || (enumDirection == EnumDirection.NORTH)) {
                     tile = new InventoryLargeChest("container.chestDouble",
                             (TileEntityChest) localTileEntity, (ITileInventory) tile);
                 } else {
@@ -108,7 +110,16 @@ public class AnySilentContainer implements IAnySilentContainer {
         }
 
         if (block instanceof BlockShulkerBox) {
-            // TODO shulker
+            if (!anychest && isBlockedShulkerBox(world, blockPosition, block)) {
+                return false;
+            }
+
+            player.b(StatisticList.ae);
+
+            if (silentchest) {
+                // TODO We need to go deeper: Box is not anumated, but sound plays.
+                container = new SilentContainerShulkerBox(player.inventory, ((IInventory) tile), player);
+            }
         }
 
         boolean returnValue = false;
@@ -142,10 +153,10 @@ public class AnySilentContainer implements IAnySilentContainer {
         Block block = world.getType(blockPosition).getBlock();
 
         if (block instanceof BlockShulkerBox) {
-            return isBlockedShulkerBox(world, x, y, z);
+            return isBlockedShulkerBox(world, blockPosition, block);
         }
 
-        // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
+        // For reference, loot at net.minecraft.server.BlockChest
         // Check if chest is blocked or has an ocelot on top
         if (world.getType(new BlockPosition(x, y + 1, z)).m() || hasOcelotOnTop(world, blockPosition)) {
             return true;
@@ -162,10 +173,27 @@ public class AnySilentContainer implements IAnySilentContainer {
         return false;
     }
 
-    private boolean isBlockedShulkerBox(World world, int x, int y, int z) {
+    private boolean isBlockedShulkerBox(World world, BlockPosition blockPosition, Block block) {
         // For reference, look at net.minecraft.server.BlockShulkerBox
-        // TODO
-        return false;
+        TileEntity tile = world.getTileEntity(blockPosition);
+
+        if (!(tile instanceof TileEntityShulkerBox)) {
+            return false;
+        }
+
+        IBlockData iBlockData = block.getBlockData();
+
+        EnumDirection enumDirection = iBlockData.get(BlockShulkerBox.a);
+        if (((TileEntityShulkerBox) tile).p() == TileEntityShulkerBox.AnimationPhase.CLOSED) {
+            AxisAlignedBB axisAlignedBB = BlockShulkerBox.j.b(0.5F * enumDirection.getAdjacentX(),
+                    0.5F * enumDirection.getAdjacentY(), 0.5F * enumDirection.getAdjacentZ())
+                    .a(enumDirection.getAdjacentX(), enumDirection.getAdjacentY(),
+                            enumDirection.getAdjacentZ());
+
+            return !(world.b(axisAlignedBB.a(blockPosition.shift(enumDirection))));
+        }
+
+        return true;
     }
 
     private boolean isBlockedChest(World world, Block block, BlockPosition blockPosition) {

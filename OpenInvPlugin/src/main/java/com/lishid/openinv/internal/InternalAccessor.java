@@ -43,12 +43,16 @@ public class InternalAccessor {
         version = packageName.substring(packageName.lastIndexOf('.') + 1);
 
         try {
-            Class.forName("com.lishid.openinv.internal." + version + ".AnySilentChest");
+            Class.forName("com.lishid.openinv.internal." + version + ".AnySilentContainer");
             return true;
         }
         catch (Exception e) {
             return false;
         }
+    }
+
+    public String getVersion() {
+        return this.version != null ? this.version : "null";
     }
 
     private void printErrorMessage() {

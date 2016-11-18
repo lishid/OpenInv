@@ -56,13 +56,14 @@ public class OpenInvPlayerListener implements Listener {
         if (event.getClickedBlock().getType() == org.bukkit.Material.ENDER_CHEST) {
             if (OpenInv.hasPermission(player, Permissions.PERM_SILENT)
                     && plugin.getPlayerSilentChestStatus(player)) {
+                // TODO: Bypasses blocks on top, anychest also does not work
                 event.setCancelled(true);
                 player.openInventory(player.getEnderChest());
             }
             return;
         }
 
-        if (plugin.getAnySilentContainer().isAnySilentContainer(event.getClickedBlock())) {
+        if (plugin.getAnySilentContainer().isAnySilentContainer(event.getClickedBlock().getState())) {
 
             boolean silentchest = OpenInv.hasPermission(player, Permissions.PERM_SILENT) && plugin.getPlayerSilentChestStatus(player);
             boolean anychest = OpenInv.hasPermission(player, Permissions.PERM_ANYCHEST) && plugin.getPlayerAnyChestStatus(player);
@@ -79,6 +80,7 @@ public class OpenInvPlayerListener implements Listener {
                     } else if (silentchest && plugin.notifySilentChest()) {
                         player.sendMessage("You are opening a chest silently.");
                     } else if (anychest && plugin.notifyAnyChest()) {
+                        // TODO fix anychest always claiming chest is blocked
                         player.sendMessage("You are opening a blocked chest.");
                     }
                     event.setCancelled(true);

@@ -19,6 +19,7 @@ package com.lishid.openinv.internal.v1_8_R2;
 import com.lishid.openinv.internal.IAnySilentContainer;
 
 import org.bukkit.ChatColor;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
 //Volatile
@@ -39,7 +40,7 @@ import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
 public class AnySilentContainer implements IAnySilentContainer {
 
     @Override
-    public boolean isAnySilentContainer(org.bukkit.block.Block block) {
+    public boolean isAnySilentContainer(BlockState block) {
         return block instanceof org.bukkit.block.Chest;
     }
 

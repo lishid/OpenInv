@@ -27,6 +27,8 @@
         </property>
       </activation>
       <modules>
+        <module>OpenInvCore</module>
+        <module>OpenInvPlugin</module>
         <module>OpenInvCraftbukkit1_11_R1</module>
       </modules>
     </profile>
@@ -40,6 +42,8 @@
         </property>
       </activation>
       <modules>
+        <module>OpenInvCore</module>
+        <module>OpenInvPlugin</module>
         <module>OpenInvCraftbukkit1_7_R4</module>
         <module>OpenInvCraftbukkit1_8_R1</module>
         <module>OpenInvCraftbukkit1_8_R2</module>
@@ -57,6 +61,8 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>OpenInvCore</module>
+        <module>OpenInvPlugin</module>
         <module>OpenInvCraftbukkit1_4_5</module>
         <module>OpenInvCraftbukkit1_4_6</module>
         <module>OpenInvCraftbukkit1_4_R1</module>

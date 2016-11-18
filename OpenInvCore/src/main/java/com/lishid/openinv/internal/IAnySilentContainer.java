@@ -1,17 +1,17 @@
 package com.lishid.openinv.internal;
 
-import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
 public interface IAnySilentContainer extends IAnySilentChest {
 
     /**
-     * Checks if the given Block is a container which can be unblocked or silenced.
+     * Checks if the given block is a container which can be unblocked or silenced.
      * 
-     * @param block the Block
+     * @param block the BlockState
      * @return true if the Block is a supported container
      */
-    public boolean isAnySilentContainer(Block block);
+    public boolean isAnySilentContainer(BlockState block);
 
     /**
      * Opens the container at the given coordinates for the Player.
