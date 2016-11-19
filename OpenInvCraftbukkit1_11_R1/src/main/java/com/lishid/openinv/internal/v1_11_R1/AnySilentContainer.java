@@ -116,9 +116,11 @@ public class AnySilentContainer implements IAnySilentContainer {
 
             player.b(StatisticList.ae);
 
-            if (silentchest) {
-                // TODO We need to go deeper: Box is not anumated, but sound plays.
+            if (silentchest && tile instanceof TileEntityShulkerBox) {
+                // TODO: This fixes sound, but the box is then silent for anyone until the tile entity is recreated
+                SilentContainerShulkerBox.increaseOpenQuantity((TileEntityShulkerBox) tile);
                 container = new SilentContainerShulkerBox(player.inventory, ((IInventory) tile), player);
+                SilentContainerShulkerBox.decreaseOpenQuantity((TileEntityShulkerBox) tile);
             }
         }
 
