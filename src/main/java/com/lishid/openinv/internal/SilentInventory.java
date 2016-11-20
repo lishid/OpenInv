@@ -3,18 +3,18 @@ package com.lishid.openinv.internal;
 import java.util.List;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftHumanEntity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 
-import net.minecraft.server.v1_10_R1.ChestLock;
-import net.minecraft.server.v1_10_R1.Container;
-import net.minecraft.server.v1_10_R1.ContainerChest;
-import net.minecraft.server.v1_10_R1.EntityHuman;
-import net.minecraft.server.v1_10_R1.IChatBaseComponent;
-import net.minecraft.server.v1_10_R1.ITileInventory;
-import net.minecraft.server.v1_10_R1.ItemStack;
-import net.minecraft.server.v1_10_R1.PlayerInventory;
+import net.minecraft.server.v1_11_R1.ChestLock;
+import net.minecraft.server.v1_11_R1.Container;
+import net.minecraft.server.v1_11_R1.ContainerChest;
+import net.minecraft.server.v1_11_R1.EntityHuman;
+import net.minecraft.server.v1_11_R1.IChatBaseComponent;
+import net.minecraft.server.v1_11_R1.ITileInventory;
+import net.minecraft.server.v1_11_R1.ItemStack;
+import net.minecraft.server.v1_11_R1.PlayerInventory;
 
 public class SilentInventory implements ITileInventory {
 
@@ -25,8 +25,9 @@ public class SilentInventory implements ITileInventory {
     }
 
     @Override
-    public boolean x_() {
-        return inv.x_();
+    public boolean isLocked()
+    {
+        return inv.isLocked();
     }
 
     @Override
@@ -35,13 +36,18 @@ public class SilentInventory implements ITileInventory {
     }
 
     @Override
-    public ChestLock y_() {
-        return inv.y_();
+    public ChestLock getLock() {
+        return inv.getLock();
     }
 
     @Override
     public int getSize() {
         return inv.getSize();
+    }
+
+    @Override
+    public boolean w_() {
+        return inv.w_();
     }
 
     @Override
@@ -105,17 +111,17 @@ public class SilentInventory implements ITileInventory {
     }
 
     @Override
-    public int g() {
-        return inv.g();
+    public int h() {
+        return inv.h();
     }
 
     @Override
-    public void l() {
-        inv.l();
+    public void clear() {
+        inv.clear();
     }
 
     @Override
-    public ItemStack[] getContents() {
+    public List<ItemStack> getContents() {
         return inv.getContents();
     }
 
