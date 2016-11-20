@@ -18,23 +18,19 @@ package com.lishid.openinv.internal;
 
 import java.lang.reflect.Field;
 
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftInventory;
+import net.minecraft.server.v1_11_R1.*;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-
-import net.minecraft.server.v1_10_R1.ContainerUtil;
-import net.minecraft.server.v1_10_R1.EntityHuman;
-import net.minecraft.server.v1_10_R1.ItemStack;
-import net.minecraft.server.v1_10_R1.PlayerInventory;
 
 public class SpecialPlayerInventory extends PlayerInventory {
 
     private final CraftInventory inventory = new CraftInventory(this);
-    private final ItemStack[] extra = new ItemStack[4];
+    private final NonNullList<ItemStack> extra = NonNullList.a();
     private CraftPlayer owner;
-    private ItemStack[][] arrays;
+    private NonNullList<ItemStack>[] arrays;
     private boolean playerOnline;
 
     public SpecialPlayerInventory(Player p, boolean online) {
@@ -67,7 +63,8 @@ public class SpecialPlayerInventory extends PlayerInventory {
             e.printStackTrace();
         }
 
-        arrays = new ItemStack[][] { this.items, this.armor, this.extraSlots, this.extra };
+        //noinspection unchecked
+        arrays = new NonNullList[] { this.items, this.armor, this.extraSlots, this.extra };
     }
 
     private void linkInventory(PlayerInventory inventory) {
@@ -109,11 +106,11 @@ public class SpecialPlayerInventory extends PlayerInventory {
     }
 
     @Override
-    public ItemStack[] getContents() {
-        ItemStack[] contents = new ItemStack[getSize()];
-        System.arraycopy(this.items, 0, contents, 0, this.items.length);
-        System.arraycopy(this.armor, 0, contents, this.items.length, this.armor.length);
-        System.arraycopy(this.extraSlots, 0, contents, this.items.length + this.armor.length, this.extraSlots.length);
+    public NonNullList<ItemStack> getContents() {
+        NonNullList<ItemStack> contents = NonNullList.a();
+        contents.addAll(this.items);
+        contents.addAll(this.armor);
+        contents.addAll(this.extraSlots);
         return contents;
     }
 
@@ -124,19 +121,19 @@ public class SpecialPlayerInventory extends PlayerInventory {
 
     @Override
     public ItemStack getItem(int i) {
-        ItemStack[] is = null;
-        ItemStack[][] contents = this.arrays;
+        NonNullList<ItemStack> is = null;
+        NonNullList<ItemStack>[] contents = this.arrays;
         int j = contents.length;
 
         for (int k = 0; k < j; ++k) {
-            ItemStack[] is2 = contents[k];
+            NonNullList<ItemStack> is2 = contents[k];
 
-            if (i < is2.length) {
+            if (i < is2.size()) {
                 is = is2;
                 break;
             }
 
-            i -= is2.length;
+            i -= is2.size();
         }
 
         if (is == this.items) {
@@ -149,24 +146,24 @@ public class SpecialPlayerInventory extends PlayerInventory {
             // Do nothing
         }
 
-        return is == null ? null : is[i];
+        return is == null ? ItemStack.a : is.get(i);
     }
 
     @Override
     public ItemStack splitStack(int i, int j) {
-        ItemStack[] is = null;
-        ItemStack[][] contents = this.arrays;
+        NonNullList<ItemStack> is = null;
+        NonNullList<ItemStack>[] contents = this.arrays;
         int k = contents.length;
 
         for (int l = 0; l < k; ++l) {
-            ItemStack[] is2 = contents[l];
+            NonNullList<ItemStack> is2 = contents[l];
 
-            if (i < is2.length) {
+            if (i < is2.size()) {
                 is = is2;
                 break;
             }
 
-            i -= is2.length;
+            i -= is2.size();
         }
 
         if (is == this.items) {
@@ -179,27 +176,27 @@ public class SpecialPlayerInventory extends PlayerInventory {
             // Do nothing
         }
 
-        return is != null && is[i] != null ? ContainerUtil.a(is, i, j) : null;
+        return is != null && !is.get(i).isEmpty() ? ContainerUtil.a(is, i, j) : ItemStack.a;
     }
 
     @Override
     public ItemStack splitWithoutUpdate(int i) {
-        ItemStack[] is = null;
-        ItemStack[][] contents = this.arrays;
+        NonNullList<ItemStack> is = null;
+        NonNullList<ItemStack>[] contents = this.arrays;
         int j = contents.length;
 
         for (int object = 0; object < j; ++object) {
-            ItemStack[] is2 = contents[object];
+            NonNullList<ItemStack> is2 = contents[object];
 
-            if (i < is2.length) {
+            if (i < is2.size()) {
                 is = is2;
                 break;
             }
 
-            i -= is2.length;
+            i -= is2.size();
         }
 
-        if (is != null && is[i] != null) {
+        if (is != null && !is.get(i).isEmpty()) {
             if (is == this.items) {
                 i = getReversedItemSlotNum(i);
             } else if (is == this.armor) {
@@ -210,29 +207,29 @@ public class SpecialPlayerInventory extends PlayerInventory {
                 // Do nothing
             }
 
-            Object object = is[i];
-            is[i] = null;
+            Object object = is.get(i);
+            is.set(i, ItemStack.a);
             return (ItemStack) object;
         } else {
-            return null;
+            return ItemStack.a;
         }
     }
 
     @Override
     public void setItem(int i, ItemStack itemStack) {
-        ItemStack[] is = null;
-        ItemStack[][] contents = this.arrays;
+        NonNullList<ItemStack> is = null;
+        NonNullList<ItemStack>[] contents = this.arrays;
         int j = contents.length;
 
         for (int k = 0; k < j; ++k) {
-            ItemStack[] is2 = contents[k];
+            NonNullList<ItemStack> is2 = contents[k];
 
-            if (i < is2.length) {
+            if (i < is2.size()) {
                 is = is2;
                 break;
             }
 
-            i -= is2.length;
+            i -= is2.size();
         }
 
         if (is != null) {
@@ -244,10 +241,10 @@ public class SpecialPlayerInventory extends PlayerInventory {
                 // Do nothing
             } else if (is == this.extra) {
                 owner.getHandle().drop(itemStack, true);
-                itemStack = null;
+                itemStack = ItemStack.a;
             }
 
-            is[i] = itemStack;
+            is.set(i, itemStack);
 
             owner.getHandle().defaultContainer.b();
         }

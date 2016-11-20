@@ -18,25 +18,25 @@ package com.lishid.openinv.internal;
 
 import java.util.Iterator;
 
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
 import com.lishid.openinv.OpenInv;
 
-import net.minecraft.server.v1_10_R1.AxisAlignedBB;
-import net.minecraft.server.v1_10_R1.Block;
-import net.minecraft.server.v1_10_R1.BlockChest;
-import net.minecraft.server.v1_10_R1.BlockChest.Type;
-import net.minecraft.server.v1_10_R1.BlockPosition;
-import net.minecraft.server.v1_10_R1.Entity;
-import net.minecraft.server.v1_10_R1.EntityOcelot;
-import net.minecraft.server.v1_10_R1.EntityPlayer;
-import net.minecraft.server.v1_10_R1.EnumDirection;
-import net.minecraft.server.v1_10_R1.ITileInventory;
-import net.minecraft.server.v1_10_R1.InventoryLargeChest;
-import net.minecraft.server.v1_10_R1.TileEntity;
-import net.minecraft.server.v1_10_R1.TileEntityChest;
-import net.minecraft.server.v1_10_R1.World;
+import net.minecraft.server.v1_11_R1.AxisAlignedBB;
+import net.minecraft.server.v1_11_R1.Block;
+import net.minecraft.server.v1_11_R1.BlockChest;
+import net.minecraft.server.v1_11_R1.BlockChest.Type;
+import net.minecraft.server.v1_11_R1.BlockPosition;
+import net.minecraft.server.v1_11_R1.Entity;
+import net.minecraft.server.v1_11_R1.EntityOcelot;
+import net.minecraft.server.v1_11_R1.EntityPlayer;
+import net.minecraft.server.v1_11_R1.EnumDirection;
+import net.minecraft.server.v1_11_R1.ITileInventory;
+import net.minecraft.server.v1_11_R1.InventoryLargeChest;
+import net.minecraft.server.v1_11_R1.TileEntity;
+import net.minecraft.server.v1_11_R1.TileEntityChest;
+import net.minecraft.server.v1_11_R1.World;
 
 public class AnySilentChest {
 
