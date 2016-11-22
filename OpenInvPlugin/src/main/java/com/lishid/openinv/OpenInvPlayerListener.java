@@ -47,45 +47,43 @@ public class OpenInvPlayerListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getPlayer().isSneaking()
-                || event.useInteractedBlock() == Result.DENY) {
+                || event.useInteractedBlock() == Result.DENY
+                || !plugin.getAnySilentContainer().isAnySilentContainer(event.getClickedBlock())) {
             return;
         }
 
         Player player = event.getPlayer();
+        boolean anychest = OpenInv.hasPermission(player, Permissions.PERM_ANYCHEST) && plugin.getPlayerAnyChestStatus(player);
+        int x = event.getClickedBlock().getX();
+        int y = event.getClickedBlock().getY();
+        int z = event.getClickedBlock().getZ();
+        boolean needsAnyChest = plugin.getAnySilentContainer().isAnyContainerNeeded(player, x, y, z);
+
+        if (!anychest && needsAnyChest) {
+            return;
+        }
+
+        boolean silentchest = OpenInv.hasPermission(player, Permissions.PERM_SILENT) && plugin.getPlayerSilentChestStatus(player);
 
         if (event.getClickedBlock().getType() == org.bukkit.Material.ENDER_CHEST) {
-            if (OpenInv.hasPermission(player, Permissions.PERM_SILENT)
-                    && plugin.getPlayerSilentChestStatus(player)) {
-                // TODO: Bypasses blocks on top, anychest also does not work
+            if (silentchest || anychest) {
+                // TODO: anychest is silent
                 event.setCancelled(true);
                 player.openInventory(player.getEnderChest());
             }
             return;
         }
 
-        if (plugin.getAnySilentContainer().isAnySilentContainer(event.getClickedBlock().getState())) {
-
-            boolean silentchest = OpenInv.hasPermission(player, Permissions.PERM_SILENT) && plugin.getPlayerSilentChestStatus(player);
-            boolean anychest = OpenInv.hasPermission(player, Permissions.PERM_ANYCHEST) && plugin.getPlayerAnyChestStatus(player);
-
-            int x = event.getClickedBlock().getX();
-            int y = event.getClickedBlock().getY();
-            int z = event.getClickedBlock().getZ();
-
-            // If anychest or silentchest is active
-            if (anychest || silentchest) {
-                if (plugin.getAnySilentContainer().activateContainer(player, anychest, silentchest, x, y, z)) {
-                    if (silentchest && plugin.notifySilentChest() && anychest && plugin.notifyAnyChest()) {
-                        player.sendMessage("You are opening a blocked chest silently.");
-                    } else if (silentchest && plugin.notifySilentChest()) {
-                        player.sendMessage("You are opening a chest silently.");
-                    } else if (anychest && plugin.notifyAnyChest()) {
-                        // TODO fix anychest always claiming chest is blocked
-                        player.sendMessage("You are opening a blocked chest.");
-                    }
-                    event.setCancelled(true);
-                }
+        // If anychest or silentchest is active
+        if ((anychest || silentchest) && plugin.getAnySilentContainer().activateContainer(player, silentchest, x, y, z)) {
+            if (silentchest && plugin.notifySilentChest() && needsAnyChest && plugin.notifyAnyChest()) {
+                player.sendMessage("You are opening a blocked chest silently.");
+            } else if (silentchest && plugin.notifySilentChest()) {
+                player.sendMessage("You are opening a chest silently.");
+            } else if (needsAnyChest && plugin.notifyAnyChest()) {
+                player.sendMessage("You are opening a blocked chest.");
             }
+            event.setCancelled(true);
         }
     }
 

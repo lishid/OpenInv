@@ -19,6 +19,8 @@ package com.lishid.openinv.internal.v1_11_R1;
 import com.lishid.openinv.internal.IAnySilentContainer;
 
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
 // Volatile
@@ -49,12 +51,16 @@ import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
 public class AnySilentContainer implements IAnySilentContainer {
 
     @Override
-    public boolean isAnySilentContainer(org.bukkit.block.BlockState block) {
-        return block instanceof org.bukkit.block.Chest || block instanceof org.bukkit.block.ShulkerBox;
+    public boolean isAnySilentContainer(org.bukkit.block.Block block) {
+        if (block.getType() == Material.ENDER_CHEST) {
+            return true;
+        }
+        BlockState state = block.getState();
+        return state instanceof org.bukkit.block.Chest || state instanceof org.bukkit.block.ShulkerBox;
     }
 
     @Override
-    public boolean activateContainer(Player p, boolean anychest, boolean silentchest, int x, int y, int z) {
+    public boolean activateContainer(Player p, boolean silentchest, int x, int y, int z) {
 
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
@@ -77,10 +83,6 @@ public class AnySilentContainer implements IAnySilentContainer {
 
                 if (localBlock != block) {
                     continue;
-                }
-
-                if (!anychest && isBlockedChest(world, localBlock, localBlockPosition)) {
-                    return false;
                 }
 
                 TileEntity localTileEntity = world.getTileEntity(localBlockPosition);
@@ -110,17 +112,21 @@ public class AnySilentContainer implements IAnySilentContainer {
         }
 
         if (block instanceof BlockShulkerBox) {
-            if (!anychest && isBlockedShulkerBox(world, blockPosition, block)) {
-                return false;
-            }
-
             player.b(StatisticList.ae);
 
             if (silentchest && tile instanceof TileEntityShulkerBox) {
-                // TODO: This fixes sound, but the box is then silent for anyone until the tile entity is recreated
-                SilentContainerShulkerBox.increaseOpenQuantity((TileEntityShulkerBox) tile);
-                container = new SilentContainerShulkerBox(player.inventory, ((IInventory) tile), player);
-                SilentContainerShulkerBox.decreaseOpenQuantity((TileEntityShulkerBox) tile);
+                // TODO: End state allows for silent opening by other players while open (not close)
+                // increases by 1 when animation is scheduled to complete, even though animation does not occur
+                // Can't set value lower than 0, it corrects.
+                // Could schedule a reset for a couple seconds later when the animation finishes.
+                // Could say "that's good enough" and get some rest
+                int value = SilentContainerShulkerBox.getOpenValue((TileEntityShulkerBox) tile);
+                if (value < 1) {
+                    SilentContainerShulkerBox.setOpenValue((TileEntityShulkerBox) tile, 2);
+                }
+                container = new SilentContainerShulkerBox(player.inventory, (IInventory) tile, player);
+                // Reset value to start
+                SilentContainerShulkerBox.setOpenValue((TileEntityShulkerBox) tile, value);
             }
         }
 
@@ -203,7 +209,7 @@ public class AnySilentContainer implements IAnySilentContainer {
             return false;
         }
 
-        return world.getType(blockPosition).m() || hasOcelotOnTop(world, blockPosition);
+        return world.getType(blockPosition.up()).m() || hasOcelotOnTop(world, blockPosition);
     }
 
     private boolean hasOcelotOnTop(World world, BlockPosition blockPosition) {
@@ -226,7 +232,7 @@ public class AnySilentContainer implements IAnySilentContainer {
     @Deprecated
     @Override
     public boolean activateChest(Player player, boolean anychest, boolean silentchest, int x, int y, int z) {
-        return !activateContainer(player, anychest, silentchest, x, y, z);
+        return !activateContainer(player, silentchest, x, y, z);
     }
 
     /**

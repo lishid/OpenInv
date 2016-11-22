@@ -1,6 +1,6 @@
 package com.lishid.openinv.internal;
 
-import org.bukkit.block.BlockState;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 public interface IAnySilentContainer extends IAnySilentChest {
@@ -11,20 +11,21 @@ public interface IAnySilentContainer extends IAnySilentChest {
      * @param block the BlockState
      * @return true if the Block is a supported container
      */
-    public boolean isAnySilentContainer(BlockState block);
+    public boolean isAnySilentContainer(Block block);
 
     /**
-     * Opens the container at the given coordinates for the Player.
+     * Opens the container at the given coordinates for the Player. If you do not want blocked
+     * containers to open, be sure to check {@link #isAnyContainerNeeded(Player, int, int, int)}
+     * first.
      * 
      * @param player
-     * @param anychest whether compatibility for blocked containers is to be used
      * @param silentchest whether the container's noise is to be silenced
      * @param x the x coordinate
      * @param y the y coordinate
      * @param z the z coordinate
      * @return true if the container can be opened
      */
-    public boolean activateContainer(Player player, boolean anychest, boolean silentchest, int x, int y, int z);
+    public boolean activateContainer(Player player, boolean silentchest, int x, int y, int z);
 
     /**
      * Checks if the container at the given coordinates is blocked.

@@ -31,10 +31,11 @@ import net.minecraft.server.v1_10_R1.IInventory;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftInventory;
 
 public class InventoryAccess implements IInventoryAccess {
+
     @Override
     public boolean check(Inventory inventory, HumanEntity player) {
         IInventory inv = grabInventory(inventory);
-        
+
         if (inv instanceof SpecialPlayerInventory) {
             if (!OpenInv.hasPermission(player, Permissions.PERM_EDITINV)) {
                 return false;
@@ -51,24 +52,24 @@ public class InventoryAccess implements IInventoryAccess {
     }
 
     private IInventory grabInventory(Inventory inventory) {
-        if(inventory instanceof CraftInventory) {
+        if (inventory instanceof CraftInventory) {
             return ((CraftInventory) inventory).getInventory();
         }
-        
-        //Use reflection to find the iinventory
+
+        // Use reflection to find the iinventory
         Class<? extends Inventory> clazz = inventory.getClass();
         IInventory result = null;
-        for(Field f : clazz.getDeclaredFields()) {
+        for (Field f : clazz.getDeclaredFields()) {
             f.setAccessible(true);
-            if(IInventory.class.isAssignableFrom(f.getDeclaringClass())) {
+            if (IInventory.class.isAssignableFrom(f.getDeclaringClass())) {
                 try {
                     result = (IInventory) f.get(inventory);
-                }
-                catch (Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }
         return result;
     }
+
 }

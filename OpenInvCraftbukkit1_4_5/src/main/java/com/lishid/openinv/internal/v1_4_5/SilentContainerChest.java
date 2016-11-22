@@ -20,6 +20,7 @@ package com.lishid.openinv.internal.v1_4_5;
 import net.minecraft.server.v1_4_5.ContainerChest;
 import net.minecraft.server.v1_4_5.EntityHuman;
 import net.minecraft.server.v1_4_5.IInventory;
+import net.minecraft.server.v1_4_5.ItemStack;
 import net.minecraft.server.v1_4_5.PlayerInventory;
 
 public class SilentContainerChest extends ContainerChest {
@@ -38,8 +39,9 @@ public class SilentContainerChest extends ContainerChest {
         PlayerInventory playerinventory = entityHuman.inventory;
 
         if (playerinventory.getCarried() != null) {
-            entityHuman.drop(playerinventory.getCarried());
+            ItemStack carried = playerinventory.getCarried();
             playerinventory.setCarried(null);
+            entityHuman.drop(carried);
         }
     }
 }

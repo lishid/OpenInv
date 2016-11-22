@@ -19,7 +19,7 @@ package com.lishid.openinv.internal.v1_9_R1;
 import com.lishid.openinv.internal.IAnySilentContainer;
 
 import org.bukkit.ChatColor;
-import org.bukkit.block.BlockState;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 // Volatile
@@ -41,32 +41,31 @@ import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 public class AnySilentContainer implements IAnySilentContainer {
 
     @Override
-    public boolean isAnySilentContainer(BlockState block) {
-        return block instanceof org.bukkit.block.Chest;
+    public boolean isAnySilentContainer(org.bukkit.block.Block block) {
+        return block.getType() == Material.ENDER_CHEST || block.getState() instanceof org.bukkit.block.Chest;
     }
 
     @Override
-    public boolean activateContainer(Player p, boolean anychest, boolean silentchest, int x, int y, int z) {
+    public boolean activateContainer(Player p, boolean silentchest, int x, int y, int z) {
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
         Object chest = world.getTileEntity(new BlockPosition(x, y, z));
-        if (chest == null)
-            return false;
 
-        if (!anychest && isAnyContainerNeeded(p, x, y, z)) {
+        if (chest == null) {
             return false;
         }
 
         int id = Block.getId(world.getType(new BlockPosition(x, y, z)).getBlock());
 
-        if (Block.getId(world.getType(new BlockPosition(x - 1, y, z)).getBlock()) == id)
-            chest = new InventoryLargeChest("Large chest", (TileEntityChest) world.getTileEntity(new BlockPosition(x - 1, y, z)), (ITileInventory) chest);
-        if (Block.getId(world.getType(new BlockPosition(x + 1, y, z)).getBlock()) == id)
-            chest = new InventoryLargeChest("Large chest", (ITileInventory) chest, (TileEntityChest) world.getTileEntity(new BlockPosition(x + 1, y, z)));
-        if (Block.getId(world.getType(new BlockPosition(x, y, z - 1)).getBlock()) == id)
-            chest = new InventoryLargeChest("Large chest", (TileEntityChest) world.getTileEntity(new BlockPosition(x, y, z - 1)), (ITileInventory) chest);
-        if (Block.getId(world.getType(new BlockPosition(x, y, z + 1)).getBlock()) == id)
+        if (Block.getId(world.getType(new BlockPosition(x, y, z + 1)).getBlock()) == id) {
             chest = new InventoryLargeChest("Large chest", (ITileInventory) chest, (TileEntityChest) world.getTileEntity(new BlockPosition(x, y, z + 1)));
+        } else if (Block.getId(world.getType(new BlockPosition(x, y, z - 1)).getBlock()) == id) {
+            chest = new InventoryLargeChest("Large chest", (TileEntityChest) world.getTileEntity(new BlockPosition(x, y, z - 1)), (ITileInventory) chest);
+        } else if (Block.getId(world.getType(new BlockPosition(x + 1, y, z)).getBlock()) == id) {
+            chest = new InventoryLargeChest("Large chest", (ITileInventory) chest, (TileEntityChest) world.getTileEntity(new BlockPosition(x + 1, y, z)));
+        } else if (Block.getId(world.getType(new BlockPosition(x - 1, y, z)).getBlock()) == id) {
+            chest = new InventoryLargeChest("Large chest", (TileEntityChest) world.getTileEntity(new BlockPosition(x - 1, y, z)), (ITileInventory) chest);
+        }
 
         boolean returnValue = false;
         if (!silentchest) {
@@ -133,12 +132,12 @@ public class AnySilentContainer implements IAnySilentContainer {
     }
 
     /**
-     * @deprecated Use {@link #activateContainer(Player, boolean, boolean, int, int, int)}.
+     * @deprecated Use {@link #activateContainer(Player, boolean, int, int, int)}.
      */
     @Deprecated
     @Override
     public boolean activateChest(Player player, boolean anychest, boolean silentchest, int x, int y, int z) {
-        return !activateContainer(player, anychest, silentchest, x, y, z);
+        return !activateContainer(player, silentchest, x, y, z);
     }
 
     /**

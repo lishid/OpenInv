@@ -21,7 +21,7 @@ import java.lang.reflect.Field;
 import com.lishid.openinv.internal.IAnySilentContainer;
 
 import org.bukkit.ChatColor;
-import org.bukkit.block.BlockState;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
 //Volatile
@@ -39,32 +39,31 @@ import org.bukkit.craftbukkit.v1_5_R3.entity.CraftPlayer;
 public class AnySilentContainer implements IAnySilentContainer {
 
     @Override
-    public boolean isAnySilentContainer(BlockState block) {
-        return block instanceof org.bukkit.block.Chest;
+    public boolean isAnySilentContainer(org.bukkit.block.Block block) {
+        return block.getType() == Material.ENDER_CHEST || block.getState() instanceof org.bukkit.block.Chest;
     }
 
     @Override
-    public boolean activateContainer(Player p, boolean anychest, boolean silentchest, int x, int y, int z) {
+    public boolean activateContainer(Player p, boolean silentchest, int x, int y, int z) {
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
         Object chest = world.getTileEntity(x, y, z);
-        if (chest == null)
-            return false;
 
-        if (!anychest && isAnyContainerNeeded(p, x, y, z)) {
+        if (chest == null) {
             return false;
         }
 
         int id = world.getTypeId(x, y, z);
 
-        if (world.getTypeId(x - 1, y, z) == id)
-            chest = new InventoryLargeChest("Large chest", (TileEntityChest) world.getTileEntity(x - 1, y, z), (IInventory) chest);
-        if (world.getTypeId(x + 1, y, z) == id)
-            chest = new InventoryLargeChest("Large chest", (IInventory) chest, (TileEntityChest) world.getTileEntity(x + 1, y, z));
-        if (world.getTypeId(x, y, z - 1) == id)
-            chest = new InventoryLargeChest("Large chest", (TileEntityChest) world.getTileEntity(x, y, z - 1), (IInventory) chest);
-        if (world.getTypeId(x, y, z + 1) == id)
+        if (world.getTypeId(x, y, z + 1) == id) {
             chest = new InventoryLargeChest("Large chest", (IInventory) chest, (TileEntityChest) world.getTileEntity(x, y, z + 1));
+        } else if(world.getTypeId(x, y, z - 1) == id) {
+            chest = new InventoryLargeChest("Large chest", (TileEntityChest) world.getTileEntity(x, y, z - 1), (IInventory) chest);
+        } else if (world.getTypeId(x + 1, y, z) == id) {
+            chest = new InventoryLargeChest("Large chest", (IInventory) chest, (TileEntityChest) world.getTileEntity(x + 1, y, z));
+        } else if (world.getTypeId(x - 1, y, z) == id) {
+            chest = new InventoryLargeChest("Large chest", (TileEntityChest) world.getTileEntity(x - 1, y, z), (IInventory) chest);
+        }
 
         boolean returnValue = false;
         if (!silentchest) {
@@ -137,12 +136,12 @@ public class AnySilentContainer implements IAnySilentContainer {
     }
 
     /**
-     * @deprecated Use {@link #activateContainer(Player, boolean, boolean, int, int, int)}.
+     * @deprecated Use {@link #activateContainer(Player, boolean, int, int, int)}.
      */
     @Deprecated
     @Override
     public boolean activateChest(Player player, boolean anychest, boolean silentchest, int x, int y, int z) {
-        return !activateContainer(player, anychest, silentchest, x, y, z);
+        return !activateContainer(player, silentchest, x, y, z);
     }
 
     /**

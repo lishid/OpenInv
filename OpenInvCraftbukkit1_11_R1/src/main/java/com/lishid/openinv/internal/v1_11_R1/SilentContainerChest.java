@@ -37,9 +37,10 @@ public class SilentContainerChest extends ContainerChest {
         // Don't send close signal twice, might screw up
         PlayerInventory playerinventory = entityHuman.inventory;
 
-        if (!playerinventory.getCarried().isEmpty()) {
-            entityHuman.drop(playerinventory.getCarried(), false);
+        if (playerinventory.getCarried() != ItemStack.a) {
+            ItemStack carried = playerinventory.getCarried();
             playerinventory.setCarried(ItemStack.a);
+            entityHuman.drop(carried, false);
         }
     }
 }

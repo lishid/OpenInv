@@ -21,29 +21,41 @@ public class SilentContainerShulkerBox extends ContainerShulkerBox {
         return h;
     }
 
-    public static void increaseOpenQuantity(TileEntityShulkerBox containerShulkerBox) {
+    public static void setOpenValue(TileEntityShulkerBox tileShulkerBox, Object value) {
         try {
-            exposeOpenStatus().set(containerShulkerBox, ((Integer) exposeOpenStatus().get(containerShulkerBox)) + 1);
+            exposeOpenStatus().set(tileShulkerBox, value);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void decreaseOpenQuantity(TileEntityShulkerBox containerShulkerBox) {
+    public static Integer getOpenValue(TileEntityShulkerBox tileShulkerBox) {
         try {
-            exposeOpenStatus().set(containerShulkerBox, ((Integer) exposeOpenStatus().get(containerShulkerBox)) - 1);
+            return (Integer) exposeOpenStatus().get(tileShulkerBox);
         } catch (Exception e) {
             e.printStackTrace();
+            return 0;
         }
     }
+
+    private final TileEntityShulkerBox tile;
 
     public SilentContainerShulkerBox(PlayerInventory playerInventory, IInventory iInventory,
             EntityHuman entityHuman) {
         super(playerInventory, iInventory, entityHuman);
+        if (iInventory instanceof TileEntityShulkerBox) {
+            tile = (TileEntityShulkerBox) iInventory;
+        } else {
+            tile = null;
+        }
     }
 
     @Override
     public void b(EntityHuman entityHuman) {
+        if (tile != null) {
+            setOpenValue(tile, tile.getViewers().size());
+        }
+
         PlayerInventory playerinventory = entityHuman.inventory;
 
         if (!playerinventory.getCarried().isEmpty()) {
