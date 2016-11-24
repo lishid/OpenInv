@@ -107,7 +107,7 @@ public class OpenInv extends JavaPlugin {
         accessor = new InternalAccessor(this);
         // Version check
         if (!accessor.initialize(getServer())) {
-            getLogger().info("Your version of CraftBukkit (" + accessor.getVersion() + ")is not supported.");
+            getLogger().info("Your version of CraftBukkit (" + accessor.getVersion() + ") is not supported.");
             getLogger().info("Please look for an updated version of OpenInv.");
             pm.disablePlugin(this);
             return;

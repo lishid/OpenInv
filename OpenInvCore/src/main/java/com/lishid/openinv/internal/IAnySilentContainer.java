@@ -3,6 +3,7 @@ package com.lishid.openinv.internal;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+@SuppressWarnings("deprecation")
 public interface IAnySilentContainer extends IAnySilentChest {
 
     /**

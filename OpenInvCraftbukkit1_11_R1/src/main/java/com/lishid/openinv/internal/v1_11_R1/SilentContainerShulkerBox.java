@@ -38,24 +38,13 @@ public class SilentContainerShulkerBox extends ContainerShulkerBox {
         }
     }
 
-    private final TileEntityShulkerBox tile;
-
     public SilentContainerShulkerBox(PlayerInventory playerInventory, IInventory iInventory,
             EntityHuman entityHuman) {
         super(playerInventory, iInventory, entityHuman);
-        if (iInventory instanceof TileEntityShulkerBox) {
-            tile = (TileEntityShulkerBox) iInventory;
-        } else {
-            tile = null;
-        }
     }
 
     @Override
     public void b(EntityHuman entityHuman) {
-        if (tile != null) {
-            setOpenValue(tile, tile.getViewers().size());
-        }
-
         PlayerInventory playerinventory = entityHuman.inventory;
 
         if (!playerinventory.getCarried().isEmpty()) {

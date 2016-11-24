@@ -30,6 +30,7 @@ import net.minecraft.util.com.mojang.authlib.GameProfile;
 
 import org.bukkit.craftbukkit.v1_7_R2.CraftServer;
 
+@SuppressWarnings("deprecation") // Deprecated methods are used properly and will not change.
 public class PlayerDataManager implements IPlayerDataManager {
 
     @Override

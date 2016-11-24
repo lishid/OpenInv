@@ -25,7 +25,7 @@ import org.bukkit.entity.Player;
 public interface IAnySilentChest {
 
     /**
-     * @deprecated Use {@link IAnySilentContainer#activateContainer(Player, boolean, boolean, int, int, int)}.
+     * @deprecated Use {@link IAnySilentContainer#activateContainer(Player, boolean, int, int, int)}.
      */
     @Deprecated
     public boolean activateChest(Player player, boolean anychest, boolean silentchest, int x, int y, int z);
