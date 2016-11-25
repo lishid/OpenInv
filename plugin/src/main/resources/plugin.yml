@@ -1,0 +1,45 @@
+name: OpenInv
+main: com.lishid.openinv.OpenInv
+version: ${openinv.version}
+author: lishid
+authors: [ShadowRanger]
+description: >
+             This plugin allows you to open a player's inventory as a chest and interact with it in real time.
+commands:
+  openinv:
+    aliases: [oi, inv, open]
+    description: Opens a player's inventory.
+    usage: |
+           /<command> - Opens last person's inventory.
+           /<command> <player> - Opens a player's inventory.
+  openender:
+    aliases: [oe]
+    description: Opens a player's ender chest.
+    usage: |
+           /<command> - Opens last person's ender chest.
+           /<command> <player> - Opens a player's ender chest.
+  searchinv:
+    aliases: [si]
+    description: Searches and lists players that have a specific item in their inventory.
+    usage: |
+           /<command> <item> [minAmount] - Item can be the Item ID or the CraftBukkit Item Name, minAmount is the minimum amount to be considered.
+  searchender:
+    aliases: [se]
+    description: Searches and lists players that have a specific item in their ender chest.
+    usage: |
+           /<command> <item> [minAmount] - Item can be the Item ID or the CraftBukkit Item Name, minAmount is the minimum amount to be considered.
+  toggleopeninv:
+    aliases: [toi, toggleoi, toggleinv]
+    description: Toggles the item openinv function.
+    usage: |
+           /<command> [check] - Checks whether item openinv is enabled.
+  anychest:
+    aliases: [ac]
+    description: Toggles the any chest function, which allows opening of blocked chests.
+    usage: |
+           /<command> [check] - Checks whether any chest is enabled.
+  silentchest:
+    aliases: [sc, silent]
+    description: Toggles the silent chest function, which hides the animation of a chest when opened or closed, and suppresses the sound.
+    usage: |
+           /<command> [check] - Checks whether silent chest is enabled.

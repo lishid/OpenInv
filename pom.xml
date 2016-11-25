@@ -1,55 +1,128 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.lishid</groupId>
-    <artifactId>openinv</artifactId>
-    <packaging>jar</packaging>
-    <version>2.4.0</version>
-    <name>OpenInv</name>
-    <url>http://dev.bukkit.org/bukkit-plugins/openinv/</url>
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.lishid</groupId>
+  <artifactId>openinv</artifactId>
+  <packaging>pom</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>OpenInv</name>
+  <url>http://dev.bukkit.org/bukkit-plugins/openinv/</url>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <openinv.version>3.0.0-SNAPSHOT</openinv.version>
+  </properties>
 
-    <repositories>
-        <repository>
-            <id>bukkit-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
-        </repository>
-    </repositories>
+  <profiles>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>craftbukkit</artifactId>
-            <version>1.11-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
+    <!--
+      ~ N.B.: All dependencies for profiles are set in ./assembly/pom.xml
+      ~ 
+      ~ This is to prevent recursive dependencies. It's not ideal, but it works.
+      ~ The parent project always builds first. Then, due to profile ordering here,
+      ~ whatever modules are enabled are built. Finally, the assembly module is built,
+      ~ which contains no actual code, but shades all its "dependencies" into one jar.
+     -->
 
-    <build>
-        <defaultGoal>clean install</defaultGoal>
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <excludes>
-                    <exclude>**/*.java</exclude>
-                </excludes>
-            </resource>
-        </resources>
+    <!--
+      ~ This profile exists to simplify profile usage.
+      ~ The interface and plugin modules should be built first to ensure that they are up to date.
+     -->
+    <profile>
+      <id>reactorbuildfirst</id>
+      <activation>
+        <property>
+          <name>!breakBuildProcess</name>
+        </property>
+      </activation>
+      <modules>
+        <module>internal</module>
+        <module>plugin</module>
+      </modules>
+    </profile>
 
-        <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <profile>
+      <id>latest</id>
+      <activation>
+        <property>
+          <name>latest</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <modules>
+        <module>v1_11_R1</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>all</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>v1_11_R1</module>
+      </modules>
+    </profile>
+
+    <!--
+      ~ This profile exists to fix reactor build order.
+      ~ The assembly module must be built last to aggregate all active modules into the final jar.
+     -->
+    <profile>
+      <id>reactorbuildlast</id>
+      <activation>
+        <property>
+          <name>!breakBuildProcess</name>
+        </property>
+      </activation>
+      <modules>
+        <module>assembly</module>
+      </modules>
+    </profile>
+
+  </profiles>
+
+  <repositories>
+    <repository>
+      <id>spigot-repo</id>
+      <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+    </repository>
+  </repositories>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.4.3</version>
+        <configuration>
+          <filters>
+            <filter>
+              <artifact>*:*</artifact>
+              <!-- Keep the file clean, don't include every single pom from all modules -->
+              <excludes>META-INF/maven/**</excludes>
+            </filter>
+          </filters>
+        </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.5.1</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
 </project>
