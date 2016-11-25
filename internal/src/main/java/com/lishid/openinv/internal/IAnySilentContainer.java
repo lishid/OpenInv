@@ -3,8 +3,7 @@ package com.lishid.openinv.internal;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-@SuppressWarnings("deprecation")
-public interface IAnySilentContainer extends IAnySilentChest {
+public interface IAnySilentContainer {
 
     /**
      * Checks if the given block is a container which can be unblocked or silenced.

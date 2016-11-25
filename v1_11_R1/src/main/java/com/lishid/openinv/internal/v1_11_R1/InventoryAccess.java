@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2016 lishid.  All rights reserved.
+ * Copyright (C) 2011-2014 lishid.  All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,61 +16,64 @@
 
 package com.lishid.openinv.internal.v1_11_R1;
 
-import java.lang.reflect.Field;
+import com.lishid.openinv.internal.IInventoryAccess;
+import com.lishid.openinv.internal.ISpecialEnderChest;
+import com.lishid.openinv.internal.ISpecialPlayerInventory;
+import com.lishid.openinv.internal.InternalAccessor;
 
-import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 
-import com.lishid.openinv.OpenInv;
-import com.lishid.openinv.Permissions;
-
+// Volatile
 import net.minecraft.server.v1_11_R1.IInventory;
 
-public class InventoryAccess {
+import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
 
-    private final OpenInv plugin;
+public class InventoryAccess implements IInventoryAccess {
 
-    public InventoryAccess(OpenInv plugin) {
-        this.plugin = plugin;
-    }
-
-    public boolean check(Inventory inventory, HumanEntity player) {
-        IInventory inv = grabInventory(inventory);
-        
-        if (inv instanceof SpecialPlayerInventory) {
-            if (!OpenInv.hasPermission(player, Permissions.PERM_EDITINV)) {
-                return false;
-            }
-        } else if (inv instanceof SpecialEnderChest) {
-            if (!OpenInv.hasPermission(player, Permissions.PERM_EDITENDER)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-    
-    private IInventory grabInventory(Inventory inventory) {
+    @Override
+    public boolean isSpecialPlayerInventory(Inventory inventory) {
         if (inventory instanceof CraftInventory) {
-            return ((CraftInventory) inventory).getInventory();
+            return ((CraftInventory) inventory).getInventory() instanceof ISpecialPlayerInventory;
         }
-        
-        // Use reflection to find the inventory
-        Class<? extends Inventory> clazz = inventory.getClass();
-        IInventory result = null;
-        for (Field f : clazz.getDeclaredFields()) {
-            f.setAccessible(true);
-            
-            if (IInventory.class.isAssignableFrom(f.getDeclaringClass())) {
-                try {
-                    result = (IInventory) f.get(inventory);
-                } catch (Exception e) {
-                    plugin.log(e);
-                }
-            }
+        return InternalAccessor.grabFieldOfTypeFromObject(IInventory.class, inventory) instanceof ISpecialPlayerInventory;
+    }
+
+    @Override
+    public ISpecialPlayerInventory getSpecialPlayerInventory(Inventory inventory) {
+        IInventory inv;
+        if (inventory instanceof CraftInventory) {
+            inv = ((CraftInventory) inventory).getInventory();
+        } else {
+            inv = InternalAccessor.grabFieldOfTypeFromObject(IInventory.class, inventory);
         }
 
-        return result;
+        if (inv instanceof SpecialPlayerInventory) {
+            return (SpecialPlayerInventory) inv;
+        }
+        return null;
     }
+
+    @Override
+    public boolean isSpecialEnderChest(Inventory inventory) {
+        if (inventory instanceof CraftInventory) {
+            return ((CraftInventory) inventory).getInventory() instanceof ISpecialEnderChest;
+        }
+        return InternalAccessor.grabFieldOfTypeFromObject(IInventory.class, inventory) instanceof ISpecialEnderChest;
+    }
+
+    @Override
+    public ISpecialEnderChest getSpecialEnderChest(Inventory inventory) {
+        IInventory inv;
+        if (inventory instanceof CraftInventory) {
+            inv = ((CraftInventory) inventory).getInventory();
+        } else {
+            inv = InternalAccessor.grabFieldOfTypeFromObject(IInventory.class, inventory);
+        }
+
+        if (inv instanceof SpecialEnderChest) {
+            return (SpecialEnderChest) inv;
+        }
+        return null;
+    }
+
 }

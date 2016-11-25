@@ -16,8 +16,6 @@
 
 package com.lishid.openinv.internal;
 
-import java.util.UUID;
-
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -32,12 +30,6 @@ public interface IPlayerDataManager {
      * @return
      */
     public Player loadPlayer(OfflinePlayer offline);
-
-    /**
-     * @deprecated use {@link #loadPlayer(OfflinePlayer)}
-     */
-    @Deprecated
-    public Player loadPlayer(UUID uuid);
 
     /**
      * Gets a unique identifying string for an OfflinePlayer.

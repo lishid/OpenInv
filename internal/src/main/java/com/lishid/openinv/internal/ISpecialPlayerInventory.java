@@ -36,21 +36,9 @@ public interface ISpecialPlayerInventory {
     public void setPlayerOnline(Player player);
 
     /**
-     * @deprecated use {@link #setPlayerOnline(Player)}
-     */
-    @Deprecated
-    public void playerOnline(Player player);
-
-    /**
      * Sets the Player associated with this ISpecialPlayerInventory offline.
      */
     public void setPlayerOffline();
-
-    /**
-     * @deprecated use {@link #setPlayerOffline()}
-     */
-    @Deprecated
-    public void playerOffline();
 
     /**
      * Gets whether or not this ISpecialPlayerInventory is in use.

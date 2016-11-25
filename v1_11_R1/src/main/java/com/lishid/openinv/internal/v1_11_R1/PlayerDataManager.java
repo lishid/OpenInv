@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2016 lishid.  All rights reserved.
+ * Copyright (C) 2011-2014 lishid.  All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,54 +16,49 @@
 
 package com.lishid.openinv.internal.v1_11_R1;
 
-import java.util.UUID;
+import com.lishid.openinv.internal.IPlayerDataManager;
+
+import com.mojang.authlib.GameProfile;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.craftbukkit.v1_11_R1.CraftServer;
 import org.bukkit.entity.Player;
 
-import com.lishid.openinv.OpenInv;
-import com.mojang.authlib.GameProfile;
-
+// Volatile
 import net.minecraft.server.v1_11_R1.EntityPlayer;
 import net.minecraft.server.v1_11_R1.MinecraftServer;
 import net.minecraft.server.v1_11_R1.PlayerInteractManager;
 
-public class PlayerDataManager {
+import org.bukkit.craftbukkit.v1_11_R1.CraftServer;
 
-    private final OpenInv plugin;
+public class PlayerDataManager implements IPlayerDataManager {
 
-    public PlayerDataManager(OpenInv plugin) {
-        this.plugin = plugin;
-    }
-
-    public Player loadPlayer(UUID uuid) {
-        try {
-            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-            if (player == null || !player.hasPlayedBefore()) {
-                return null;
-            }
-
-            GameProfile profile = new GameProfile(uuid, player.getName());
-            MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
-            // Create an entity to load the player data
-            EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), profile, new PlayerInteractManager(server.getWorldServer(0)));
-
-            // Get the bukkit entity
-            Player target = entity.getBukkitEntity();
-
-            if (target != null) {
-                // Load data
-                target.loadData();
-
-                // Return the entity
-                return target;
-            }
-        } catch (Exception e) {
-            plugin.log(e);
+    @Override
+    public Player loadPlayer(OfflinePlayer offline) {
+        // Ensure player has data
+        if (offline == null || !offline.hasPlayedBefore()) {
+            return null;
         }
 
-        return null;
+        // Create a profile and entity to load the player data
+        GameProfile profile = new GameProfile(offline.getUniqueId(), offline.getName());
+        MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), profile,
+                new PlayerInteractManager(server.getWorldServer(0)));
+
+        // Get the bukkit entity
+        Player target = (entity == null) ? null : entity.getBukkitEntity();
+        if (target != null) {
+            // Load data
+            target.loadData();
+        }
+        // Return the entity
+        return target;
     }
+
+    @Override
+    public String getPlayerDataID(OfflinePlayer player) {
+        return player.getUniqueId().toString();
+    }
+
 }

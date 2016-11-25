@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2016 lishid.  All rights reserved.
+ * Copyright (C) 2011-2014 lishid.  All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,101 +17,94 @@
 package com.lishid.openinv.internal.v1_11_R1;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 
-import net.minecraft.server.v1_11_R1.*;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
+import com.lishid.openinv.internal.ISpecialPlayerInventory;
+
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-public class SpecialPlayerInventory extends PlayerInventory {
+import net.minecraft.server.v1_11_R1.ContainerUtil;
+// Volatile
+import net.minecraft.server.v1_11_R1.EntityHuman;
+import net.minecraft.server.v1_11_R1.ItemStack;
+import net.minecraft.server.v1_11_R1.NonNullList;
+import net.minecraft.server.v1_11_R1.PlayerInventory;
+
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
+
+public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
 
     private final CraftInventory inventory = new CraftInventory(this);
-    private final NonNullList<ItemStack> extra = NonNullList.a();
-    private CraftPlayer owner;
-    private NonNullList<ItemStack>[] arrays;
-    private boolean playerOnline;
+    private boolean playerOnline = false;
 
-    public SpecialPlayerInventory(Player p, boolean online) {
-        super(((CraftPlayer) p).getHandle());
-        this.owner = (CraftPlayer) p;
+    public SpecialPlayerInventory(Player bukkitPlayer, Boolean online) {
+        super(((CraftPlayer) bukkitPlayer).getHandle());
         this.playerOnline = online;
-        reflectContents(getClass().getSuperclass(), player.inventory, this);
+        setItemArrays(this, player.inventory.items, player.inventory.armor, player.inventory.extraSlots);
     }
 
-    private void reflectContents(Class clazz, PlayerInventory src, PlayerInventory dest) {
+    private void setItemArrays(PlayerInventory inventory, NonNullList<ItemStack> items,
+            NonNullList<ItemStack> armor, NonNullList<ItemStack> extraSlots) {
         try {
-            Field itemsField = clazz.getDeclaredField("items");
-            itemsField.setAccessible(true);
-            itemsField.set(dest, src.items);
+            // Prepare to remove final modifier
+            Field modifiers = Field.class.getDeclaredField("modifiers");
+            modifiers.setAccessible(true);
 
-            Field armorField = clazz.getDeclaredField("armor");
-            armorField.setAccessible(true);
-            armorField.set(dest, src.armor);
+            // Access and replace main inventory array
+            Field field = PlayerInventory.class.getField("items");
+            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(inventory, items);
 
-            Field extraSlotsField = clazz.getDeclaredField("extraSlots");
-            extraSlotsField.setAccessible(true);
-            extraSlotsField.set(dest, src.extraSlots);
+            // Access and replace armor inventory array
+            field = PlayerInventory.class.getField("armor");
+            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(inventory, armor);
+
+            // Access and replace offhand inventory array
+            field = PlayerInventory.class.getField("extraSlots");
+            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(inventory, extraSlots);
+
+            // Access and replace array containing all inventory arrays
+            field = PlayerInventory.class.getDeclaredField("g");
+            field.setAccessible(true);
+            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(inventory, Arrays.asList(new NonNullList[] { items, armor, extraSlots }));
         } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
+            // Unable to set final fields to item arrays, we're screwed. Noisily fail.
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-
-        //noinspection unchecked
-        arrays = new NonNullList[] { this.items, this.armor, this.extraSlots, this.extra };
     }
 
-    private void linkInventory(PlayerInventory inventory) {
-        reflectContents(inventory.getClass(), inventory, this);
-    }
-
+    @Override
     public Inventory getBukkitInventory() {
         return inventory;
     }
 
-    public boolean inventoryRemovalCheck(boolean save) {
-        boolean offline = transaction.isEmpty() && !playerOnline;
-
-        if (offline && save) {
-            owner.saveData();
-        }
-
-        return offline;
-    }
-
-    public void playerOnline(Player player) {
+    @Override
+    public void setPlayerOnline(Player player) {
         if (!playerOnline) {
-            owner = (CraftPlayer) player;
-            this.player = owner.getHandle();
-            linkInventory(owner.getHandle().inventory);
+            this.player = ((CraftPlayer) player).getHandle();
+            setItemArrays(this.player.inventory, items, armor, extraSlots);
             playerOnline = true;
         }
     }
 
-    public boolean playerOffline() {
+    @Override
+    public void setPlayerOffline() {
         playerOnline = false;
-        return inventoryRemovalCheck(false);
     }
 
     @Override
-    public void onClose(CraftHumanEntity who) {
-        super.onClose(who);
-        inventoryRemovalCheck(true);
-    }
-
-    @Override
-    public NonNullList<ItemStack> getContents() {
-        NonNullList<ItemStack> contents = NonNullList.a();
-        contents.addAll(this.items);
-        contents.addAll(this.armor);
-        contents.addAll(this.extraSlots);
-        return contents;
+    public boolean isInUse() {
+        return !this.getViewers().isEmpty();
     }
 
     @Override
@@ -121,153 +114,142 @@ public class SpecialPlayerInventory extends PlayerInventory {
 
     @Override
     public ItemStack getItem(int i) {
-        NonNullList<ItemStack> is = null;
-        NonNullList<ItemStack>[] contents = this.arrays;
-        int j = contents.length;
+        NonNullList<ItemStack> list = this.items;
 
-        for (int k = 0; k < j; ++k) {
-            NonNullList<ItemStack> is2 = contents[k];
-
-            if (i < is2.size()) {
-                is = is2;
-                break;
-            }
-
-            i -= is2.size();
-        }
-
-        if (is == this.items) {
+        if (i >= list.size()) {
+            i -= list.size();
+            list = this.armor;
+        } else {
             i = getReversedItemSlotNum(i);
-        } else if (is == this.armor) {
-            i = getReversedArmorSlotNum(i);
-        } else if (is == this.extraSlots) {
-            // Do nothing
-        } else if (is == this.extra) {
-            // Do nothing
         }
 
-        return is == null ? ItemStack.a : is.get(i);
+        if (i >= list.size()) {
+            i -= list.size();
+            list = this.extraSlots;
+        } else if (list == this.armor) {
+            i = getReversedArmorSlotNum(i);
+        }
+
+        if (i >= list.size()) {
+            return ItemStack.a;
+        }
+
+        return list.get(i);
     }
 
     @Override
     public ItemStack splitStack(int i, int j) {
-        NonNullList<ItemStack> is = null;
-        NonNullList<ItemStack>[] contents = this.arrays;
-        int k = contents.length;
+        NonNullList<ItemStack> list = this.items;
 
-        for (int l = 0; l < k; ++l) {
-            NonNullList<ItemStack> is2 = contents[l];
-
-            if (i < is2.size()) {
-                is = is2;
-                break;
-            }
-
-            i -= is2.size();
-        }
-
-        if (is == this.items) {
+        if (i >= list.size()) {
+            i -= list.size();
+            list = this.armor;
+        } else {
             i = getReversedItemSlotNum(i);
-        } else if (is == this.armor) {
-            i = getReversedArmorSlotNum(i);
-        } else if (is == this.extraSlots) {
-            // Do nothing
-        } else if (is == this.extra) {
-            // Do nothing
         }
 
-        return is != null && !is.get(i).isEmpty() ? ContainerUtil.a(is, i, j) : ItemStack.a;
+        if (i >= list.size()) {
+            i -= list.size();
+            list = this.extraSlots;
+        } else if (list == this.armor) {
+            i = getReversedArmorSlotNum(i);
+        }
+
+        if (i >= list.size()) {
+            return ItemStack.a;
+        }
+
+        return list == null || list.get(i).isEmpty() ? ItemStack.a : ContainerUtil.a(list, i, j);
     }
 
     @Override
     public ItemStack splitWithoutUpdate(int i) {
-        NonNullList<ItemStack> is = null;
-        NonNullList<ItemStack>[] contents = this.arrays;
-        int j = contents.length;
+        NonNullList<ItemStack> list = this.items;
 
-        for (int object = 0; object < j; ++object) {
-            NonNullList<ItemStack> is2 = contents[object];
-
-            if (i < is2.size()) {
-                is = is2;
-                break;
-            }
-
-            i -= is2.size();
+        if (i >= list.size()) {
+            i -= list.size();
+            list = this.armor;
+        } else {
+            i = getReversedItemSlotNum(i);
         }
 
-        if (is != null && !is.get(i).isEmpty()) {
-            if (is == this.items) {
-                i = getReversedItemSlotNum(i);
-            } else if (is == this.armor) {
-                i = getReversedArmorSlotNum(i);
-            } else if (is == this.extraSlots) {
-                // Do nothing
-            } else if (is == this.extra) {
-                // Do nothing
-            }
+        if (i >= list.size()) {
+            i -= list.size();
+            list = this.extraSlots;
+        } else if (list == this.armor) {
+            i = getReversedArmorSlotNum(i);
+        }
 
-            Object object = is.get(i);
-            is.set(i, ItemStack.a);
-            return (ItemStack) object;
-        } else {
+        if (i >= list.size()) {
             return ItemStack.a;
         }
+
+        if (list != null && !list.get(i).isEmpty()) {
+            ItemStack itemstack = list.get(i);
+
+            list.set(i, ItemStack.a);
+            return itemstack;
+        }
+
+        return ItemStack.a;
     }
 
     @Override
-    public void setItem(int i, ItemStack itemStack) {
-        NonNullList<ItemStack> is = null;
-        NonNullList<ItemStack>[] contents = this.arrays;
-        int j = contents.length;
+    public void setItem(int i, ItemStack itemstack) {
+        NonNullList<ItemStack> list = this.items;
 
-        for (int k = 0; k < j; ++k) {
-            NonNullList<ItemStack> is2 = contents[k];
-
-            if (i < is2.size()) {
-                is = is2;
-                break;
-            }
-
-            i -= is2.size();
+        if (i >= list.size()) {
+            i -= list.size();
+            list = this.armor;
+        } else {
+            i = getReversedItemSlotNum(i);
         }
 
-        if (is != null) {
-            if (is == this.items) {
-                i = getReversedItemSlotNum(i);
-            } else if (is == this.armor) {
-                i = getReversedArmorSlotNum(i);
-            } else if (is == this.extraSlots) {
-                // Do nothing
-            } else if (is == this.extra) {
-                owner.getHandle().drop(itemStack, true);
-                itemStack = ItemStack.a;
-            }
+        if (i >= list.size()) {
+            i -= list.size();
+            list = this.extraSlots;
+        } else if (list == this.armor) {
+            i = getReversedArmorSlotNum(i);
+        }
 
-            is.set(i, itemStack);
+        if (i >= list.size()) {
+            player.drop(itemstack, true);
+            return;
+        }
 
-            owner.getHandle().defaultContainer.b();
+        if (list != null) {
+            list.set(i, itemstack);
         }
     }
 
     private int getReversedItemSlotNum(int i) {
-        return (i >= 27) ? (i - 27) : (i + 9);
+        if (i >= 27) {
+            return i - 27;
+        }
+        return i + 9;
     }
 
     private int getReversedArmorSlotNum(int i) {
-        if (i == 0) return 3;
-        if (i == 1) return 2;
-        if (i == 2) return 1;
-        return (i == 3) ? 0 : i;
-    }
-
-    @Override
-    public boolean hasCustomName() {
-        return true;
+        if (i == 0) {
+            return 3;
+        }
+        if (i == 1) {
+            return 2;
+        }
+        if (i == 2) {
+            return 1;
+        }
+        if (i == 3) {
+            return 0;
+        }
+        return i;
     }
 
     @Override
     public String getName() {
+        if (player.getName().length() > 16) {
+            return player.getName().substring(0, 16);
+        }
         return player.getName();
     }
 
@@ -276,9 +258,4 @@ public class SpecialPlayerInventory extends PlayerInventory {
         return true;
     }
 
-    @Override
-    public void update() {
-        super.update();
-        player.inventory.update();
-    }
 }

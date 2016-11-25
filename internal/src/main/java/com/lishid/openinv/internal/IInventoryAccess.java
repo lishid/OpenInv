@@ -16,18 +16,42 @@
 
 package com.lishid.openinv.internal;
 
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 
 public interface IInventoryAccess {
 
     /**
-     * Check if an entity has permission to modify the contents of an inventory.
+     * Check if an Inventory is an ISpecialPlayerInventory implementation.
      * 
      * @param inventory the Inventory
-     * @param player the HumanEntity
-     * @return true if the HumanEntity can modify the Inventory
+     * @return true if the Inventory is backed by an ISpecialPlayerInventory
      */
-    public boolean check(Inventory inventory, HumanEntity player);
+    public boolean isSpecialPlayerInventory(Inventory inventory);
+
+    /**
+     * Gets an ISpecialPlayerInventory from an Inventory or null if the Inventory is not backed by
+     * an ISpecialPlayerInventory.
+     * 
+     * @param inventory the Inventory
+     * @return the ISpecialPlayerInventory or null
+     */
+    public ISpecialPlayerInventory getSpecialPlayerInventory(Inventory inventory);
+
+    /**
+     * Check if an Inventory is an ISpecialEnderChest implementation.
+     * 
+     * @param inventory the Inventory
+     * @return true if the Inventory is backed by an ISpecialEnderChest
+     */
+    public boolean isSpecialEnderChest(Inventory inventory);
+
+    /**
+     * Gets an ISpecialEnderChest from an Inventory or null if the Inventory is not backed by an
+     * ISpecialEnderChest.
+     * 
+     * @param inventory the Inventory
+     * @return the ISpecialEnderChest or null
+     */
+    public ISpecialEnderChest getSpecialEnderChest(Inventory inventory);
 
 }

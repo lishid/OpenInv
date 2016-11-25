@@ -1,19 +1,38 @@
 package com.lishid.openinv;
 
-public final class Permissions {
+import org.bukkit.permissions.Permissible;
 
-    private Permissions() {}
+public enum Permissions {
 
-    public static final String PERM_OPENINV = "OpenInv.openinv";
-    public static final String PERM_OVERRIDE = "OpenInv.override";
-    public static final String PERM_EXEMPT = "OpenInv.exempt";
-    public static final String PERM_CROSSWORLD = "OpenInv.crossworld";
-    public static final String PERM_SILENT = "OpenInv.silent";
-    public static final String PERM_ANYCHEST = "OpenInv.anychest";
-    public static final String PERM_ENDERCHEST = "OpenInv.openender";
-    public static final String PERM_ENDERCHEST_ALL = "OpenInv.openenderall";
-    public static final String PERM_SEARCH = "OpenInv.search";
-    public static final String PERM_EDITINV = "OpenInv.editinv";
-    public static final String PERM_EDITENDER = "OpenInv.editender";
-    public static final String PERM_OPENSELF = "OpenInv.openself";
+    OPENINV("OpenInv.openinv"),
+    OVERRIDE("OpenInv.override"),
+    EXEMPT("OpenInv.exempt"),
+    CROSSWORLD("OpenInv.crossworld"),
+    SILENT("OpenInv.silent"),
+    ANYCHEST("OpenInv.anychest"),
+    ENDERCHEST("OpenInv.openender"),
+    ENDERCHEST_ALL("OpenInv.openenderall"),
+    SEARCH("OpenInv.search"),
+    EDITINV("OpenInv.editinv"),
+    EDITENDER("OpenInv.editender"),
+    OPENSELF("OpenInv.openself");
+
+    private final String permission;
+
+    private Permissions(String permission) {
+        this.permission = permission;
+    }
+
+    public boolean hasPermission(Permissible permissible) {
+        String[] parts = permission.split("\\.");
+        String perm = "";
+        for (int i = 0; i < parts.length; i++) {
+            if (permissible.hasPermission(perm + "*")) {
+                return true;
+            }
+            perm += parts[i] + ".";
+        }
+        return permissible.hasPermission(permission);
+    }
+
 }

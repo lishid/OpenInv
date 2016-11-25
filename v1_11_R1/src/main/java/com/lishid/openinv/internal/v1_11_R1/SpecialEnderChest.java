@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2016 lishid.  All rights reserved.
+ * Copyright (C) 2011-2014 lishid.  All rights reserved.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,50 +17,48 @@
 package com.lishid.openinv.internal.v1_11_R1;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
-import net.minecraft.server.v1_11_R1.NonNullList;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
+import com.lishid.openinv.internal.ISpecialEnderChest;
+
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 
+// Volatile
+import net.minecraft.server.v1_11_R1.IInventory;
 import net.minecraft.server.v1_11_R1.InventoryEnderChest;
 import net.minecraft.server.v1_11_R1.InventorySubcontainer;
 import net.minecraft.server.v1_11_R1.ItemStack;
 
-public class SpecialEnderChest extends InventorySubcontainer {
+import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
 
-    private final CraftInventory inventory = new CraftInventory(this);
+public class SpecialEnderChest extends InventorySubcontainer implements IInventory, ISpecialEnderChest {
+
     private final InventoryEnderChest enderChest;
-    private CraftPlayer owner;
-    private boolean playerOnline;
+    private final CraftInventory inventory = new CraftInventory(this);
+    private boolean playerOnline = false;
 
-    public SpecialEnderChest(Player p, boolean online) {
-        this(p, ((CraftPlayer) p).getHandle().getEnderChest(), online);
+    public SpecialEnderChest(Player player, Boolean online) {
+        super(((CraftPlayer) player).getHandle().getEnderChest().getName(),
+                ((CraftPlayer) player).getHandle().getEnderChest().hasCustomName(),
+                ((CraftPlayer) player).getHandle().getEnderChest().getSize());
+        CraftPlayer craftPlayer = (CraftPlayer) player;
+        this.enderChest = craftPlayer.getHandle().getEnderChest();
+        this.bukkitOwner = craftPlayer;
+        setItemLists(this, enderChest.getContents());
     }
 
-    public SpecialEnderChest(Player p, InventoryEnderChest enderChest, boolean online) {
-        super(enderChest.getName(), enderChest.hasCustomName(), enderChest.getSize());
-        this.owner = (CraftPlayer) p;
-        this.enderChest = enderChest;
-        this.playerOnline = online;
-        reflectContents(getClass().getSuperclass(), this, this.enderChest.getContents());
-    }
-
-    private void saveOnExit() {
-        if (transaction.isEmpty() && !playerOnline) {
-            owner.saveData();
-        }
-    }
-
-    private void reflectContents(Class clazz, InventorySubcontainer enderChest, List<ItemStack> items) {
+    private void setItemLists(InventorySubcontainer subcontainer, List<ItemStack> list) {
         try {
-            Field itemsField = clazz.getDeclaredField("items");
-            itemsField.setAccessible(true);
-            itemsField.set(enderChest, items);
+            // Prepare to remove final modifier
+            Field modifiers = Field.class.getDeclaredField("modifiers");
+            modifiers.setAccessible(true);
+            // Access and replace main inventory array
+            Field field = InventorySubcontainer.class.getField("items");
+            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+            field.set(subcontainer, list);
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         } catch (SecurityException e) {
@@ -72,46 +70,31 @@ public class SpecialEnderChest extends InventorySubcontainer {
         }
     }
 
-    private void linkInventory(InventoryEnderChest inventory) {
-        reflectContents(inventory.getClass(), inventory, this.items);
-    }
-
+    @Override
     public Inventory getBukkitInventory() {
         return inventory;
     }
 
-    public boolean inventoryRemovalCheck(boolean save) {
-        boolean offline = transaction.isEmpty() && !playerOnline;
-
-        if (offline && save) {
-            owner.saveData();
-        }
-
-        return offline;
-    }
-
-    public void playerOnline(Player p) {
+    @Override
+    public void setPlayerOnline(Player player) {
         if (!playerOnline) {
-            owner = (CraftPlayer) p;
-            linkInventory(((CraftPlayer) p).getHandle().getEnderChest());
+            try {
+                this.bukkitOwner = player;
+                CraftPlayer craftPlayer = (CraftPlayer) player;
+                setItemLists(craftPlayer.getHandle().getEnderChest(), this.items);
+            } catch (Exception e) {}
             playerOnline = true;
         }
     }
 
-    public boolean playerOffline() {
+    @Override
+    public void setPlayerOffline() {
         playerOnline = false;
-        return inventoryRemovalCheck(false);
     }
 
     @Override
-    public void onClose(CraftHumanEntity who) {
-        super.onClose(who);
-        inventoryRemovalCheck(true);
-    }
-
-    @Override
-    public InventoryHolder getOwner() {
-        return this.owner;
+    public boolean isInUse() {
+        return !this.getViewers().isEmpty();
     }
 
     @Override
@@ -119,4 +102,5 @@ public class SpecialEnderChest extends InventorySubcontainer {
         super.update();
         enderChest.update();
     }
+
 }

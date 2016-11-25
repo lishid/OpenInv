@@ -1,6 +1,0 @@
-config-version: 2
-notify:
-  any-chest: true
-  silent-chest: true
-items:
-  open-inv: STICK
