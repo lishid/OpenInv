@@ -2,44 +2,44 @@ name: OpenInv
 main: com.lishid.openinv.OpenInv
 version: ${openinv.version}
 author: lishid
-authors: [ShadowRanger]
+authors: [Jikoo, ShadowRanger]
 description: >
              This plugin allows you to open a player's inventory as a chest and interact with it in real time.
 commands:
   openinv:
     aliases: [oi, inv, open]
-    description: Opens a player's inventory.
-    usage: |
-           /<command> - Opens last person's inventory.
-           /<command> <player> - Opens a player's inventory.
+    description: Open a player's inventory
+    permission: OpenInv.*;OpenInv.openinv
+    usage: |-
+           /<command> [Player] - Open a player's inventory
   openender:
     aliases: [oe]
-    description: Opens a player's ender chest.
-    usage: |
-           /<command> - Opens last person's ender chest.
-           /<command> <player> - Opens a player's ender chest.
+    description: Opens the enderchest of a player
+    permission: OpenInv.*;OpenInv.openender
+    usage: |-
+           /<command> [Player] - Open a player's enderchest
   searchinv:
     aliases: [si]
-    description: Searches and lists players that have a specific item in their inventory.
-    usage: |
-           /<command> <item> [minAmount] - Item can be the Item ID or the CraftBukkit Item Name, minAmount is the minimum amount to be considered.
+    description: Search and list players having a specific item
+    permission: OpenInv.*;OpenInv.search
+    usage: |-
+           /<command> <Item> [MinAmount] - Item is the ID or the Bukkit Material, MinAmount is the minimum amount required
   searchender:
     aliases: [se]
-    description: Searches and lists players that have a specific item in their ender chest.
-    usage: |
-           /<command> <item> [minAmount] - Item can be the Item ID or the CraftBukkit Item Name, minAmount is the minimum amount to be considered.
-  toggleopeninv:
-    aliases: [toi, toggleoi, toggleinv]
-    description: Toggles the item openinv function.
-    usage: |
-           /<command> [check] - Checks whether item openinv is enabled.
-  anychest:
-    aliases: [ac]
-    description: Toggles the any chest function, which allows opening of blocked chests.
-    usage: |
-           /<command> [check] - Checks whether any chest is enabled.
+    permission: OpenInv.*;OpenInv.search
+    description: Searches and lists players having a specific item in their ender chest
+    usage: |-
+           /<command> <item> [minAmount] - Item is the ID or the Bukkit Material, MinAmount is the minimum amount required
   silentchest:
     aliases: [sc, silent]
-    description: Toggles the silent chest function, which hides the animation of a chest when opened or closed, and suppresses the sound.
-    usage: |
-           /<command> [check] - Checks whether silent chest is enabled.
+    description: Toggle silent chest function, which stops sounds and animations when using containers.
+    permission: OpenInv.*;OpenInv.silent
+    usage: |-
+           /<command> [Check] - Check or toggle silent chest
+  anychest:
+    aliases: [ac]
+    description: Toggle anychest function, which allows opening of blocked chests.
+    permission: OpenInv.*;OpenInv.anychest
+    usage: |-
+           /<command> [Check] - Checks or toggle anychest
+

@@ -144,7 +144,9 @@ public class OpenInv extends JavaPlugin {
         pm.registerEvents(new OpenInvInventoryListener(this), this);
 
         getCommand("openinv").setExecutor(new OpenInvPluginCommand(this));
-        getCommand("searchinv").setExecutor(new SearchInvPluginCommand());
+        SearchInvPluginCommand searchInv = new SearchInvPluginCommand();
+        getCommand("searchinv").setExecutor(searchInv);
+        getCommand("searchender").setExecutor(searchInv);
         getCommand("silentchest").setExecutor(new SilentChestPluginCommand(this));
         getCommand("anychest").setExecutor(new AnyChestPluginCommand(this));
         getCommand("openender").setExecutor(new OpenEnderPluginCommand(this));
@@ -566,7 +568,7 @@ public class OpenInv extends JavaPlugin {
             }
 
             // Send usage
-            player.sendMessage(command.getUsage());
+            player.sendMessage(command.getUsage().replace("<command>", commandName));
 
             List<String> aliases = command.getAliases();
             if (aliases.isEmpty()) {

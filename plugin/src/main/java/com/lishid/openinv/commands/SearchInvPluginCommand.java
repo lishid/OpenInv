@@ -23,9 +23,11 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 
 public class SearchInvPluginCommand implements CommandExecutor {
 
+    @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
         Material material = null;
@@ -53,7 +55,8 @@ public class SearchInvPluginCommand implements CommandExecutor {
 
         StringBuilder players = new StringBuilder();
         for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-            if (player.getInventory().contains(material, count)) {
+            Inventory inventory = command.getName().equals("searchinv") ? player.getInventory() : player.getEnderChest();
+            if (inventory.contains(material, count)) {
                 players.append(player.getName()).append(", ");
             }
         }
