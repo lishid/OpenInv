@@ -115,21 +115,24 @@ public class OpenInvPluginCommand implements CommandExecutor {
         }
 
         // Permissions checks
-        if (!Permissions.OVERRIDE.hasPermission(player) && Permissions.EXEMPT.hasPermission(onlineTarget)) {
-            player.sendMessage(ChatColor.RED + onlineTarget.getDisplayName() + "'s inventory is protected!");
-            return;
-        }
+        if (onlineTarget.equals(player)) {
+            // Self-open check
+            if (!Permissions.OPENSELF.hasPermission(player)) {
+                player.sendMessage(ChatColor.RED + "You're not allowed to openinv yourself.");
+                return;
+            }
+        } else {
+            // Protected check
+            if (!Permissions.OVERRIDE.hasPermission(player) && Permissions.EXEMPT.hasPermission(onlineTarget)) {
+                player.sendMessage(ChatColor.RED + onlineTarget.getDisplayName() + "'s inventory is protected!");
+                return;
+            }
 
-        // Crosswork check
-        if ((!Permissions.CROSSWORLD.hasPermission(player) && !Permissions.OVERRIDE.hasPermission(player)) && onlineTarget.getWorld() != player.getWorld()) {
-            player.sendMessage(ChatColor.RED + onlineTarget.getDisplayName() + " is not in your world!");
-            return;
-        }
-
-        // Self-open check
-        if (!Permissions.OPENSELF.hasPermission(player) && onlineTarget.equals(player)) {
-            player.sendMessage(ChatColor.RED + "You're not allowed to openinv yourself.");
-            return;
+            // Crossworld check
+            if ((!Permissions.CROSSWORLD.hasPermission(player) && !Permissions.OVERRIDE.hasPermission(player)) && onlineTarget.getWorld() != player.getWorld()) {
+                player.sendMessage(ChatColor.RED + onlineTarget.getDisplayName() + " is not in your world!");
+                return;
+            }
         }
 
         // Record the target

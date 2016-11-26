@@ -113,10 +113,19 @@ public class OpenEnderPluginCommand implements CommandExecutor {
             onlineTarget = target.getPlayer();
         }
 
-
-        if (!onlineTarget.equals(player) && !Permissions.ENDERCHEST_ALL.hasPermission(player)) {
-            player.sendMessage(ChatColor.RED + "You do not have permission to access other player's enderchest");
-            return;
+        if (!onlineTarget.equals(player)) {
+            if (!Permissions.ENDERCHEST_ALL.hasPermission(player)) {
+                player.sendMessage(ChatColor.RED + "You do not have permission to access other players' enderchests.");
+                return;
+            }
+            if (!Permissions.CROSSWORLD.hasPermission(player) && !player.getWorld().equals(onlineTarget.getWorld())) {
+                player.sendMessage(ChatColor.RED + onlineTarget.getDisplayName() + " is not in your world!");
+                return;
+            }
+            if (!Permissions.OVERRIDE.hasPermission(player) && Permissions.EXEMPT.hasPermission(onlineTarget)) {
+                player.sendMessage(ChatColor.RED + onlineTarget.getDisplayName() + "'s inventory is protected!");
+                return;
+            }
         }
 
         // Record the target
