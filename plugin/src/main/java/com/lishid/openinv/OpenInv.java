@@ -41,7 +41,6 @@ import com.lishid.openinv.util.Function;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -118,27 +117,7 @@ public class OpenInv extends JavaPlugin {
         inventoryAccess = accessor.newInventoryAccess();
         anySilentContainer = accessor.newAnySilentContainer();
 
-        FileConfiguration config = getConfig();
-        boolean dirtyConfig = false;
-        if (!config.isBoolean("NotifySilentChest")) {
-            config.set("NotifySilentChest", true);
-            dirtyConfig = true;
-        }
-        if (!config.isBoolean("NotifyAnyChest")) {
-            config.set("NotifyAnyChest", true);
-            dirtyConfig = true;
-        }
-        if (!config.isBoolean("DisableSaving")) {
-            config.set("DisableSaving", false);
-            dirtyConfig = true;
-        }
-        config.addDefault("NotifySilentChest", true);
-        config.addDefault("NotifyAnyChest", true);
-        config.addDefault("DisableSaving", false);
-        config.options().copyDefaults(true);
-        if (dirtyConfig) {
-            saveConfig();
-        }
+        new ConfigUpdater(this).checkForUpdates();
 
         pm.registerEvents(new OpenInvPlayerListener(this), this);
         pm.registerEvents(new OpenInvInventoryListener(this), this);
@@ -256,7 +235,7 @@ public class OpenInv extends JavaPlugin {
      * @return true unless configured otherwise
      */
     public boolean notifySilentChest() {
-        return getConfig().getBoolean("NotifySilentChest", true);
+        return getConfig().getBoolean("notify.silent-chest", true);
     }
 
     /**
@@ -266,7 +245,7 @@ public class OpenInv extends JavaPlugin {
      * @return true unless configured otherwise
      */
     public boolean notifyAnyChest() {
-        return getConfig().getBoolean("NotifyAnyChest", true);
+        return getConfig().getBoolean("notify.any-chest", true);
     }
 
     /**
@@ -276,7 +255,7 @@ public class OpenInv extends JavaPlugin {
      * @return true if SilentChest is enabled
      */
     public boolean getPlayerSilentChestStatus(OfflinePlayer player) {
-        return getConfig().getBoolean("SilentChest." + playerLoader.getPlayerDataID(player) + ".toggle", false);
+        return getConfig().getBoolean("toggles.silent-chest." + playerLoader.getPlayerDataID(player), false);
     }
 
     /**
@@ -286,7 +265,7 @@ public class OpenInv extends JavaPlugin {
      * @param status the status
      */
     public void setPlayerSilentChestStatus(OfflinePlayer player, boolean status) {
-        getConfig().set("SilentChest." + playerLoader.getPlayerDataID(player) + ".toggle", status);
+        getConfig().set("toggles.silent-chest." + playerLoader.getPlayerDataID(player), status);
         saveConfig();
     }
 
@@ -297,7 +276,7 @@ public class OpenInv extends JavaPlugin {
      * @return true if AnyChest is enabled
      */
     public boolean getPlayerAnyChestStatus(OfflinePlayer player) {
-        return getConfig().getBoolean("AnyChest." + playerLoader.getPlayerDataID(player) + ".toggle", true);
+        return getConfig().getBoolean("toggles.any-chest." + playerLoader.getPlayerDataID(player), false);
     }
 
     /**
@@ -307,7 +286,7 @@ public class OpenInv extends JavaPlugin {
      * @param status the status
      */
     public void setPlayerAnyChestStatus(OfflinePlayer player, boolean status) {
-        getConfig().set("AnyChest." + playerLoader.getPlayerDataID(player) + ".toggle", status);
+        getConfig().set("toggles.silent-chest." + playerLoader.getPlayerDataID(player), status);
         saveConfig();
     }
 
