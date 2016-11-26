@@ -225,7 +225,7 @@ public class OpenInv extends JavaPlugin {
      * @return false unless configured otherwise
      */
     public boolean disableSaving() {
-        return getConfig().getBoolean("DisableSaving", false);
+        return getConfig().getBoolean("settings.disable-saving", false);
     }
 
     /**

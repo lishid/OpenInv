@@ -12,7 +12,7 @@ import org.bukkit.configuration.ConfigurationSection;
 
 public class ConfigUpdater {
 
-    private static final int CONFIG_VERSION = 2;
+    private static final int CONFIG_VERSION = 3;
 
     private final OpenInv plugin;
 
@@ -41,8 +41,20 @@ public class ConfigUpdater {
         switch (getConfigVersion()) {
             case 1:
                 updateConfig1To2();
+            case 2:
+                updateConfig2To3();
                 break;
         }
+    }
+
+    private void updateConfig2To3() {
+        plugin.getConfig().set("config-version", 3);
+        plugin.getConfig().set("items.open-inv", null);
+        plugin.getConfig().set("toggles.items.open-inv", null);
+        plugin.getConfig().set("settings.disable-saving", plugin.getConfig().getBoolean("DisableSaving", false));
+        plugin.getConfig().set("DisableSaving", null);
+        // Save the new config
+        plugin.saveConfig();
     }
 
     private void updateConfig1To2() {
