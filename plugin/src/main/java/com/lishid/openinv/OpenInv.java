@@ -169,7 +169,7 @@ public class OpenInv extends JavaPlugin {
      * @return true if the server version is supported
      */
     public boolean isSupportedVersion() {
-        return accessor.isSupported();
+        return this.accessor.isSupported();
     }
 
     /**
@@ -312,6 +312,17 @@ public class OpenInv extends JavaPlugin {
     }
 
     /**
+     * Gets a unique identifier by which the OfflinePlayer can be referenced. Using the value
+     * returned to look up a Player will generally be much faster for later implementations.
+     * 
+     * @param offline the OfflinePlayer
+     * @return the identifier
+     */
+    public String getPlayerID(OfflinePlayer offline) {
+        return this.playerLoader.getPlayerDataID(offline);
+    }
+
+    /**
      * Get an OfflinePlayer by name.
      * <p>
      * Note: This method is potentially very heavily blocking. It should not ever be called on the
@@ -333,12 +344,15 @@ public class OpenInv extends JavaPlugin {
             }
         }
 
+        // Attempt exact offline match first - adds UUID support for later versions
+        OfflinePlayer player = this.playerLoader.getPlayerByID(name);
+
         // Ensure name is valid if server is in online mode to avoid unnecessary searching
         if (getServer().getOnlineMode() && !name.matches("[a-zA-Z0-9_]{3,16}")) {
             return null;
         }
 
-        OfflinePlayer player = getServer().getPlayerExact(name);
+        player = getServer().getPlayerExact(name);
 
         if (player != null) {
             return player;

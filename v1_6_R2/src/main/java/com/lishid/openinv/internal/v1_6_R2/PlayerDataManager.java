@@ -59,4 +59,14 @@ public class PlayerDataManager implements IPlayerDataManager {
         return player.getName();
     }
 
+    @Override
+    public OfflinePlayer getPlayerByID(String identifier) {
+        OfflinePlayer player = Bukkit.getOfflinePlayer(identifier);
+        // Ensure player is a real player, otherwise return null
+        if (player == null || !player.hasPlayedBefore() && !player.isOnline()) {
+            return null;
+        }
+        return player;
+    }
+
 }

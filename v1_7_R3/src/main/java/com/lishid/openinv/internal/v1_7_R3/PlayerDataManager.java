@@ -16,6 +16,8 @@
 
 package com.lishid.openinv.internal.v1_7_R3;
 
+import java.util.UUID;
+
 import com.lishid.openinv.internal.IPlayerDataManager;
 
 import org.bukkit.Bukkit;
@@ -58,6 +60,22 @@ public class PlayerDataManager implements IPlayerDataManager {
     @Override
     public String getPlayerDataID(OfflinePlayer player) {
         return player.getUniqueId().toString();
+    }
+
+    @Override
+    public OfflinePlayer getPlayerByID(String identifier) {
+        try {
+            UUID uuid = UUID.fromString(identifier);
+            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
+            // Ensure player is a real player, otherwise return null
+            if (player == null || !player.hasPlayedBefore() && !player.isOnline()) {
+                return null;
+            }
+            return player;
+        } catch (IllegalArgumentException e) {
+            // Not a UUID
+            return null;
+        }
     }
 
 }

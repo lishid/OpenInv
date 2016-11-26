@@ -39,4 +39,12 @@ public interface IPlayerDataManager {
      */
     public String getPlayerDataID(OfflinePlayer player);
 
+    /**
+     * Gets an OfflinePlayer by the given unique identifier.
+     * 
+     * @param identifier the unique identifier
+     * @return the OfflinePlayer, or null if no exact match was found
+     */
+    public OfflinePlayer getPlayerByID(String identifier);
+
 }
