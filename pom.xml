@@ -1,5 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.lishid</groupId>
   <artifactId>openinv</artifactId>
@@ -55,11 +55,51 @@
     </profile>
 
     <profile>
+      <id>modern</id>
+      <activation>
+        <property>
+          <name>modern</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <modules>
+        <module>v1_8_R1</module>
+        <module>v1_8_R2</module>
+        <module>v1_8_R3</module>
+        <module>v1_9_R1</module>
+        <module>v1_9_R2</module>
+        <module>v1_10_R1</module>
+        <module>v1_11_R1</module>
+      </modules>
+    </profile>
+
+    <profile>
       <id>all</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>1_4_5</module>
+        <module>1_4_6</module>
+        <module>v1_4_R1</module>
+        <!-- 1_5_R1 was never released -->
+        <module>v1_5_R2</module>
+        <module>v1_5_R3</module>
+        <!-- 1_6_R1 also had no tagged releases, remove? -->
+        <module>v1_6_R1</module>
+        <module>v1_6_R2</module>
+        <module>v1_6_R3</module>
+        <!-- TODO: Recompile CB for 1_7_R1 through 1_7_R4, currently using whatever jars worked -->
+        <module>v1_7_R1</module>
+        <module>v1_7_R2</module>
+        <module>v1_7_R3</module>
+        <module>v1_7_R4</module>
+        <module>v1_8_R1</module>
+        <module>v1_8_R2</module>
+        <module>v1_8_R3</module>
+        <module>v1_9_R1</module>
+        <module>v1_9_R2</module>
+        <module>v1_10_R1</module>
         <module>v1_11_R1</module>
       </modules>
     </profile>
