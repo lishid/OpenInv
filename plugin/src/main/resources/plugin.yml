@@ -29,7 +29,7 @@ commands:
     permission: OpenInv.*;OpenInv.search
     description: Searches and lists players having a specific item in their ender chest
     usage: |-
-           /<command> <item> [minAmount] - Item is the ID or the Bukkit Material, MinAmount is the minimum amount required
+           /<command> <item> [MinAmount] - Item is the ID or the Bukkit Material, MinAmount is the minimum amount required
   silentchest:
     aliases: [sc, silent]
     description: Toggle silent chest function, which stops sounds and animations when using containers.
@@ -42,4 +42,9 @@ commands:
     permission: OpenInv.*;OpenInv.anychest
     usage: |-
            /<command> [Check] - Checks or toggle anychest
-
+  searchenchant:
+    aliases: [searchenchants]
+    description: Search and list players with a specific enchantment.
+    permission: OpenInv.*;OpenInv.searchenchant
+    usage: |-
+           /<command> <[enchantment] [MinLevel]> - Enchantment is the enchantment type, MinLevel is the minimum level. One is optional

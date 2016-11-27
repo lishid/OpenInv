@@ -27,6 +27,7 @@ import java.util.concurrent.Future;
 import com.lishid.openinv.commands.AnyChestPluginCommand;
 import com.lishid.openinv.commands.OpenEnderPluginCommand;
 import com.lishid.openinv.commands.OpenInvPluginCommand;
+import com.lishid.openinv.commands.SearchEnchantPluginCommand;
 import com.lishid.openinv.commands.SearchInvPluginCommand;
 import com.lishid.openinv.commands.SilentChestPluginCommand;
 import com.lishid.openinv.internal.IAnySilentContainer;
@@ -123,12 +124,13 @@ public class OpenInv extends JavaPlugin {
         pm.registerEvents(new OpenInvInventoryListener(this), this);
 
         getCommand("openinv").setExecutor(new OpenInvPluginCommand(this));
+        getCommand("openender").setExecutor(new OpenEnderPluginCommand(this));
         SearchInvPluginCommand searchInv = new SearchInvPluginCommand();
         getCommand("searchinv").setExecutor(searchInv);
         getCommand("searchender").setExecutor(searchInv);
+        getCommand("searchenchant").setExecutor(new SearchEnchantPluginCommand());
         getCommand("silentchest").setExecutor(new SilentChestPluginCommand(this));
         getCommand("anychest").setExecutor(new AnyChestPluginCommand(this));
-        getCommand("openender").setExecutor(new OpenEnderPluginCommand(this));
 
     }
 
@@ -286,7 +288,7 @@ public class OpenInv extends JavaPlugin {
      * @param status the status
      */
     public void setPlayerAnyChestStatus(OfflinePlayer player, boolean status) {
-        getConfig().set("toggles.silent-chest." + playerLoader.getPlayerDataID(player), status);
+        getConfig().set("toggles.any-chest." + playerLoader.getPlayerDataID(player), status);
         saveConfig();
     }
 
@@ -325,6 +327,10 @@ public class OpenInv extends JavaPlugin {
 
         // Attempt exact offline match first - adds UUID support for later versions
         OfflinePlayer player = this.playerLoader.getPlayerByID(name);
+
+        if (player != null) {
+            return player;
+        }
 
         // Ensure name is valid if server is in online mode to avoid unnecessary searching
         if (getServer().getOnlineMode() && !name.matches("[a-zA-Z0-9_]{3,16}")) {

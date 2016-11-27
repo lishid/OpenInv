@@ -68,7 +68,7 @@ public class SearchInvPluginCommand implements CommandExecutor {
             sender.sendMessage("No players found with " + material.toString());
         }
 
-        sender.sendMessage("Players with the item " + material.toString() + ":  " + players.toString());
+        sender.sendMessage("Players with the item " + material.toString() + ": " + players.toString());
         return true;
     }
 
