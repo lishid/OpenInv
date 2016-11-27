@@ -16,8 +16,6 @@
 
 package com.lishid.openinv.internal.v1_4_6;
 
-import java.lang.reflect.Field;
-
 import com.lishid.openinv.internal.IAnySilentContainer;
 
 import org.bukkit.ChatColor;
@@ -142,15 +140,7 @@ public class AnySilentContainer implements IAnySilentContainer {
             returnValue = true;
         } else {
             try {
-                int windowId = 0;
-                try {
-                    Field windowID = player.getClass().getDeclaredField("containerCounter");
-                    windowID.setAccessible(true);
-                    windowId = windowID.getInt(player);
-                    windowId = windowId % 100 + 1;
-                    windowID.setInt(player, windowId);
-                } catch (NoSuchFieldException e) {}
-
+                int windowId = player.nextContainerCounter();
                 player.playerConnection.sendPacket(new Packet100OpenWindow(windowId, 0, ((IInventory) tile).getName(), ((IInventory) tile).getSize()));
                 player.activeContainer = new SilentContainerChest(player.inventory, ((IInventory) tile));
                 player.activeContainer.windowId = windowId;

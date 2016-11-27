@@ -10,7 +10,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <openinv.version>3.0.1</openinv.version>
+    <openinv.version>3.0.1-SNAPSHOT</openinv.version>
   </properties>
 
   <profiles>
