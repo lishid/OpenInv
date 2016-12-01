@@ -1,44 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
   <groupId>com.lishid</groupId>
-  <artifactId>openinv</artifactId>
-  <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
-  <name>OpenInv</name>
+  <artifactId>openinvparent</artifactId>
+  <name>OpenInvParent</name>
   <url>http://dev.bukkit.org/bukkit-plugins/openinv/</url>
+  <version>1.0-SNAPSHOT</version>
+
+  <packaging>pom</packaging>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <openinv.version>3.0.3-SNAPSHOT</openinv.version>
   </properties>
 
+  <modules>
+    <module>api</module>
+    <module>common</module>
+    <module>plugin</module>
+    <module>internal</module>
+    <module>assembly</module>
+  </modules>
+
   <profiles>
 
     <!--
-      ~ N.B.: All dependencies for profiles are set in ./assembly/pom.xml
+      ~ N.B.: All version-specific code is handled in submodules of the internal module.
       ~ 
-      ~ This is to prevent recursive dependencies. It's not ideal, but it works.
-      ~ The parent project always builds first. Then, due to profile ordering here,
-      ~ whatever modules are enabled are built. Finally, the assembly module is built,
-      ~ which contains no actual code, but shades all its "dependencies" into one jar.
+      ~ Internal submodules built by each profile are handled in internal/pom.xml
      -->
 
-    <!--
-      ~ This profile exists to simplify profile usage.
-      ~ The interface and plugin modules should be built first to ensure that they are up to date.
-     -->
     <profile>
-      <id>reactorbuildfirst</id>
+      <id>all</id>
       <activation>
-        <property>
-          <name>!breakBuildProcess</name>
-        </property>
+        <activeByDefault>true</activeByDefault>
       </activation>
-      <modules>
-        <module>internal</module>
-        <module>plugin</module>
-      </modules>
     </profile>
 
     <profile>
@@ -49,9 +46,6 @@
           <value>true</value>
         </property>
       </activation>
-      <modules>
-        <module>v1_11_R1</module>
-      </modules>
     </profile>
 
     <profile>
@@ -62,62 +56,6 @@
           <value>true</value>
         </property>
       </activation>
-      <modules>
-        <module>v1_8_R1</module>
-        <module>v1_8_R2</module>
-        <module>v1_8_R3</module>
-        <module>v1_9_R1</module>
-        <module>v1_9_R2</module>
-        <module>v1_10_R1</module>
-        <module>v1_11_R1</module>
-      </modules>
-    </profile>
-
-    <profile>
-      <id>all</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>1_4_5</module>
-        <module>1_4_6</module>
-        <module>v1_4_R1</module>
-        <!-- 1_5_R1 was never released -->
-        <module>v1_5_R2</module>
-        <module>v1_5_R3</module>
-        <!-- 1_6_R1 also had no tagged releases, remove? -->
-        <module>v1_6_R1</module>
-        <module>v1_6_R2</module>
-        <module>v1_6_R3</module>
-        <!-- TODO: Recompile CB for 1_7_R1 through 1_7_R4, currently using whatever jars worked -->
-        <module>v1_7_R1</module>
-        <module>v1_7_R2</module>
-        <module>v1_7_R3</module>
-        <module>v1_7_R4</module>
-        <module>v1_8_R1</module>
-        <module>v1_8_R2</module>
-        <module>v1_8_R3</module>
-        <module>v1_9_R1</module>
-        <module>v1_9_R2</module>
-        <module>v1_10_R1</module>
-        <module>v1_11_R1</module>
-      </modules>
-    </profile>
-
-    <!--
-      ~ This profile exists to fix reactor build order.
-      ~ The assembly module must be built last to aggregate all active modules into the final jar.
-     -->
-    <profile>
-      <id>reactorbuildlast</id>
-      <activation>
-        <property>
-          <name>!breakBuildProcess</name>
-        </property>
-      </activation>
-      <modules>
-        <module>assembly</module>
-      </modules>
     </profile>
 
   </profiles>

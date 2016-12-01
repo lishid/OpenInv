@@ -4,35 +4,18 @@
 
   <parent>
     <groupId>com.lishid</groupId>
-    <artifactId>openinv</artifactId>
+    <artifactId>openinvparent</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>openinvplugin</artifactId>
   <name>OpenInvPlugin</name>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>bukkit</artifactId>
-      <!-- Really should use 1.4.5-R1.0, but the InventoryDragEvent doesn't exist. TODO separate module? -->
-      <version>1.11-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.lishid</groupId>
-      <artifactId>openinvinternal</artifactId>
-      <version>1.0-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
+  <packaging>pom</packaging>
 
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-    </resources>
-  </build>
+  <modules>
+    <module>plugin-v1_10_R1</module>
+    <module>plugin-core</module>
+  </modules>
 
 </project>

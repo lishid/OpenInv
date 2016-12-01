@@ -117,9 +117,9 @@ OpenInv is a [Bukkit plugin](https://dev.bukkit.org/bukkit-plugins/openinv/) whi
 To compile, the relevant Craftbukkit/Spigot jars must be installed in your local repository using the install plugin.  
 Ex: `mvn install:install-file -Dpackaging=jar -Dfile=spigot-1.11-R0.1-SNAPSHOT.jar -DgroupId=org.spigotmc -DartifactId=spigot -Dversion=1.11-R0.1-SNAPSHOT`
 
-Compiling OpenInv for a specific version is very easy - just compile the correct module.
+To compile for a specific version or set of versions, you'll need to use a profile. Provided profiles are `latest`, `modern` (versions 1.8+), and `all`. Select an existing profile using the `-P` argument (ex: `mvn clean package -am -P all`) or make your own. For more information, check out the [official guide](http://maven.apache.org/guides/introduction/introduction-to-profiles.html).
 
-Compiling for a set of versions is slightly more complex. You'll need to use a profile for the versions you want to compile. Provided profiles are latest, modern (versions 1.8+), and all. For more information, check out the [official guide](http://maven.apache.org/guides/introduction/introduction-to-profiles.html).
+The final file is target/OpenInv.jar
 
 ## License
 ```
