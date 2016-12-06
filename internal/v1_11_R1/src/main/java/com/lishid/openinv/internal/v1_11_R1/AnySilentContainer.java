@@ -211,9 +211,9 @@ public class AnySilentContainer implements IAnySilentContainer {
                 break;
             }
 
-            if (blockChest.g == Type.BASIC)
+            if (blockChest.g == Type.BASIC) {
                 player.b(StatisticList.ac);
-            else if (blockChest.g == Type.TRAP) {
+            } else if (blockChest.g == Type.TRAP) {
                 player.b(StatisticList.W);
             }
 

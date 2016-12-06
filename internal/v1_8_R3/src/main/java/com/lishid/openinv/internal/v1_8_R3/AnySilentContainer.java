@@ -28,6 +28,7 @@ import net.minecraft.server.v1_8_R3.Block;
 import net.minecraft.server.v1_8_R3.BlockChest;
 import net.minecraft.server.v1_8_R3.BlockEnderChest;
 import net.minecraft.server.v1_8_R3.BlockPosition;
+import net.minecraft.server.v1_8_R3.Container;
 import net.minecraft.server.v1_8_R3.Entity;
 import net.minecraft.server.v1_8_R3.EntityOcelot;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
@@ -144,6 +145,7 @@ public class AnySilentContainer implements IAnySilentContainer {
         }
 
         Block block = world.getType(blockPosition).getBlock();
+        Container container = null;
 
         if (block instanceof BlockChest) {
             for (EnumDirection localEnumDirection : EnumDirection.EnumDirectionLimit.HORIZONTAL) {
@@ -170,26 +172,27 @@ public class AnySilentContainer implements IAnySilentContainer {
             }
 
             if (silentchest) {
-                tile = new SilentContainerChest(player.inventory, ((IInventory) tile), player);
+                container = new SilentContainerChest(player.inventory, ((IInventory) tile), player);
             }
 
-            if (((BlockChest) block).b == 0)
+            if (((BlockChest) block).b == 0) {
                 player.b(StatisticList.aa);
-            else if (((BlockChest) block).b == 1) {
+            } else if (((BlockChest) block).b == 1) {
                 player.b(StatisticList.U);
             }
         }
 
         boolean returnValue = false;
-        if (!silentchest) {
-            player.openContainer((IInventory) tile);
+        final IInventory iInventory = (IInventory) tile;
+
+        if (!silentchest || container == null) {
+            player.openContainer(iInventory);
             returnValue = true;
         } else {
             try {
-                SilentContainerChest silentContainerChest = new SilentContainerChest(player.inventory, ((IInventory) tile), player);
                 int windowId = player.nextContainerCounter();
-                player.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, "minecraft:chest", ((IInventory) tile).getScoreboardDisplayName(), ((IInventory) tile).getSize()));
-                player.activeContainer = silentContainerChest;
+                player.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, iInventory.getName(), iInventory.getScoreboardDisplayName(), iInventory.getSize()));
+                player.activeContainer = container;
                 player.activeContainer.windowId = windowId;
                 player.activeContainer.addSlotListener(player);
                 returnValue = true;
