@@ -15,8 +15,6 @@ import org.bukkit.entity.Player;
  */
 public interface IOpenInv {
 
-
-
     /**
      * Checks if the server version is supported by OpenInv.
      * 

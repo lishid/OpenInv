@@ -10,7 +10,7 @@ OpenInv is a [Bukkit plugin](https://dev.bukkit.org/bukkit-plugins/openinv/) whi
 - **OpenEnder**: Open anyone's inventory, even if they're offline.
   - Read-only mode! No edits allowed! Don't grant `OpenInv.editender`
   - Cross-world support! Don't grant `OpenInv.crossworld`
-  - No self-opening! Don't grant `OpenInv.openself`
+  - No opening others! Don't grant `OpenInv.openenderall`
 - **SilentChest**: Open containers without displaying an animation or making sound.
 - **AnyChest**: Open containers, even if blocked by ocelots or blocks.
 
@@ -80,7 +80,7 @@ OpenInv is a [Bukkit plugin](https://dev.bukkit.org/bukkit-plugins/openinv/) whi
     <td>Required to use /openender.</td>
   </tr>
   <tr>
-    <td>OpenInv.editinv</td>
+    <td>OpenInv.editender</td>
     <td>Required to make changes to open ender chests.</td>
   </tr>
   <tr>
