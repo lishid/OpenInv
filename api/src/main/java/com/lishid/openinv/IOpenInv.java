@@ -7,6 +7,7 @@ import com.lishid.openinv.internal.ISpecialPlayerInventory;
 
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 /**
  * Interface defining behavior for the OpenInv plugin.
@@ -149,5 +150,38 @@ public interface IOpenInv {
      * @return the Player
      */
     public Player loadPlayer(final OfflinePlayer offline);
+
+    /**
+     * Mark a Player as in use by a Plugin to prevent it from being removed from the cache. Used to
+     * prevent issues with multiple copies of the same Player being loaded such as lishid#49.
+     * Changes made to loaded copies overwrite changes to the others when saved, leading to
+     * duplication bugs and more.
+     * <p>
+     * When finished with the Player object, be sure to call {@link #releasePlayer(Player, Plugin)}
+     * to prevent the cache from keeping it stored until the plugin is disabled.
+     * <p>
+     * When using a Player object from OpenInv, you must handle the Player coming online, replacing
+     * your Player reference with the Player from the PlayerJoinEvent. In addition, you must change
+     * any values in the Player to reflect any unsaved alterations to the existing Player which do
+     * not affect the inventory or ender chest contents.
+     * <p>
+     * OpenInv only saves player data when unloading a Player from the cache, and then only if
+     * {@link #disableSaving()} returns false. If you are making changes that OpenInv does not cause
+     * to persist when a Player logs in as noted above, it is suggested that you manually call
+     * {@link Player#saveData()} when releasing your reference to ensure your changes persist.
+     * 
+     * @param player the Player
+     * @param plugin the Plugin holding the reference to the Player
+     */
+    public void retainPlayer(Player player, Plugin plugin);
+
+    /**
+     * Mark a Player as no longer in use by a Plugin to allow OpenInv to remove it from the cache
+     * when eligible.
+     * 
+     * @param player the Player
+     * @param plugin the Plugin no longer holding a reference to the Player
+     */
+    public void releasePlayer(Player player, Plugin plugin);
 
 }

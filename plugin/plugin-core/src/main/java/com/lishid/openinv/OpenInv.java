@@ -44,12 +44,16 @@ import com.lishid.openinv.util.Function;
 import com.lishid.openinv.util.InternalAccessor;
 import com.lishid.openinv.util.Permissions;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -63,13 +67,17 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
     private final Map<String, ISpecialPlayerInventory> inventories = new HashMap<String, ISpecialPlayerInventory>();
     private final Map<String, ISpecialEnderChest> enderChests = new HashMap<String, ISpecialEnderChest>();
+    // TODO: handle plugin unload
+    private final Multimap<String, Class<? extends Plugin>> pluginUsage = HashMultimap.create();
+
     private final Cache<String, Player> playerCache = new Cache<String, Player>(300000L,
             new Function<Player>() {
                 @Override
                 public boolean run(Player value) {
                     String key = playerLoader.getPlayerDataID(value);
                     return inventories.containsKey(key) && inventories.get(key).isInUse()
-                            || enderChests.containsKey(key) && enderChests.get(key).isInUse();
+                            || enderChests.containsKey(key) && enderChests.get(key).isInUse()
+                            || pluginUsage.containsKey(key);
                 }
             },
             new Function<Player>() {
@@ -427,6 +435,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             return this.playerCache.get(key);
         }
 
+        // TODO: wrap Player to ensure all methods can safely be called offline
         Player loaded;
 
         if (offline.isOnline()) {
@@ -477,6 +486,34 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         }
 
         return loaded;
+    }
+
+    /**
+     * @see com.lishid.openinv.IOpenInv#retainPlayer(org.bukkit.entity.Player, org.bukkit.plugin.Plugin)
+     */
+    @Override
+    public void retainPlayer(Player player, Plugin plugin) {
+        String key = this.playerLoader.getPlayerDataID(player);
+
+        if (this.pluginUsage.containsEntry(key, plugin.getClass())) {
+            return;
+        }
+
+        this.pluginUsage.put(key, plugin.getClass());
+    }
+
+    /**
+     * @see com.lishid.openinv.IOpenInv#releasePlayer(org.bukkit.entity.Player, org.bukkit.plugin.Plugin)
+     */
+    @Override
+    public void releasePlayer(Player player, Plugin plugin) {
+        String key = this.playerLoader.getPlayerDataID(player);
+
+        if (!this.pluginUsage.containsEntry(key, plugin.getClass())) {
+            return;
+        }
+
+        this.pluginUsage.remove(key, plugin.getClass());
     }
 
     /**
