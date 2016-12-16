@@ -38,6 +38,7 @@ import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import com.lishid.openinv.listeners.InventoryClickListener;
 import com.lishid.openinv.listeners.InventoryDragListener;
 import com.lishid.openinv.listeners.PlayerListener;
+import com.lishid.openinv.listeners.PluginListener;
 import com.lishid.openinv.util.Cache;
 import com.lishid.openinv.util.ConfigUpdater;
 import com.lishid.openinv.util.Function;
@@ -67,7 +68,6 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
     private final Map<String, ISpecialPlayerInventory> inventories = new HashMap<String, ISpecialPlayerInventory>();
     private final Map<String, ISpecialEnderChest> enderChests = new HashMap<String, ISpecialEnderChest>();
-    // TODO: handle plugin unload
     private final Multimap<String, Class<? extends Plugin>> pluginUsage = HashMultimap.create();
 
     private final Cache<String, Player> playerCache = new Cache<String, Player>(300000L,
@@ -135,6 +135,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
         // Register listeners
         pm.registerEvents(new PlayerListener(this), this);
+        pm.registerEvents(new PluginListener(this), this);
         pm.registerEvents(new InventoryClickListener(this), this);
         // Bukkit will handle missing events for us, attempt to register InventoryDragEvent without a version check
         pm.registerEvents(new InventoryDragListener(this), this);
@@ -514,6 +515,15 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         }
 
         this.pluginUsage.remove(key, plugin.getClass());
+    }
+
+    /**
+     * Unmark any Players in use by the specified Plugin.
+     * 
+     * @param plugin
+     */
+    public void releaseAllPlayers(Plugin plugin) {
+        this.pluginUsage.removeAll(plugin.getClass());
     }
 
     /**
