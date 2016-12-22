@@ -1,6 +1,7 @@
 package com.lishid.openinv.commands;
 
-import org.bukkit.Bukkit;
+import com.lishid.openinv.OpenInv;
+
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -18,6 +19,12 @@ import org.bukkit.inventory.meta.ItemMeta;
  * @author Jikoo
  */
 public class SearchEnchantPluginCommand implements CommandExecutor {
+
+    private final OpenInv plugin;
+
+    public SearchEnchantPluginCommand(OpenInv plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -45,7 +52,7 @@ public class SearchEnchantPluginCommand implements CommandExecutor {
         }
 
         StringBuilder players = new StringBuilder();
-        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+        for (Player player : plugin.getOnlinePlayers()) {
             boolean flagInventory = containsEnchantment(player.getInventory(), enchant, level);
             boolean flagEnder = containsEnchantment(player.getEnderChest(), enchant, level);
 

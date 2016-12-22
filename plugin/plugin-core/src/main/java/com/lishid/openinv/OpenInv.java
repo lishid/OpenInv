@@ -16,6 +16,10 @@
 
 package com.lishid.openinv;
 
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -143,10 +147,10 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         // Register commands to their executors
         getCommand("openinv").setExecutor(new OpenInvPluginCommand(this));
         getCommand("openender").setExecutor(new OpenEnderPluginCommand(this));
-        SearchInvPluginCommand searchInv = new SearchInvPluginCommand();
+        SearchInvPluginCommand searchInv = new SearchInvPluginCommand(this);
         getCommand("searchinv").setExecutor(searchInv);
         getCommand("searchender").setExecutor(searchInv);
-        getCommand("searchenchant").setExecutor(new SearchEnchantPluginCommand());
+        getCommand("searchenchant").setExecutor(new SearchEnchantPluginCommand(this));
         getCommand("silentchest").setExecutor(new SilentChestPluginCommand(this));
         getCommand("anychest").setExecutor(new AnyChestPluginCommand(this));
 
@@ -524,6 +528,36 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
      */
     public void releaseAllPlayers(Plugin plugin) {
         this.pluginUsage.removeAll(plugin.getClass());
+    }
+
+    @SuppressWarnings("unchecked")
+    public Collection<? extends Player> getOnlinePlayers() {
+
+        if (this.playerLoader != null) {
+            return this.playerLoader.getOnlinePlayers();
+        }
+
+        Method getOnlinePlayers;
+        try {
+            getOnlinePlayers = Bukkit.class.getDeclaredMethod("getOnlinePlayers");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+
+        Object onlinePlayers;
+        try {
+            onlinePlayers = getOnlinePlayers.invoke(null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+
+        if (onlinePlayers instanceof List) {
+            return (Collection<Player>) onlinePlayers;
+        }
+
+        return Arrays.asList((Player[]) onlinePlayers);
     }
 
     /**

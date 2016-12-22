@@ -16,6 +16,9 @@
 
 package com.lishid.openinv.internal.v1_4_5;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 import com.lishid.openinv.internal.IPlayerDataManager;
 
 import org.bukkit.Bukkit;
@@ -67,6 +70,11 @@ public class PlayerDataManager implements IPlayerDataManager {
             return null;
         }
         return player;
+    }
+
+    @Override
+    public Collection<? extends Player> getOnlinePlayers() {
+        return Arrays.asList(Bukkit.getOnlinePlayers());
     }
 
 }

@@ -16,7 +16,8 @@
 
 package com.lishid.openinv.commands;
 
-import org.bukkit.Bukkit;
+import com.lishid.openinv.OpenInv;
+
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -26,6 +27,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 public class SearchInvPluginCommand implements CommandExecutor {
+
+    private final OpenInv plugin;
+
+    public SearchInvPluginCommand(OpenInv plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -54,7 +61,7 @@ public class SearchInvPluginCommand implements CommandExecutor {
         }
 
         StringBuilder players = new StringBuilder();
-        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+        for (Player player : plugin.getOnlinePlayers()) {
             Inventory inventory = command.getName().equals("searchinv") ? player.getInventory() : player.getEnderChest();
             if (inventory.contains(material, count)) {
                 players.append(player.getName()).append(", ");

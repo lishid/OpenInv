@@ -16,6 +16,8 @@
 
 package com.lishid.openinv.internal;
 
+import java.util.Collection;
+
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -46,5 +48,12 @@ public interface IPlayerDataManager {
      * @return the OfflinePlayer, or null if no exact match was found
      */
     public OfflinePlayer getPlayerByID(String identifier);
+
+    /**
+     * Gets a Collection of all Players currently online.
+     * 
+     * @return the Collection of Players
+     */
+    public Collection<? extends Player> getOnlinePlayers();
 
 }
