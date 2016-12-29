@@ -157,7 +157,7 @@ public class AnySilentContainer implements IAnySilentContainer {
         // Silent ender chest is pretty much API-only
         if (silentchest && b.getType() == Material.ENDER_CHEST) {
             p.openInventory(p.getEnderChest());
-            player.b(StatisticList.X);
+            player.b(StatisticList.getStatistic("stat.enderchestOpened"));
             return true;
         }
 
@@ -174,7 +174,7 @@ public class AnySilentContainer implements IAnySilentContainer {
             InventoryEnderChest enderChest = player.getEnderChest();
             enderChest.a((TileEntityEnderChest) tile);
             player.openContainer(enderChest);
-            player.b(StatisticList.X);
+            player.b(StatisticList.getStatistic("stat.enderchestOpened"));
             return true;
         }
 
@@ -212,9 +212,9 @@ public class AnySilentContainer implements IAnySilentContainer {
             }
 
             if (blockChest.g == Type.BASIC) {
-                player.b(StatisticList.ac);
+                player.b(StatisticList.getStatistic("stat.chestOpened"));
             } else if (blockChest.g == Type.TRAP) {
-                player.b(StatisticList.W);
+                player.b(StatisticList.getStatistic("stat.trappedChestTriggered"));
             }
 
             if (silentchest) {
@@ -223,7 +223,7 @@ public class AnySilentContainer implements IAnySilentContainer {
         }
 
         if (block instanceof BlockShulkerBox) {
-            player.b(StatisticList.ae);
+            player.b(StatisticList.getStatistic("stat.shulkerBoxOpened"));
 
             if (silentchest && tile instanceof TileEntityShulkerBox) {
                 // Set value to current + 1. Ensures consistency later when resetting.
