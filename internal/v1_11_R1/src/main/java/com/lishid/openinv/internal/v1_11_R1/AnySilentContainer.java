@@ -69,10 +69,11 @@ public class AnySilentContainer implements IAnySilentContainer {
         EntityPlayer player = ((CraftPlayer) p).getHandle();
         World world = player.world;
         BlockPosition blockPosition = new BlockPosition(b.getX(), b.getY(), b.getZ());
-        Block block = world.getType(blockPosition).getBlock();
+        IBlockData blockData = world.getType(blockPosition);
+        Block block = blockData.getBlock();
 
         if (block instanceof BlockShulkerBox) {
-            return isBlockedShulkerBox(world, blockPosition, block);
+            return isBlockedShulkerBox(world, blockPosition, blockData);
         }
 
         if (block instanceof BlockEnderChest) {
@@ -107,7 +108,7 @@ public class AnySilentContainer implements IAnySilentContainer {
         return false;
     }
 
-    private boolean isBlockedShulkerBox(World world, BlockPosition blockPosition, Block block) {
+    private boolean isBlockedShulkerBox(World world, BlockPosition blockPosition, IBlockData blockData) {
         // For reference, look at net.minecraft.server.BlockShulkerBox
         TileEntity tile = world.getTileEntity(blockPosition);
 
@@ -115,16 +116,20 @@ public class AnySilentContainer implements IAnySilentContainer {
             return false;
         }
 
-        IBlockData iBlockData = block.getBlockData();
-
-        EnumDirection enumDirection = iBlockData.get(BlockShulkerBox.a);
+        EnumDirection enumDirection = blockData.get(BlockShulkerBox.a);
         if (((TileEntityShulkerBox) tile).p() == TileEntityShulkerBox.AnimationPhase.CLOSED) {
-            AxisAlignedBB axisAlignedBB = BlockShulkerBox.j.b(0.5F * enumDirection.getAdjacentX(),
+            AxisAlignedBB axisAlignedBB = Block.j.b(0.5F * enumDirection.getAdjacentX(),
                     0.5F * enumDirection.getAdjacentY(), 0.5F * enumDirection.getAdjacentZ())
                     .a(enumDirection.getAdjacentX(), enumDirection.getAdjacentY(),
                             enumDirection.getAdjacentZ());
 
-            return world.b(axisAlignedBB.a(blockPosition.shift(enumDirection)));
+            try {
+                // 1.11.2
+                return world.a(axisAlignedBB.a(blockPosition.shift(enumDirection)));
+            } catch (Exception e) {
+                // 1.11
+                return world.b(axisAlignedBB.a(blockPosition.shift(enumDirection)));
+            }
         }
 
         return false;
