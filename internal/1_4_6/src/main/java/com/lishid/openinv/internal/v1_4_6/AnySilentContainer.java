@@ -25,6 +25,7 @@ import org.bukkit.entity.Player;
 // Volatile
 import net.minecraft.server.v1_4_6.AxisAlignedBB;
 import net.minecraft.server.v1_4_6.BlockEnderChest;
+import net.minecraft.server.v1_4_6.Container;
 import net.minecraft.server.v1_4_6.EntityOcelot;
 import net.minecraft.server.v1_4_6.EntityPlayer;
 import net.minecraft.server.v1_4_6.IInventory;
@@ -36,6 +37,7 @@ import net.minecraft.server.v1_4_6.TileEntityEnderChest;
 import net.minecraft.server.v1_4_6.World;
 
 import org.bukkit.craftbukkit.v1_4_6.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_4_6.event.CraftEventFactory;
 
 public class AnySilentContainer implements IAnySilentContainer {
 
@@ -122,37 +124,47 @@ public class AnySilentContainer implements IAnySilentContainer {
             return false;
         }
 
+        IInventory inventory = (IInventory) tile;
         int id = world.getTypeId(block.getX(), block.getY(), block.getZ());
 
         if (world.getTypeId(block.getX(), block.getY(), block.getZ() + 1) == id) {
-            tile = new InventoryLargeChest("Large chest", (IInventory) tile, (TileEntityChest) world.getTileEntity(block.getX(), block.getY(), block.getZ() + 1));
+            inventory = new InventoryLargeChest("container.chestDouble", inventory, (TileEntityChest) world.getTileEntity(block.getX(), block.getY(), block.getZ() + 1));
         } else if (world.getTypeId(block.getX(), block.getY(), block.getZ() - 1) == id) {
-            tile = new InventoryLargeChest("Large chest", (TileEntityChest) world.getTileEntity(block.getX(), block.getY(), block.getZ() - 1), (IInventory) tile);
+            inventory = new InventoryLargeChest("container.chestDouble", (TileEntityChest) world.getTileEntity(block.getX(), block.getY(), block.getZ() - 1), inventory);
         } else if (world.getTypeId(block.getX() + 1, block.getY(), block.getZ()) == id) {
-            tile = new InventoryLargeChest("Large chest", (IInventory) tile, (TileEntityChest) world.getTileEntity(block.getX() + 1, block.getY(), block.getZ()));
+            inventory = new InventoryLargeChest("container.chestDouble", inventory, (TileEntityChest) world.getTileEntity(block.getX() + 1, block.getY(), block.getZ()));
         } else if (world.getTypeId(block.getX() - 1, block.getY(), block.getZ()) == id) {
-            tile = new InventoryLargeChest("Large chest", (TileEntityChest) world.getTileEntity(block.getX() - 1, block.getY(), block.getZ()), (IInventory) tile);
+            inventory = new InventoryLargeChest("container.chestDouble", (TileEntityChest) world.getTileEntity(block.getX() - 1, block.getY(), block.getZ()), inventory);
         }
 
-        boolean returnValue = false;
+        // AnyChest only
         if (!silentchest) {
-            player.openContainer((IInventory) tile);
-            returnValue = true;
-        } else {
-            try {
-                int windowId = player.nextContainerCounter();
-                player.playerConnection.sendPacket(new Packet100OpenWindow(windowId, 0, ((IInventory) tile).getName(), ((IInventory) tile).getSize()));
-                player.activeContainer = new SilentContainerChest(player.inventory, ((IInventory) tile));
-                player.activeContainer.windowId = windowId;
-                player.activeContainer.addSlotListener(player);
-                returnValue = true;
-            } catch (Exception e) {
-                e.printStackTrace();
-                p.sendMessage(ChatColor.RED + "Error while sending silent chest.");
-            }
+            player.openContainer(inventory);
+            return true;
         }
 
-        return returnValue;
+        // SilentChest
+        try {
+            // Call InventoryOpenEvent
+            Container container = new SilentContainerChest(player.inventory, inventory);
+            container = CraftEventFactory.callInventoryOpenEvent(player, container);
+            if (container == null) {
+                return false;
+            }
+
+            // Open window
+            int windowId = player.nextContainerCounter();
+            player.playerConnection.sendPacket(new Packet100OpenWindow(windowId, 0, inventory.getName(), inventory.getSize()));
+            player.activeContainer = container;
+            player.activeContainer.windowId = windowId;
+            player.activeContainer.addSlotListener(player);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            p.sendMessage(ChatColor.RED + "Error while sending silent container.");
+            return false;
+        }
     }
 
 }
