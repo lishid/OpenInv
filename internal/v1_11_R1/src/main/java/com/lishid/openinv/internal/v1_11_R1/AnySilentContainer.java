@@ -39,7 +39,6 @@ import net.minecraft.server.v1_11_R1.EntityOcelot;
 import net.minecraft.server.v1_11_R1.EntityPlayer;
 import net.minecraft.server.v1_11_R1.EnumDirection;
 import net.minecraft.server.v1_11_R1.IBlockData;
-import net.minecraft.server.v1_11_R1.IInventory;
 import net.minecraft.server.v1_11_R1.ITileInventory;
 import net.minecraft.server.v1_11_R1.InventoryEnderChest;
 import net.minecraft.server.v1_11_R1.InventoryLargeChest;
@@ -168,7 +167,7 @@ public class AnySilentContainer implements IAnySilentContainer {
 
         final World world = player.world;
         final BlockPosition blockPosition = new BlockPosition(b.getX(), b.getY(), b.getZ());
-        Object tile = world.getTileEntity(blockPosition);
+        final Object tile = world.getTileEntity(blockPosition);
 
         if (tile == null) {
             return false;
@@ -183,9 +182,11 @@ public class AnySilentContainer implements IAnySilentContainer {
             return true;
         }
 
-        if (!(tile instanceof IInventory)) {
+        if (!(tile instanceof ITileInventory)) {
             return false;
         }
+
+        ITileInventory tileInventory = (ITileInventory) tile;
 
         Block block = world.getType(blockPosition).getBlock();
         Container container = null;
@@ -207,11 +208,11 @@ public class AnySilentContainer implements IAnySilentContainer {
                 }
 
                 if ((localEnumDirection == EnumDirection.WEST) || (localEnumDirection == EnumDirection.NORTH)) {
-                    tile = new InventoryLargeChest("container.chestDouble",
-                            (TileEntityChest) localTileEntity, (ITileInventory) tile);
+                    tileInventory = new InventoryLargeChest("container.chestDouble",
+                            (TileEntityChest) localTileEntity, tileInventory);
                 } else {
-                    tile = new InventoryLargeChest("container.chestDouble",
-                            (ITileInventory) tile, (TileEntityChest) localTileEntity);
+                    tileInventory = new InventoryLargeChest("container.chestDouble",
+                            tileInventory, (TileEntityChest) localTileEntity);
                 }
                 break;
             }
@@ -223,32 +224,31 @@ public class AnySilentContainer implements IAnySilentContainer {
             }
 
             if (silentchest) {
-                container = new SilentContainerChest(player.inventory, ((IInventory) tile), player);
+                container = new SilentContainerChest(player.inventory, tileInventory, player);
             }
         }
 
         if (block instanceof BlockShulkerBox) {
             player.b(StatisticList.getStatistic("stat.shulkerBoxOpened"));
 
-            if (silentchest && tile instanceof TileEntityShulkerBox) {
+            if (silentchest && tileInventory instanceof TileEntityShulkerBox) {
                 // Set value to current + 1. Ensures consistency later when resetting.
-                SilentContainerShulkerBox.setOpenValue((TileEntityShulkerBox) tile,
-                        SilentContainerShulkerBox.getOpenValue((TileEntityShulkerBox) tile) + 1);
+                SilentContainerShulkerBox.setOpenValue((TileEntityShulkerBox) tileInventory,
+                        SilentContainerShulkerBox.getOpenValue((TileEntityShulkerBox) tileInventory) + 1);
 
-                container = new SilentContainerShulkerBox(player.inventory, (IInventory) tile, player);
+                container = new SilentContainerShulkerBox(player.inventory, tileInventory, player);
             }
         }
 
         boolean returnValue = false;
-        final IInventory iInventory = (IInventory) tile;
 
         if (!silentchest || container == null) {
-            player.openContainer(iInventory);
+            player.openContainer(tileInventory);
             returnValue = true;
         } else {
             try {
                 int windowId = player.nextContainerCounter();
-                player.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, iInventory.getName(), iInventory.getScoreboardDisplayName(), iInventory.getSize()));
+                player.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, tileInventory.getContainerName(), tileInventory.getScoreboardDisplayName(), tileInventory.getSize()));
                 player.activeContainer = container;
                 player.activeContainer.windowId = windowId;
                 player.activeContainer.addSlotListener(player);
