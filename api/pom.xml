@@ -16,7 +16,8 @@
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
       <version>1.4.5-R1.0</version>
-      <scope>provided</scope>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/../lib/bukkit-1.4.5-R1.0.jar</systemPath>
     </dependency>
   </dependencies>
 

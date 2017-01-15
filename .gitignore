@@ -5,6 +5,5 @@
 **/.idea
 **/target
 **/bin
-**/lib
 **/out
 **dependency-reduced-pom.xml
