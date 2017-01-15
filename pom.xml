@@ -12,7 +12,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <openinv.version>3.0.6</openinv.version>
+    <openinv.version>3.0.7-SNAPSHOT</openinv.version>
   </properties>
 
   <modules>
@@ -34,7 +34,10 @@
     <profile>
       <id>all</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>all</name>
+          <value>true</value>
+        </property>
       </activation>
     </profile>
 
@@ -78,7 +81,9 @@
             <filter>
               <artifact>*:*</artifact>
               <!-- Keep the file clean, don't include every single pom from all modules -->
-              <excludes>META-INF/maven/**</excludes>
+              <excludes>
+                <exclude>META-INF/maven/**</exclude>
+              </excludes>
             </filter>
           </filters>
         </configuration>
