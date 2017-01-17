@@ -1,6 +1,6 @@
 name: OpenInv
 main: com.lishid.openinv.OpenInv
-version: ${openinv.version}
+version: ${project.version}
 author: lishid
 authors: [Jikoo, ShadowRanger]
 description: >

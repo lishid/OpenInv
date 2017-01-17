@@ -7,3 +7,4 @@
 **/bin
 **/out
 **dependency-reduced-pom.xml
+**pom.xml.versionsBackup
