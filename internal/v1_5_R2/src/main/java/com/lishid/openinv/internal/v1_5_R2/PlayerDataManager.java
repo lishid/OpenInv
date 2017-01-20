@@ -23,14 +23,15 @@ import com.lishid.openinv.internal.IPlayerDataManager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
-// Volatile
 import net.minecraft.server.v1_5_R2.EntityPlayer;
 import net.minecraft.server.v1_5_R2.MinecraftServer;
 import net.minecraft.server.v1_5_R2.PlayerInteractManager;
 
 import org.bukkit.craftbukkit.v1_5_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_5_R2.entity.CraftPlayer;
 
 public class PlayerDataManager implements IPlayerDataManager {
 
@@ -75,6 +76,26 @@ public class PlayerDataManager implements IPlayerDataManager {
     @Override
     public Collection<? extends Player> getOnlinePlayers() {
         return Arrays.asList(Bukkit.getOnlinePlayers());
+    }
+
+    public static EntityPlayer getHandle(Player player) {
+        if (player instanceof CraftPlayer) {
+            return ((CraftPlayer) player).getHandle();
+        }
+
+        Server server = player.getServer();
+        EntityPlayer nmsPlayer = null;
+
+        if (server instanceof CraftServer) {
+            nmsPlayer = ((CraftServer) server).getHandle().f(player.getName());
+        }
+
+        if (nmsPlayer == null) {
+            // Could use reflection to examine fields, but it's honestly not worth the bother.
+            throw new RuntimeException("Unable to fetch EntityPlayer from provided Player implementation");
+        }
+
+        return nmsPlayer;
     }
 
 }

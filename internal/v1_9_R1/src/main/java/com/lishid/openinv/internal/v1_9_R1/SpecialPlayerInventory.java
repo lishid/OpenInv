@@ -24,11 +24,9 @@ import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-// Volatile
 import net.minecraft.server.v1_9_R1.ItemStack;
 import net.minecraft.server.v1_9_R1.PlayerInventory;
 
-import org.bukkit.craftbukkit.v1_9_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_9_R1.inventory.CraftInventory;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
@@ -38,7 +36,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     private boolean playerOnline = false;
 
     public SpecialPlayerInventory(Player bukkitPlayer, Boolean online) {
-        super(((CraftPlayer) bukkitPlayer).getHandle());
+        super(PlayerDataManager.getHandle(bukkitPlayer));
         this.playerOnline = online;
         setItemArrays(this, player.inventory.items, player.inventory.armor, player.inventory.extraSlots);
     }
@@ -88,7 +86,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     @Override
     public void setPlayerOnline(Player player) {
         if (!playerOnline) {
-            this.player = ((CraftPlayer) player).getHandle();
+            this.player = PlayerDataManager.getHandle(player);
             setItemArrays(this.player.inventory, items, armor, extraSlots);
             playerOnline = true;
         }

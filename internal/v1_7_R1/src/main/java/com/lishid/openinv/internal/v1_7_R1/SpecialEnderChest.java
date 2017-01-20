@@ -27,7 +27,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-// Volatile
+import net.minecraft.server.v1_7_R1.EntityPlayer;
 import net.minecraft.server.v1_7_R1.IInventory;
 import net.minecraft.server.v1_7_R1.InventoryEnderChest;
 import net.minecraft.server.v1_7_R1.InventorySubcontainer;
@@ -46,13 +46,13 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     private CraftPlayer owner;
     private int maxStack = MAX_STACK;
 
-    public SpecialEnderChest(Player p, Boolean online) {
-        super(((CraftPlayer) p).getHandle().getEnderChest().getInventoryName(),
-                ((CraftPlayer) p).getHandle().getEnderChest().k_(),
-                ((CraftPlayer) p).getHandle().getEnderChest().getSize());
-        CraftPlayer player = (CraftPlayer) p;
-        this.enderChest = player.getHandle().getEnderChest();
-        this.owner = player;
+    public SpecialEnderChest(Player player, Boolean online) {
+        super(PlayerDataManager.getHandle(player).getEnderChest().getInventoryName(),
+                PlayerDataManager.getHandle(player).getEnderChest().k_(),
+                PlayerDataManager.getHandle(player).getEnderChest().getSize());
+        EntityPlayer nmsPlayer = PlayerDataManager.getHandle(player);
+        this.enderChest = nmsPlayer.getEnderChest();
+        this.owner = nmsPlayer.getBukkitEntity();
         this.items = enderChest.getContents();
     }
 
@@ -65,8 +65,9 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     public void setPlayerOnline(Player player) {
         if (!playerOnline) {
             try {
-                owner = (CraftPlayer) player;
-                InventoryEnderChest playerEnderChest = owner.getHandle().getEnderChest();
+                EntityPlayer nmsPlayer = PlayerDataManager.getHandle(player);
+                this.owner = nmsPlayer.getBukkitEntity();
+                InventoryEnderChest playerEnderChest = nmsPlayer.getEnderChest();
                 Field field = playerEnderChest.getClass().getField("items");
                 field.setAccessible(true);
                 field.set(playerEnderChest, this.items);

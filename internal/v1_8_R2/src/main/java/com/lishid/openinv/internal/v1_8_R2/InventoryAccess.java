@@ -23,7 +23,6 @@ import com.lishid.openinv.util.InternalAccessor;
 
 import org.bukkit.inventory.Inventory;
 
-// Volatile
 import net.minecraft.server.v1_8_R2.IInventory;
 
 import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventory;

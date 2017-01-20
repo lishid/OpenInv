@@ -16,7 +16,6 @@
 
 package com.lishid.openinv.internal.v1_5_R3;
 
-// Volatile
 import net.minecraft.server.v1_5_R3.ContainerChest;
 import net.minecraft.server.v1_5_R3.EntityHuman;
 import net.minecraft.server.v1_5_R3.IInventory;

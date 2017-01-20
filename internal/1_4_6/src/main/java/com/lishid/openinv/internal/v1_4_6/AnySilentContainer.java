@@ -22,7 +22,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
-// Volatile
 import net.minecraft.server.v1_4_6.AxisAlignedBB;
 import net.minecraft.server.v1_4_6.BlockEnderChest;
 import net.minecraft.server.v1_4_6.Container;
@@ -36,7 +35,6 @@ import net.minecraft.server.v1_4_6.TileEntityChest;
 import net.minecraft.server.v1_4_6.TileEntityEnderChest;
 import net.minecraft.server.v1_4_6.World;
 
-import org.bukkit.craftbukkit.v1_4_6.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_4_6.event.CraftEventFactory;
 
 public class AnySilentContainer implements IAnySilentContainer {
@@ -49,7 +47,7 @@ public class AnySilentContainer implements IAnySilentContainer {
     @Override
     public boolean isAnyContainerNeeded(Player p, org.bukkit.block.Block block) {
         // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
-        EntityPlayer player = ((CraftPlayer) p).getHandle();
+        EntityPlayer player = PlayerDataManager.getHandle(p);
         World world = player.world;
 
         if (block instanceof BlockEnderChest) {
@@ -97,7 +95,7 @@ public class AnySilentContainer implements IAnySilentContainer {
     @Override
     public boolean activateContainer(Player p, boolean silentchest, org.bukkit.block.Block block) {
 
-        EntityPlayer player = ((CraftPlayer) p).getHandle();
+        EntityPlayer player = PlayerDataManager.getHandle(p);
 
         // Silent ender chest is API-only
         if (silentchest && block.getType() == Material.ENDER_CHEST) {

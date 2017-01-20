@@ -24,13 +24,12 @@ import com.lishid.openinv.internal.ISpecialEnderChest;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-// Volatile
+import net.minecraft.server.v1_10_R1.EntityPlayer;
 import net.minecraft.server.v1_10_R1.IInventory;
 import net.minecraft.server.v1_10_R1.InventoryEnderChest;
 import net.minecraft.server.v1_10_R1.InventorySubcontainer;
 import net.minecraft.server.v1_10_R1.ItemStack;
 
-import org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftInventory;
 
 public class SpecialEnderChest extends InventorySubcontainer implements IInventory, ISpecialEnderChest {
@@ -40,12 +39,12 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     private boolean playerOnline = false;
 
     public SpecialEnderChest(Player player, Boolean online) {
-        super(((CraftPlayer) player).getHandle().getEnderChest().getName(),
-                ((CraftPlayer) player).getHandle().getEnderChest().hasCustomName(),
-                ((CraftPlayer) player).getHandle().getEnderChest().getSize());
-        CraftPlayer craftPlayer = (CraftPlayer) player;
-        this.enderChest = craftPlayer.getHandle().getEnderChest();
-        this.bukkitOwner = craftPlayer;
+        super(PlayerDataManager.getHandle(player).getEnderChest().getName(),
+                PlayerDataManager.getHandle(player).getEnderChest().hasCustomName(),
+                PlayerDataManager.getHandle(player).getEnderChest().getSize());
+        EntityPlayer nmsPlayer = PlayerDataManager.getHandle(player);
+        this.enderChest = nmsPlayer.getEnderChest();
+        this.bukkitOwner = nmsPlayer.getBukkitEntity();
         setItemArrays(this, enderChest.getContents());
     }
 
@@ -78,9 +77,9 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     public void setPlayerOnline(Player player) {
         if (!playerOnline) {
             try {
-                this.bukkitOwner = player;
-                CraftPlayer craftPlayer = (CraftPlayer) player;
-                setItemArrays(craftPlayer.getHandle().getEnderChest(), this.items);
+                EntityPlayer nmsPlayer = PlayerDataManager.getHandle(player);
+                this.bukkitOwner = nmsPlayer.getBukkitEntity();
+                setItemArrays(nmsPlayer.getEnderChest(), this.items);
             } catch (Exception e) {}
             playerOnline = true;
         }

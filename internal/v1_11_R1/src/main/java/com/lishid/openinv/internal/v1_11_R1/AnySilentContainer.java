@@ -25,7 +25,6 @@ import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-// Volatile
 import net.minecraft.server.v1_11_R1.AxisAlignedBB;
 import net.minecraft.server.v1_11_R1.Block;
 import net.minecraft.server.v1_11_R1.BlockChest;
@@ -49,7 +48,6 @@ import net.minecraft.server.v1_11_R1.TileEntityEnderChest;
 import net.minecraft.server.v1_11_R1.TileEntityShulkerBox;
 import net.minecraft.server.v1_11_R1.World;
 
-import org.bukkit.craftbukkit.v1_11_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_11_R1.event.CraftEventFactory;
 
 public class AnySilentContainer implements IAnySilentContainer {
@@ -65,7 +63,7 @@ public class AnySilentContainer implements IAnySilentContainer {
 
     @Override
     public boolean isAnyContainerNeeded(Player p, org.bukkit.block.Block b) {
-        EntityPlayer player = ((CraftPlayer) p).getHandle();
+        EntityPlayer player = PlayerDataManager.getHandle(p);
         World world = player.world;
         BlockPosition blockPosition = new BlockPosition(b.getX(), b.getY(), b.getZ());
         IBlockData blockData = world.getType(blockPosition);
@@ -156,7 +154,7 @@ public class AnySilentContainer implements IAnySilentContainer {
     @Override
     public boolean activateContainer(Player p, boolean silentchest, org.bukkit.block.Block b) {
 
-        EntityPlayer player = ((CraftPlayer) p).getHandle();
+        EntityPlayer player = PlayerDataManager.getHandle(p);
 
         // Silent ender chest is pretty much API-only
         if (silentchest && b.getType() == Material.ENDER_CHEST) {

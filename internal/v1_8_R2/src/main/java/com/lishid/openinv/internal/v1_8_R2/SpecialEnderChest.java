@@ -23,12 +23,11 @@ import com.lishid.openinv.internal.ISpecialEnderChest;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-// Volatile
+import net.minecraft.server.v1_8_R2.EntityPlayer;
 import net.minecraft.server.v1_8_R2.IInventory;
 import net.minecraft.server.v1_8_R2.InventoryEnderChest;
 import net.minecraft.server.v1_8_R2.InventorySubcontainer;
 
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftInventory;
 
 public class SpecialEnderChest extends InventorySubcontainer implements IInventory, ISpecialEnderChest {
@@ -38,12 +37,12 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     private boolean playerOnline = false;
 
     public SpecialEnderChest(Player player, Boolean online) {
-        super(((CraftPlayer) player).getHandle().getEnderChest().getName(),
-                ((CraftPlayer) player).getHandle().getEnderChest().hasCustomName(),
-                ((CraftPlayer) player).getHandle().getEnderChest().getSize());
-        CraftPlayer craftPlayer = (CraftPlayer) player;
-        this.enderChest = craftPlayer.getHandle().getEnderChest();
-        this.bukkitOwner = craftPlayer;
+        super(PlayerDataManager.getHandle(player).getEnderChest().getName(),
+                PlayerDataManager.getHandle(player).getEnderChest().hasCustomName(),
+                PlayerDataManager.getHandle(player).getEnderChest().getSize());
+        EntityPlayer nmsPlayer = PlayerDataManager.getHandle(player);
+        this.enderChest = nmsPlayer.getEnderChest();
+        this.bukkitOwner = nmsPlayer.getBukkitEntity();
         this.items = enderChest.getContents();
     }
 
@@ -56,9 +55,9 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     public void setPlayerOnline(Player player) {
         if (!playerOnline) {
             try {
-                this.bukkitOwner = player;
-                CraftPlayer craftPlayer = (CraftPlayer) player;
-                InventoryEnderChest playerEnderChest = craftPlayer.getHandle().getEnderChest();
+                EntityPlayer nmsPlayer = PlayerDataManager.getHandle(player);
+                this.bukkitOwner = nmsPlayer.getBukkitEntity();
+                InventoryEnderChest playerEnderChest = nmsPlayer.getEnderChest();
                 Field field = playerEnderChest.getClass().getField("items");
                 field.setAccessible(true);
                 field.set(playerEnderChest, this.items);

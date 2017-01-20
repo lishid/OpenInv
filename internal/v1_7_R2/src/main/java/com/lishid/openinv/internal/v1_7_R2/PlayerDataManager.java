@@ -23,15 +23,16 @@ import com.lishid.openinv.internal.IPlayerDataManager;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
 
-//Volatile
 import net.minecraft.server.v1_7_R2.EntityPlayer;
 import net.minecraft.server.v1_7_R2.MinecraftServer;
 import net.minecraft.server.v1_7_R2.PlayerInteractManager;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
 
 import org.bukkit.craftbukkit.v1_7_R2.CraftServer;
+import org.bukkit.craftbukkit.v1_7_R2.entity.CraftPlayer;
 
 @SuppressWarnings("deprecation") // Deprecated methods are used properly and will not change.
 public class PlayerDataManager implements IPlayerDataManager {
@@ -77,6 +78,26 @@ public class PlayerDataManager implements IPlayerDataManager {
     @Override
     public Collection<? extends Player> getOnlinePlayers() {
         return Arrays.asList(Bukkit.getOnlinePlayers());
+    }
+
+    public static EntityPlayer getHandle(Player player) {
+        if (player instanceof CraftPlayer) {
+            return ((CraftPlayer) player).getHandle();
+        }
+
+        Server server = player.getServer();
+        EntityPlayer nmsPlayer = null;
+
+        if (server instanceof CraftServer) {
+            nmsPlayer = ((CraftServer) server).getHandle().getPlayer(player.getName());
+        }
+
+        if (nmsPlayer == null) {
+            // Could use reflection to examine fields, but it's honestly not worth the bother.
+            throw new RuntimeException("Unable to fetch EntityPlayer from provided Player implementation");
+        }
+
+        return nmsPlayer;
     }
 
 }
