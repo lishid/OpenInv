@@ -123,7 +123,7 @@ public class AnySilentContainer implements IAnySilentContainer {
             try {
                 // 1.11.2
                 return world.a(axisAlignedBB.a(blockPosition.shift(enumDirection)));
-            } catch (Exception e) {
+            } catch (NoSuchMethodError e) {
                 // 1.11
                 return world.b(axisAlignedBB.a(blockPosition.shift(enumDirection)));
             }
