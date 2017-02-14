@@ -9,7 +9,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 
 /**
- * A minimal time-based cache implementation backed by a HashMap and TreeMultimap.
+ * A minimal thread-safe time-based cache implementation backed by a HashMap and TreeMultimap.
  * 
  * @author Jikoo
  */
@@ -59,8 +59,10 @@ public class Cache<K, V> {
         // Invalidate key - runs lazy check and ensures value won't be cleaned up early
         invalidate(key);
 
-        internal.put(key, value);
-        expiry.put(System.currentTimeMillis() + retention, key);
+        synchronized (internal) {
+            internal.put(key, value);
+            expiry.put(System.currentTimeMillis() + retention, key);
+        }
     }
 
     /**
@@ -70,10 +72,12 @@ public class Cache<K, V> {
      * @return the value to which the specified key is mapped, or null if no value is mapped for the key
      */
     public V get(K key) {
-        // Run lazy check to clean cache
-        lazyCheck();
+        synchronized (internal) {
+            // Run lazy check to clean cache
+            lazyCheck();
 
-        return internal.get(key);
+            return internal.get(key);
+        }
     }
 
     /**
@@ -83,10 +87,12 @@ public class Cache<K, V> {
      * @return true if a mapping exists for the specified key
      */
     public boolean containsKey(K key) {
-        // Run lazy check to clean cache
-        lazyCheck();
+        synchronized (internal) {
+            // Run lazy check to clean cache
+            lazyCheck();
 
-        return internal.containsKey(key);
+            return internal.containsKey(key);
+        }
     }
 
     /**
@@ -95,22 +101,24 @@ public class Cache<K, V> {
      * @param key key to invalidate
      */
     public void invalidate(K key) {
-        // Run lazy check to clean cache
-        lazyCheck();
+        synchronized (internal) {
+            // Run lazy check to clean cache
+            lazyCheck();
 
-        if (!internal.containsKey(key)) {
-            // Value either not present or cleaned by lazy check. Either way, we're good
-            return;
-        }
+            if (!internal.containsKey(key)) {
+                // Value either not present or cleaned by lazy check. Either way, we're good
+                return;
+            }
 
-        // Remove stored object
-        internal.remove(key);
+            // Remove stored object
+            internal.remove(key);
 
-        // Remove expiration entry - prevents more work later, plus prevents issues with values invalidating early
-        for (Iterator<Map.Entry<Long, K>> iterator = expiry.entries().iterator(); iterator.hasNext();) {
-            if (key.equals(iterator.next().getValue())) {
-                iterator.remove();
-                break;
+            // Remove expiration entry - prevents more work later, plus prevents issues with values invalidating early
+            for (Iterator<Map.Entry<Long, K>> iterator = expiry.entries().iterator(); iterator.hasNext();) {
+                if (key.equals(iterator.next().getValue())) {
+                    iterator.remove();
+                    break;
+                }
             }
         }
     }
@@ -119,11 +127,13 @@ public class Cache<K, V> {
      * Forcibly invalidates all keys, even if they are considered to be in use.
      */
     public void invalidateAll() {
-        for (V value : internal.values()) {
-            postRemoval.run(value);
+        synchronized (internal) {
+            for (V value : internal.values()) {
+                postRemoval.run(value);
+            }
+            expiry.clear();
+            internal.clear();
         }
-        expiry.clear();
-        internal.clear();
     }
 
     /**
