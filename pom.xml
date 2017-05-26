@@ -51,10 +51,10 @@
     </profile>
 
     <profile>
-      <id>modern</id>
+      <id>recent</id>
       <activation>
         <property>
-          <name>modern</name>
+          <name>recent</name>
           <value>true</value>
         </property>
       </activation>

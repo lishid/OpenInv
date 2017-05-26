@@ -18,19 +18,14 @@
     <profile>
       <id>latest</id>
       <modules>
-        <module>v1_11_R1</module>
+        <module>v1_12_R1</module>
       </modules>
     </profile>
 
     <profile>
-      <id>modern</id>
+      <id>recent</id>
+      <!-- The recent profile is for the most recent 2 versions. -->
       <modules>
-        <module>v1_8_R1</module>
-        <module>v1_8_R2</module>
-        <module>v1_8_R3</module>
-        <module>v1_9_R1</module>
-        <module>v1_9_R2</module>
-        <module>v1_10_R1</module>
         <module>v1_11_R1</module>
         <module>v1_12_R1</module>
       </modules>
