@@ -85,8 +85,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
                                     && OpenInv.this.enderChests.get(key).isInUse()
                             || OpenInv.this.pluginUsage.containsKey(key);
                 }
-            },
-            new Function<Player>() {
+            }, new Function<Player>() {
                 @Override
                 public boolean run(final Player value) {
                     String key = OpenInv.this.playerLoader.getPlayerDataID(value);
@@ -231,6 +230,50 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     @Override
     public IInventoryAccess getInventoryAccess() {
         return this.inventoryAccess;
+    }
+
+    private int getLevenshteinDistance(final String string1, final String string2) {
+        if (string1 == null || string2 == null) {
+            throw new IllegalArgumentException("Strings must not be null");
+        }
+
+        if (string1.isEmpty()) {
+            return string2.length();
+        }
+        if (string2.isEmpty()) {
+            return string2.length();
+        }
+        if (string1.equals(string2)) {
+            return 0;
+        }
+
+        int len1 = string1.length();
+        int len2 = string2.length();
+
+        int[] prevDistances = new int[len1 + 1];
+        int[] distances = new int[len1 + 1];
+
+        for (int i = 0; i <= len1; ++i) {
+            prevDistances[i] = i;
+        }
+
+        for (int i = 1; i <= len2; ++i) {
+            // TODO: include tweaks available in Simmetrics?
+            char string2char = string2.charAt(i - 1);
+            distances[0] = i;
+
+            for (int j = 1; j <= len1; ++j) {
+                int cost = string1.charAt(j - 1) == string2char ? 0 : 1;
+
+                distances[j] = Math.min(Math.min(distances[j - 1] + 1, prevDistances[j] + 1), prevDistances[j - 1] + cost);
+            }
+
+            int[] swap = prevDistances;
+            prevDistances = distances;
+            distances = swap;
+        }
+
+        return prevDistances[len1];
     }
 
     @SuppressWarnings("unchecked")
@@ -444,8 +487,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
                 continue;
             }
 
-            // Compatibility: Lang3 is only bundled with 1.8+
-            int currentMatch = org.apache.commons.lang.StringUtils.getLevenshteinDistance(name, offline.getName());
+            int currentMatch = this.getLevenshteinDistance(name, offline.getName());
 
             if (currentMatch == 0) {
                 return offline;
