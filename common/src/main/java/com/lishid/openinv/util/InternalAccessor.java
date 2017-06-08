@@ -1,15 +1,15 @@
 /*
  * Copyright (C) 2011-2014 lishid.  All rights reserved.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation,  version 3.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -18,6 +18,7 @@ package com.lishid.openinv.util;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 import com.lishid.openinv.internal.IAnySilentContainer;
 import com.lishid.openinv.internal.IInventoryAccess;
@@ -30,144 +31,8 @@ import org.bukkit.plugin.Plugin;
 
 public class InternalAccessor {
 
-    private final Plugin plugin;
-
-    private final String version;
-    private boolean supported = false;
-
-    public InternalAccessor(Plugin plugin) {
-        this.plugin = plugin;
-
-        String packageName = plugin.getServer().getClass().getPackage().getName();
-        version = packageName.substring(packageName.lastIndexOf('.') + 1);
-
-        try {
-            Class.forName("com.lishid.openinv.internal." + version + ".PlayerDataManager");
-            supported = true;
-        } catch (Exception e) {}
-    }
-
-    /**
-     * Gets the server implementation version. If not initialized, returns the string "null"
-     * instead.
-     * 
-     * @return the version, or "null"
-     */
-    public String getVersion() {
-        return this.version != null ? this.version : "null";
-    }
-
-    /**
-     * Checks if the server implementation is supported.
-     * 
-     * @return true if initialized for a supported server version
-     */
-    public boolean isSupported() {
-        return this.supported;
-    }
-
-    /**
-     * Creates an instance of the IPlayerDataManager implementation for the current server version,
-     * or null if unsupported.
-     * 
-     * @return the IPlayerDataManager
-     */
-    public IPlayerDataManager newPlayerDataManager() {
-        return createObject(IPlayerDataManager.class, "PlayerDataManager");
-    }
-
-    /**
-     * Creates an instance of the IInventoryAccess implementation for the current server version, or
-     * null if unsupported.
-     * 
-     * @return the IInventoryAccess
-     */
-    public IInventoryAccess newInventoryAccess() {
-        return createObject(IInventoryAccess.class, "InventoryAccess");
-    }
-
-    /**
-     * Creates an instance of the IAnySilentContainer implementation for the current server version,
-     * or null if unsupported.
-     * 
-     * @return the IAnySilentContainer
-     */
-    public IAnySilentContainer newAnySilentContainer() {
-        return createObject(IAnySilentContainer.class, "AnySilentContainer");
-    }
-
-    /**
-     * Creates an instance of the ISpecialPlayerInventory implementation for the given Player, or
-     * null if the current version is unsupported.
-     * 
-     * @param player the Player
-     * @param online true if the Player is online
-     * @return the ISpecialPlayerInventory created
-     */
-    public ISpecialPlayerInventory newSpecialPlayerInventory(Player player, boolean online) {
-        return createObject(ISpecialPlayerInventory.class, "SpecialPlayerInventory", player, online);
-    }
-
-    /**
-     * Creates an instance of the ISpecialEnderChest implementation for the given Player, or
-     * null if the current version is unsupported.
-     * 
-     * @param player the Player
-     * @param online true if the Player is online
-     * @return the ISpecialEnderChest created
-     */
-    public ISpecialEnderChest newSpecialEnderChest(Player player, boolean online) {
-        return createObject(ISpecialEnderChest.class, "SpecialEnderChest", player, online);
-    }
-
-    private <T> T createObject(Class<? extends T> assignableClass, String className, Object... params) {
-        try {
-            // Check if internal versioned class exists
-            Class<?> internalClass = Class.forName("com.lishid.openinv.internal." + version + "." + className);
-            if (!assignableClass.isAssignableFrom(internalClass)) {
-                plugin.getLogger().warning("Found class " + internalClass.getName() + " but cannot cast to " + assignableClass.getName());
-                return null;
-            }
-
-            // Quick return: no parameters, no need to fiddle about finding the correct constructor.
-            if (params.length == 0) {
-                return assignableClass.cast(internalClass.getConstructor().newInstance());
-            }
-
-            // Search constructors for one matching the given parameters
-            nextConstructor: for (Constructor<?> constructor : internalClass.getConstructors()) {
-                Class<?>[] requiredClasses = constructor.getParameterTypes();
-                if (requiredClasses.length != params.length) {
-                    continue;
-                }
-                for (int i = 0; i < params.length; ++i) {
-                    if (!requiredClasses[i].isAssignableFrom(params[i].getClass())) {
-                        continue nextConstructor;
-                    }
-                }
-                return assignableClass.cast(constructor.newInstance(params));
-            }
-
-            StringBuilder message = new StringBuilder("Found class ").append(internalClass.getName())
-                    .append(" but cannot find any matching constructors for [");
-            for (Object object : params) {
-                message.append(object.getClass().getName()).append(", ");
-            }
-            if (params.length > 0) {
-                message.delete(message.length() - 2, message.length());
-            }
-
-            plugin.getLogger().warning(message.append(']').toString());
-        } catch (Exception e) {
-            plugin.getLogger().warning("OpenInv encountered an error with the CraftBukkit version \"" + version + "\". Please look for an updated version of OpenInv.");
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    public static <T> T grabFieldOfTypeFromObject(Class<T> type, Object object) {
-        // Use reflection to find the iinventory
+    public static <T> T grabFieldOfTypeFromObject(final Class<T> type, final Object object) {
+        // Use reflection to find the IInventory
         Class<?> clazz = object.getClass();
         T result = null;
         for (Field f : clazz.getDeclaredFields()) {
@@ -181,6 +46,173 @@ public class InternalAccessor {
             }
         }
         return result;
+    }
+
+    private final Plugin plugin;
+    private final String version;
+    private boolean supported = false;
+    private IPlayerDataManager playerDataManager;
+    private IInventoryAccess inventoryAccess;
+
+    private IAnySilentContainer anySilentContainer;
+
+    public InternalAccessor(final Plugin plugin) {
+        this.plugin = plugin;
+
+        String packageName = plugin.getServer().getClass().getPackage().getName();
+        this.version = packageName.substring(packageName.lastIndexOf('.') + 1);
+
+        try {
+            Class.forName("com.lishid.openinv.internal." + this.version + ".SpecialPlayerInventory");
+            Class.forName("com.lishid.openinv.internal." + this.version + ".SpecialEnderChest");
+            this.playerDataManager = this.createObject(IPlayerDataManager.class, "PlayerDataManager");
+            this.inventoryAccess = this.createObject(IInventoryAccess.class, "InventoryAccess");
+            this.anySilentContainer = this.createObject(IAnySilentContainer.class, "AnySilentContainer");
+            this.supported = true;
+        } catch (Exception e) {}
+    }
+
+    private <T> T createObject(final Class<? extends T> assignableClass, final String className,
+            final Object... params) throws ClassCastException, ClassNotFoundException,
+            InstantiationException, IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException, NoSuchMethodException, SecurityException {
+        // Fetch internal class if it exists.
+        Class<?> internalClass = Class.forName("com.lishid.openinv.internal." + this.version + "." + className);
+        if (!assignableClass.isAssignableFrom(internalClass)) {
+            String message = String.format("Found class %s but cannot cast to %s!", internalClass.getName(), assignableClass.getName());
+            this.plugin.getLogger().warning(message);
+            throw new IllegalStateException(message);
+        }
+
+        // Quick return: no parameters, no need to fiddle about finding the correct constructor.
+        if (params.length == 0) {
+            return assignableClass.cast(internalClass.getConstructor().newInstance());
+        }
+
+        // Search constructors for one matching the given parameters
+        nextConstructor: for (Constructor<?> constructor : internalClass.getConstructors()) {
+            Class<?>[] requiredClasses = constructor.getParameterTypes();
+            if (requiredClasses.length != params.length) {
+                continue;
+            }
+            for (int i = 0; i < params.length; ++i) {
+                if (!requiredClasses[i].isAssignableFrom(params[i].getClass())) {
+                    continue nextConstructor;
+                }
+            }
+            return assignableClass.cast(constructor.newInstance(params));
+        }
+
+        StringBuilder builder = new StringBuilder("Found class ").append(internalClass.getName())
+                .append(" but cannot find any matching constructors for [");
+        for (Object object : params) {
+            builder.append(object.getClass().getName()).append(", ");
+        }
+        if (params.length > 0) {
+            builder.delete(builder.length() - 2, builder.length());
+        }
+
+        String message = builder.append(']').toString();
+        this.plugin.getLogger().warning(message);
+
+        throw new IllegalArgumentException(message);
+    }
+
+    /**
+     * Creates an instance of the IAnySilentContainer implementation for the current server version.
+     *
+     * @return the IAnySilentContainer
+     * @throws IllegalStateException if server version is unsupported
+     */
+    public IAnySilentContainer getAnySilentContainer() {
+        if (!this.supported) {
+            throw new IllegalStateException(String.format("Unsupported server version %s!", this.version));
+        }
+        return this.anySilentContainer;
+    }
+
+    /**
+     * Creates an instance of the IInventoryAccess implementation for the current server version.
+     *
+     * @return the IInventoryAccess
+     * @throws IllegalStateException if server version is unsupported
+     */
+    public IInventoryAccess getInventoryAccess() {
+        if (!this.supported) {
+            throw new IllegalStateException(String.format("Unsupported server version %s!", this.version));
+        }
+        return this.inventoryAccess;
+    }
+
+    /**
+     * Creates an instance of the IPlayerDataManager implementation for the current server version.
+     *
+     * @return the IPlayerDataManager
+     * @throws IllegalStateException if server version is unsupported
+     */
+    public IPlayerDataManager getPlayerDataManager() {
+        if (!this.supported) {
+            throw new IllegalStateException(String.format("Unsupported server version %s!", this.version));
+        }
+        return this.playerDataManager;
+    }
+
+    /**
+     * Gets the server implementation version. If not initialized, returns the string "null"
+     * instead.
+     *
+     * @return the version, or "null"
+     */
+    public String getVersion() {
+        return this.version != null ? this.version : "null";
+    }
+
+    /**
+     * Checks if the server implementation is supported.
+     *
+     * @return true if initialized for a supported server version
+     */
+    public boolean isSupported() {
+        return this.supported;
+    }
+
+    /**
+     * Creates an instance of the ISpecialEnderChest implementation for the given Player, or
+     * null if the current version is unsupported.
+     *
+     * @param player the Player
+     * @param online true if the Player is online
+     * @return the ISpecialEnderChest created
+     * @throws InstantiationException if the ISpecialEnderChest could not be instantiated
+     */
+    public ISpecialEnderChest newSpecialEnderChest(final Player player, final boolean online) throws InstantiationException {
+        if (!this.supported) {
+            throw new IllegalStateException(String.format("Unsupported server version %s!", this.version));
+        }
+        try {
+            return this.createObject(ISpecialEnderChest.class, "SpecialEnderChest", player, online);
+        } catch (Exception e) {
+            throw new InstantiationException(String.format("Unable to create a new ISpecialEnderChest: %s", e.getMessage()));
+        }
+    }
+
+    /**
+     * Creates an instance of the ISpecialPlayerInventory implementation for the given Player..
+     *
+     * @param player the Player
+     * @param online true if the Player is online
+     * @return the ISpecialPlayerInventory created
+     * @throws InstantiationException if the ISpecialPlayerInventory could not be instantiated
+     */
+    public ISpecialPlayerInventory newSpecialPlayerInventory(final Player player, final boolean online) throws InstantiationException {
+        if (!this.supported) {
+            throw new IllegalStateException(String.format("Unsupported server version %s!", this.version));
+        }
+        try {
+            return this.createObject(ISpecialPlayerInventory.class, "SpecialPlayerInventory", player, online);
+        } catch (Exception e) {
+            throw new InstantiationException(String.format("Unable to create a new ISpecialPlayerInventory: %s", e.getMessage()));
+        }
     }
 
 }

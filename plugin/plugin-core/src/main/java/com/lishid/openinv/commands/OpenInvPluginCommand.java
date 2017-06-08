@@ -1,15 +1,15 @@
 /*
  * Copyright (C) 2011-2014 lishid.  All rights reserved.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation,  version 3.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -35,30 +35,30 @@ public class OpenInvPluginCommand implements CommandExecutor {
     private final OpenInv plugin;
     private final HashMap<Player, String> openInvHistory = new HashMap<Player, String>();
 
-    public OpenInvPluginCommand(OpenInv plugin) {
+    public OpenInvPluginCommand(final OpenInv plugin) {
         this.plugin = plugin;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
             return true;
         }
 
         if (args.length > 0 && args[0].equalsIgnoreCase("?")) {
-            plugin.showHelp((Player) sender);
+            this.plugin.showHelp((Player) sender);
             return true;
         }
 
         final Player player = (Player) sender;
 
         // History management
-        String history = openInvHistory.get(player);
+        String history = this.openInvHistory.get(player);
 
         if (history == null || history == "") {
             history = player.getName();
-            openInvHistory.put(player, history);
+            this.openInvHistory.put(player, history);
         }
 
         final String name;
@@ -73,7 +73,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
         new BukkitRunnable() {
             @Override
             public void run() {
-                final OfflinePlayer offlinePlayer = plugin.matchPlayer(name);
+                final OfflinePlayer offlinePlayer = OpenInvPluginCommand.this.plugin.matchPlayer(name);
 
                 if (offlinePlayer == null || !offlinePlayer.hasPlayedBefore() && !offlinePlayer.isOnline()) {
                     player.sendMessage(ChatColor.RED + "Player not found!");
@@ -86,17 +86,17 @@ public class OpenInvPluginCommand implements CommandExecutor {
                         if (!player.isOnline()) {
                             return;
                         }
-                        openInventory(player, offlinePlayer);
+                        OpenInvPluginCommand.this.openInventory(player, offlinePlayer);
                     }
-                }.runTask(plugin);
+                }.runTask(OpenInvPluginCommand.this.plugin);
 
             }
-        }.runTaskAsynchronously(plugin);
+        }.runTaskAsynchronously(this.plugin);
 
         return true;
     }
 
-    private void openInventory(Player player, OfflinePlayer target) {
+    private void openInventory(final Player player, final OfflinePlayer target) {
 
 
         Player onlineTarget;
@@ -104,7 +104,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
 
         if (!online) {
             // Try loading the player's data
-            onlineTarget = plugin.loadPlayer(target);
+            onlineTarget = this.plugin.loadPlayer(target);
 
             if (onlineTarget == null) {
                 player.sendMessage(ChatColor.RED + "Player not found!");
@@ -123,23 +123,34 @@ public class OpenInvPluginCommand implements CommandExecutor {
             }
         } else {
             // Protected check
-            if (!Permissions.OVERRIDE.hasPermission(player) && Permissions.EXEMPT.hasPermission(onlineTarget)) {
+            if (!Permissions.OVERRIDE.hasPermission(player)
+                    && Permissions.EXEMPT.hasPermission(onlineTarget)) {
                 player.sendMessage(ChatColor.RED + onlineTarget.getDisplayName() + "'s inventory is protected!");
                 return;
             }
 
             // Crossworld check
-            if ((!Permissions.CROSSWORLD.hasPermission(player) && !Permissions.OVERRIDE.hasPermission(player)) && onlineTarget.getWorld() != player.getWorld()) {
-                player.sendMessage(ChatColor.RED + onlineTarget.getDisplayName() + " is not in your world!");
+            if (!Permissions.CROSSWORLD.hasPermission(player)
+                    && !Permissions.OVERRIDE.hasPermission(player)
+                    && !onlineTarget.getWorld().equals(player.getWorld())) {
+                player.sendMessage(
+                        ChatColor.RED + onlineTarget.getDisplayName() + " is not in your world!");
                 return;
             }
         }
 
         // Record the target
-        openInvHistory.put(player, onlineTarget.getName());
+        this.openInvHistory.put(player, onlineTarget.getName());
 
         // Create the inventory
-        ISpecialPlayerInventory inv = plugin.getInventory(onlineTarget, online);
+        ISpecialPlayerInventory inv;
+        try {
+            inv = this.plugin.getSpecialInventory(onlineTarget, online);
+        } catch (Exception e) {
+            player.sendMessage(ChatColor.RED + "An error occurred creating " + onlineTarget.getDisplayName() + "'s inventory!");
+            e.printStackTrace();
+            return;
+        }
 
         // Open the inventory
         player.openInventory(inv.getBukkitInventory());

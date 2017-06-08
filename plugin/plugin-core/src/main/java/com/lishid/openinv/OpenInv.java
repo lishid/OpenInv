@@ -28,6 +28,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.annotation.Nullable;
+
 import com.lishid.openinv.commands.AnyChestPluginCommand;
 import com.lishid.openinv.commands.OpenEnderPluginCommand;
 import com.lishid.openinv.commands.OpenInvPluginCommand;
@@ -36,7 +38,6 @@ import com.lishid.openinv.commands.SearchInvPluginCommand;
 import com.lishid.openinv.commands.SilentChestPluginCommand;
 import com.lishid.openinv.internal.IAnySilentContainer;
 import com.lishid.openinv.internal.IInventoryAccess;
-import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import com.lishid.openinv.listeners.InventoryClickListener;
@@ -78,7 +79,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             new Function<Player>() {
                 @Override
                 public boolean run(final Player value) {
-                    String key = OpenInv.this.playerLoader.getPlayerDataID(value);
+                    String key = OpenInv.this.accessor.getPlayerDataManager().getPlayerDataID(value);
                     return OpenInv.this.inventories.containsKey(key)
                             && OpenInv.this.inventories.get(key).isInUse()
                             || OpenInv.this.enderChests.containsKey(key)
@@ -88,7 +89,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             }, new Function<Player>() {
                 @Override
                 public boolean run(final Player value) {
-                    String key = OpenInv.this.playerLoader.getPlayerDataID(value);
+                    String key = OpenInv.this.accessor.getPlayerDataManager().getPlayerDataID(value);
 
                     // Check if inventory is stored, and if it is, remove it and eject all viewers
                     if (OpenInv.this.inventories.containsKey(key)) {
@@ -114,9 +115,6 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             });
 
     private InternalAccessor accessor;
-    private IPlayerDataManager playerLoader;
-    private IInventoryAccess inventoryAccess;
-    private IAnySilentContainer anySilentContainer;
 
     /**
      * Evicts all viewers lacking cross-world permissions from a Player's inventory.
@@ -125,7 +123,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
      */
     public void changeWorld(final Player player) {
 
-        String key = this.playerLoader.getPlayerDataID(player);
+        String key = this.accessor.getPlayerDataManager().getPlayerDataID(player);
 
         // Check if the player is cached. If not, neither of their inventories is open.
         if (!this.playerCache.containsKey(key)) {
@@ -159,77 +157,41 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         }
     }
 
-    /**
-     * Check the configuration value for whether or not OpenInv saves player data when unloading
-     * players. This is exclusively for users who do not allow editing of inventories, only viewing,
-     * and wish to prevent any possibility of bugs such as lishid#40. If true, OpenInv will not ever
-     * save any edits made to players.
-     *
-     * @return false unless configured otherwise
-     */
     @Override
     public boolean disableSaving() {
         return this.getConfig().getBoolean("settings.disable-saving", false);
     }
 
-    /**
-     * Gets the active ISilentContainer implementation. May return null if the server version is
-     * unsupported.
-     *
-     * @return the ISilentContainer
-     */
     @Override
     public IAnySilentContainer getAnySilentContainer() {
-        return this.anySilentContainer;
+        return this.accessor.getAnySilentContainer();
     }
 
-    /**
-     * Gets an ISpecialEnderChest for the given Player.
-     *
-     * @param player the Player
-     * @param online true if the Player is currently online
-     * @return the ISpecialEnderChest
-     */
+    @Deprecated
     @Override
     public ISpecialEnderChest getEnderChest(final Player player, final boolean online) {
-        String id = this.playerLoader.getPlayerDataID(player);
-        if (this.enderChests.containsKey(id)) {
-            return this.enderChests.get(id);
+        try {
+            return this.getSpecialEnderChest(player, online);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+            return null;
         }
-        ISpecialEnderChest inv = this.accessor.newSpecialEnderChest(player, online);
-        this.enderChests.put(id, inv);
-        this.playerCache.put(id, player);
-        return inv;
     }
 
-    /**
-     * Gets an ISpecialPlayerInventory for the given Player.
-     *
-     * @param player the Player
-     * @param online true if the Player is currently online
-     * @return the ISpecialPlayerInventory
-     */
+    @Deprecated
     @Override
     public ISpecialPlayerInventory getInventory(final Player player, final boolean online) {
-        String id = this.playerLoader.getPlayerDataID(player);
-        if (this.inventories.containsKey(id)) {
-            return this.inventories.get(id);
+        try {
+            return this.getSpecialInventory(player, online);
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+            return null;
         }
-        ISpecialPlayerInventory inv = this.accessor.newSpecialPlayerInventory(player, online);
-        this.inventories.put(id, inv);
-        this.playerCache.put(id, player);
-        return inv;
     }
 
-    /**
-     * Gets the active IInventoryAccess implementation. May return null if the server version is
-     * unsupported.
-     *
-     * @return the IInventoryAccess
-     */
     @Override
     public IInventoryAccess getInventoryAccess() {
-        return this.inventoryAccess;
+        return this.accessor.getInventoryAccess();
     }
 
     private int getLevenshteinDistance(final String string1, final String string2) {
@@ -279,8 +241,8 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     @SuppressWarnings("unchecked")
     public Collection<? extends Player> getOnlinePlayers() {
 
-        if (this.playerLoader != null) {
-            return this.playerLoader.getOnlinePlayers();
+        if (this.accessor.isSupported()) {
+            return this.accessor.getPlayerDataManager().getOnlinePlayers();
         }
 
         Method getOnlinePlayers;
@@ -306,56 +268,53 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         return Arrays.asList((Player[]) onlinePlayers);
     }
 
-    /**
-     * Gets the provided player's AnyChest setting.
-     *
-     * @param player the OfflinePlayer
-     * @return true if AnyChest is enabled
-     */
     @Override
     public boolean getPlayerAnyChestStatus(final OfflinePlayer player) {
-        return this.getConfig().getBoolean("toggles.any-chest." + this.playerLoader.getPlayerDataID(player), false);
+        return this.getConfig().getBoolean("toggles.any-chest." + this.accessor.getPlayerDataManager().getPlayerDataID(player), false);
     }
 
-    /**
-     * Gets a unique identifier by which the OfflinePlayer can be referenced. Using the value
-     * returned to look up a Player will generally be much faster for later implementations.
-     *
-     * @param offline the OfflinePlayer
-     * @return the identifier
-     */
     @Override
     public String getPlayerID(final OfflinePlayer offline) {
-        return this.playerLoader.getPlayerDataID(offline);
+        return this.accessor.getPlayerDataManager().getPlayerDataID(offline);
     }
 
-    /**
-     * Gets a player's SilentChest setting.
-     *
-     * @param player the OfflinePlayer
-     * @return true if SilentChest is enabled
-     */
     @Override
     public boolean getPlayerSilentChestStatus(final OfflinePlayer player) {
-        return this.getConfig().getBoolean("toggles.silent-chest." + this.playerLoader.getPlayerDataID(player), false);
+        return this.getConfig().getBoolean("toggles.silent-chest." + this.accessor.getPlayerDataManager().getPlayerDataID(player), false);
     }
 
-    /**
-     * Checks if the server version is supported by OpenInv.
-     *
-     * @return true if the server version is supported
-     */
+    @Override
+    public ISpecialEnderChest getSpecialEnderChest(final Player player, final boolean online)
+            throws InstantiationException {
+        String id = this.accessor.getPlayerDataManager().getPlayerDataID(player);
+        if (this.enderChests.containsKey(id)) {
+            return this.enderChests.get(id);
+        }
+        ISpecialEnderChest inv = this.accessor.newSpecialEnderChest(player, online);
+        this.enderChests.put(id, inv);
+        this.playerCache.put(id, player);
+        return inv;
+    }
+
+    @Override
+    public ISpecialPlayerInventory getSpecialInventory(final Player player, final boolean online)
+            throws InstantiationException {
+        String id = this.accessor.getPlayerDataManager().getPlayerDataID(player);
+        if (this.inventories.containsKey(id)) {
+            return this.inventories.get(id);
+        }
+        ISpecialPlayerInventory inv = this.accessor.newSpecialPlayerInventory(player, online);
+        this.inventories.put(id, inv);
+        this.playerCache.put(id, player);
+        return inv;
+    }
+
     @Override
     public boolean isSupportedVersion() {
         return this.accessor != null && this.accessor.isSupported();
     }
 
-    /**
-     * Load a Player from an OfflinePlayer. May return null under some circumstances.
-     *
-     * @param offline the OfflinePlayer to load a Player for
-     * @return the Player
-     */
+    @Nullable
     @Override
     public Player loadPlayer(final OfflinePlayer offline) {
 
@@ -363,7 +322,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             return null;
         }
 
-        String key = this.playerLoader.getPlayerDataID(offline);
+        String key = this.accessor.getPlayerDataManager().getPlayerDataID(offline);
         if (this.playerCache.containsKey(key)) {
             return this.playerCache.get(key);
         }
@@ -377,15 +336,19 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             return loaded;
         }
 
+        if (!this.isSupportedVersion()) {
+            return null;
+        }
+
         if (Bukkit.isPrimaryThread()) {
-            return this.playerLoader.loadPlayer(offline);
+            return this.accessor.getPlayerDataManager().loadPlayer(offline);
         }
 
         Future<Player> future = Bukkit.getScheduler().callSyncMethod(this,
                 new Callable<Player>() {
             @Override
             public Player call() throws Exception {
-                return OpenInv.this.playerLoader.loadPlayer(offline);
+                return OpenInv.this.accessor.getPlayerDataManager().loadPlayer(offline);
             }
         });
 
@@ -421,16 +384,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         return loaded;
     }
 
-    /**
-     * Get an OfflinePlayer by name.
-     * <p>
-     * Note: This method is potentially very heavily blocking. It should not ever be called on the
-     * main thread, and if it is, a stack trace will be displayed alerting server owners to the
-     * call.
-     *
-     * @param name the name of the Player
-     * @return the OfflinePlayer with the closest matching name or null if no players have ever logged in
-     */
+    @Nullable
     @Override
     public OfflinePlayer matchPlayer(final String name) {
 
@@ -444,11 +398,15 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             }
         }
 
-        // Attempt exact offline match first - adds UUID support for later versions
-        OfflinePlayer player = this.playerLoader.getPlayerByID(name);
+        OfflinePlayer player;
 
-        if (player != null) {
-            return player;
+        if (this.isSupportedVersion()) {
+            // Attempt exact offline match first - adds UUID support for later versions
+            player = this.accessor.getPlayerDataManager().getPlayerByID(name);
+
+            if (player != null) {
+                return player;
+            }
         }
 
         // Ensure name is valid if server is in online mode to avoid unnecessary searching
@@ -503,23 +461,11 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         return player;
     }
 
-    /**
-     * Check the configuration value for whether or not OpenInv displays a notification to the user
-     * when a container is activated with AnyChest.
-     *
-     * @return true unless configured otherwise
-     */
     @Override
     public boolean notifyAnyChest() {
         return this.getConfig().getBoolean("notify.any-chest", true);
     }
 
-    /**
-     * Check the configuration value for whether or not OpenInv displays a notification to the user
-     * when a container is activated with SilentChest.
-     *
-     * @return true unless configured otherwise
-     */
     @Override
     public boolean notifySilentChest() {
         return this.getConfig().getBoolean("notify.silent-chest", true);
@@ -532,7 +478,9 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             return;
         }
 
-        this.playerCache.invalidateAll();
+        if (this.isSupportedVersion()) {
+            this.playerCache.invalidateAll();
+        }
     }
 
     @Override
@@ -549,10 +497,6 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             pm.disablePlugin(this);
             return;
         }
-
-        this.playerLoader = this.accessor.newPlayerDataManager();
-        this.inventoryAccess = this.accessor.newInventoryAccess();
-        this.anySilentContainer = this.accessor.newAnySilentContainer();
 
         new ConfigUpdater(this).checkForUpdates();
 
@@ -575,21 +519,13 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
     }
 
-    /**
-     * Unmark any Players in use by the specified Plugin.
-     *
-     * @param plugin
-     */
     public void releaseAllPlayers(final Plugin plugin) {
         this.pluginUsage.removeAll(plugin.getClass());
     }
 
-    /**
-     * @see com.lishid.openinv.IOpenInv#releasePlayer(org.bukkit.entity.Player, org.bukkit.plugin.Plugin)
-     */
     @Override
     public void releasePlayer(final Player player, final Plugin plugin) {
-        String key = this.playerLoader.getPlayerDataID(player);
+        String key = this.accessor.getPlayerDataManager().getPlayerDataID(player);
 
         if (!this.pluginUsage.containsEntry(key, plugin.getClass())) {
             return;
@@ -598,12 +534,9 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         this.pluginUsage.remove(key, plugin.getClass());
     }
 
-    /**
-     * @see com.lishid.openinv.IOpenInv#retainPlayer(org.bukkit.entity.Player, org.bukkit.plugin.Plugin)
-     */
     @Override
     public void retainPlayer(final Player player, final Plugin plugin) {
-        String key = this.playerLoader.getPlayerDataID(player);
+        String key = this.accessor.getPlayerDataManager().getPlayerDataID(player);
 
         if (this.pluginUsage.containsEntry(key, plugin.getClass())) {
             return;
@@ -612,15 +545,9 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         this.pluginUsage.put(key, plugin.getClass());
     }
 
-    /**
-     * Sets a player's AnyChest setting.
-     *
-     * @param player the OfflinePlayer
-     * @param status the status
-     */
     @Override
     public void setPlayerAnyChestStatus(final OfflinePlayer player, final boolean status) {
-        this.getConfig().set("toggles.any-chest." + this.playerLoader.getPlayerDataID(player), status);
+        this.getConfig().set("toggles.any-chest." + this.accessor.getPlayerDataManager().getPlayerDataID(player), status);
         this.saveConfig();
     }
 
@@ -628,10 +555,11 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
      * Method for handling a Player going offline.
      *
      * @param player the Player
+     * @throws IllegalStateException if the server version is unsupported
      */
     public void setPlayerOffline(final Player player) {
 
-        String key = this.playerLoader.getPlayerDataID(player);
+        String key = this.accessor.getPlayerDataManager().getPlayerDataID(player);
 
         // Check if the player is cached. If not, neither of their inventories is open.
         if (!this.playerCache.containsKey(key)) {
@@ -651,10 +579,11 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
      * Method for handling a Player coming online.
      *
      * @param player the Player
+     * @throws IllegalStateException if the server version is unsupported
      */
     public void setPlayerOnline(final Player player) {
 
-        String key = this.playerLoader.getPlayerDataID(player);
+        String key = this.accessor.getPlayerDataManager().getPlayerDataID(player);
 
         // Check if the player is cached. If not, neither of their inventories is open.
         if (!this.playerCache.containsKey(key)) {
@@ -681,15 +610,9 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         }
     }
 
-    /**
-     * Sets a player's SilentChest setting.
-     *
-     * @param player the OfflinePlayer
-     * @param status the status
-     */
     @Override
     public void setPlayerSilentChestStatus(final OfflinePlayer player, final boolean status) {
-        this.getConfig().set("toggles.silent-chest." + this.playerLoader.getPlayerDataID(player), status);
+        this.getConfig().set("toggles.silent-chest." + this.accessor.getPlayerDataManager().getPlayerDataID(player), status);
         this.saveConfig();
     }
 
@@ -728,14 +651,9 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         }
     }
 
-    /**
-     * Forcibly unload a cached Player's data.
-     *
-     * @param player the OfflinePlayer to unload
-     */
     @Override
     public void unload(final OfflinePlayer player) {
-        this.playerCache.invalidate(this.playerLoader.getPlayerDataID(player));
+        this.playerCache.invalidate(this.accessor.getPlayerDataManager().getPlayerDataID(player));
     }
 
 }
