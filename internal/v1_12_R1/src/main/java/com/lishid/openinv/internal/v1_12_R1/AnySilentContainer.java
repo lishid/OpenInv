@@ -15,6 +15,7 @@ import com.lishid.openinv.internal.IAnySilentContainer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Statistic;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -35,7 +36,6 @@ import net.minecraft.server.v1_12_R1.ITileInventory;
 import net.minecraft.server.v1_12_R1.InventoryEnderChest;
 import net.minecraft.server.v1_12_R1.InventoryLargeChest;
 import net.minecraft.server.v1_12_R1.PacketPlayOutOpenWindow;
-import net.minecraft.server.v1_12_R1.StatisticList;
 import net.minecraft.server.v1_12_R1.TileEntity;
 import net.minecraft.server.v1_12_R1.TileEntityChest;
 import net.minecraft.server.v1_12_R1.TileEntityEnderChest;
@@ -47,20 +47,20 @@ import org.bukkit.craftbukkit.v1_12_R1.event.CraftEventFactory;
 public class AnySilentContainer implements IAnySilentContainer {
 
     @Override
-    public boolean activateContainer(final Player p, final boolean silentchest,
-            final org.bukkit.block.Block b) {
+    public boolean activateContainer(final Player bukkitPlayer, final boolean silentchest,
+            final org.bukkit.block.Block bukkitBlock) {
 
-        EntityPlayer player = PlayerDataManager.getHandle(p);
-
-        // Silent ender chest is pretty much API-only
-        if (silentchest && b.getType() == Material.ENDER_CHEST) {
-            p.openInventory(p.getEnderChest());
-            player.b(StatisticList.getStatistic("stat.enderchestOpened"));
+        // Silent ender chest is API-only
+        if (silentchest && bukkitBlock.getType() == Material.ENDER_CHEST) {
+            bukkitPlayer.openInventory(bukkitPlayer.getEnderChest());
+            bukkitPlayer.incrementStatistic(Statistic.ENDERCHEST_OPENED);
             return true;
         }
 
+        EntityPlayer player = PlayerDataManager.getHandle(bukkitPlayer);
+
         final World world = player.world;
-        final BlockPosition blockPosition = new BlockPosition(b.getX(), b.getY(), b.getZ());
+        final BlockPosition blockPosition = new BlockPosition(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
         final Object tile = world.getTileEntity(blockPosition);
 
         if (tile == null) {
@@ -72,7 +72,7 @@ public class AnySilentContainer implements IAnySilentContainer {
             InventoryEnderChest enderChest = player.getEnderChest();
             enderChest.a((TileEntityEnderChest) tile);
             player.openContainer(enderChest);
-            player.b(StatisticList.getStatistic("stat.enderchestOpened"));
+            bukkitPlayer.incrementStatistic(Statistic.ENDERCHEST_OPENED);
             return true;
         }
 
@@ -111,9 +111,9 @@ public class AnySilentContainer implements IAnySilentContainer {
 
             BlockChest blockChest = (BlockChest) block;
             if (blockChest.g == BlockChest.Type.BASIC) {
-                player.b(StatisticList.getStatistic("stat.chestOpened"));
+                bukkitPlayer.incrementStatistic(Statistic.CHEST_OPENED);
             } else if (blockChest.g == BlockChest.Type.TRAP) {
-                player.b(StatisticList.getStatistic("stat.trappedChestTriggered"));
+                bukkitPlayer.incrementStatistic(Statistic.TRAPPED_CHEST_TRIGGERED);
             }
 
             if (silentchest) {
@@ -122,7 +122,7 @@ public class AnySilentContainer implements IAnySilentContainer {
         }
 
         if (block instanceof BlockShulkerBox) {
-            player.b(StatisticList.getStatistic("stat.shulkerBoxOpened"));
+            bukkitPlayer.incrementStatistic(Statistic.SHULKER_BOX_OPENED);
 
             if (silentchest && tileInventory instanceof TileEntityShulkerBox) {
                 // Set value to current + 1. Ensures consistency later when resetting.
@@ -157,8 +157,7 @@ public class AnySilentContainer implements IAnySilentContainer {
             player.activeContainer.windowId = windowId;
             player.activeContainer.addSlotListener(player);
 
-            // Special handling for shulker boxes - reset value for viewers to what it was
-            // initially.
+            // Special handling for shulker boxes - reset value for viewers to what it was initially.
             if (tile instanceof TileEntityShulkerBox) {
                 new BukkitRunnable() {
                     @Override
@@ -169,8 +168,7 @@ public class AnySilentContainer implements IAnySilentContainer {
                             return;
                         }
                         TileEntityShulkerBox box = (TileEntityShulkerBox) tile;
-                        // Reset back - we added 1, and calling TileEntityShulkerBox#startOpen adds
-                        // 1 more.
+                        // Reset back - we added 1, and calling TileEntityShulkerBox#startOpen adds 1 more.
                         SilentContainerShulkerBox.setOpenValue(box,
                                 SilentContainerShulkerBox.getOpenValue((TileEntityShulkerBox) tile)
                                         - 2);
@@ -181,7 +179,7 @@ public class AnySilentContainer implements IAnySilentContainer {
             return true;
         } catch (Exception e) {
             e.printStackTrace();
-            p.sendMessage(ChatColor.RED + "Error while sending silent container.");
+            bukkitPlayer.sendMessage(ChatColor.RED + "Error while sending silent container.");
             return false;
         }
     }
@@ -256,7 +254,7 @@ public class AnySilentContainer implements IAnySilentContainer {
 
     private boolean isBlockedChest(final World world, final BlockPosition blockPosition) {
         // For reference, loot at net.minecraft.server.BlockChest
-        return world.getType(blockPosition.up()).m() || this.hasOcelotOnTop(world, blockPosition);
+        return world.getType(blockPosition.up()).l() || this.hasOcelotOnTop(world, blockPosition);
     }
 
     private boolean isBlockedShulkerBox(final World world, final BlockPosition blockPosition,
