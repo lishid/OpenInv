@@ -150,28 +150,28 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             Field modifiers = Field.class.getDeclaredField("modifiers");
             modifiers.setAccessible(true);
 
-            // Access and replace main inventory array
+            // Access and replace main inventory list
             Field field = PlayerInventory.class.getField("items");
             modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
             field.set(inventory, items);
 
-            // Access and replace armor inventory array
+            // Access and replace armor inventory list
             field = PlayerInventory.class.getField("armor");
             modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
             field.set(inventory, armor);
 
-            // Access and replace offhand inventory array
+            // Access and replace offhand inventory list
             field = PlayerInventory.class.getField("extraSlots");
             modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
             field.set(inventory, extraSlots);
 
-            // Access and replace array containing all inventory arrays
-            field = PlayerInventory.class.getDeclaredField("g");
+            // Access and replace list containing all inventory lists
+            field = PlayerInventory.class.getDeclaredField("f");
             field.setAccessible(true);
             modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
             field.set(inventory, Arrays.asList(new NonNullList[] { items, armor, extraSlots }));
         } catch (NoSuchFieldException e) {
-            // Unable to set final fields to item arrays, we're screwed. Noisily fail.
+            // Unable to set final fields to item lists, we're screwed. Noisily fail.
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
