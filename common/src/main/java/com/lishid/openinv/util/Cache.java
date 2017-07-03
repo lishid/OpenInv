@@ -72,10 +72,10 @@ public class Cache<K, V> {
      * @return the value to which the specified key is mapped, or null if no value is mapped for the key
      */
     public V get(K key) {
-        synchronized (internal) {
-            // Run lazy check to clean cache
-            lazyCheck();
+        // Run lazy check to clean cache
+        lazyCheck();
 
+        synchronized (internal) {
             return internal.get(key);
         }
     }
@@ -87,10 +87,10 @@ public class Cache<K, V> {
      * @return true if a mapping exists for the specified key
      */
     public boolean containsKey(K key) {
-        synchronized (internal) {
-            // Run lazy check to clean cache
-            lazyCheck();
+        // Run lazy check to clean cache
+        lazyCheck();
 
+        synchronized (internal) {
             return internal.containsKey(key);
         }
     }
@@ -101,10 +101,10 @@ public class Cache<K, V> {
      * @param key key to invalidate
      */
     public void invalidate(K key) {
-        synchronized (internal) {
-            // Run lazy check to clean cache
-            lazyCheck();
+        // Run lazy check to clean cache
+        lazyCheck();
 
+        synchronized (internal) {
             if (!internal.containsKey(key)) {
                 // Value either not present or cleaned by lazy check. Either way, we're good
                 return;
@@ -143,27 +143,30 @@ public class Cache<K, V> {
     private void lazyCheck() {
         long now = System.currentTimeMillis();
         long nextExpiry = now + retention;
-        for (Iterator<Map.Entry<Long, K>> iterator = expiry.entries().iterator(); iterator.hasNext();) {
-            Map.Entry<Long, K> entry = iterator.next();
+        synchronized (internal) {
+            for (Iterator<Map.Entry<Long, K>> iterator = expiry.entries().iterator(); iterator
+                    .hasNext();) {
+                Map.Entry<Long, K> entry = iterator.next();
 
-            if (entry.getKey() > now) {
-                break;
+                if (entry.getKey() > now) {
+                    break;
+                }
+
+                iterator.remove();
+
+                if (inUseCheck.run(internal.get(entry.getValue()))) {
+                    expiry.put(nextExpiry, entry.getValue());
+                    continue;
+                }
+
+                V value = internal.remove(entry.getValue());
+
+                if (value == null) {
+                    continue;
+                }
+
+                postRemoval.run(value);
             }
-
-            iterator.remove();
-
-            if (inUseCheck.run(internal.get(entry.getValue()))) {
-                expiry.put(nextExpiry, entry.getValue());
-                continue;
-            }
-
-            V value = internal.remove(entry.getValue());
-
-            if (value == null) {
-                continue;
-            }
-
-            postRemoval.run(value);
         }
     }
 
