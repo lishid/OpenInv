@@ -41,6 +41,7 @@ import com.lishid.openinv.internal.IInventoryAccess;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import com.lishid.openinv.listeners.InventoryClickListener;
+import com.lishid.openinv.listeners.InventoryCloseListener;
 import com.lishid.openinv.listeners.InventoryDragListener;
 import com.lishid.openinv.listeners.PlayerListener;
 import com.lishid.openinv.listeners.PluginListener;
@@ -504,6 +505,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         pm.registerEvents(new PlayerListener(this), this);
         pm.registerEvents(new PluginListener(this), this);
         pm.registerEvents(new InventoryClickListener(this), this);
+        pm.registerEvents(new InventoryCloseListener(this), this);
         // Bukkit will handle missing events for us, attempt to register InventoryDragEvent without a version check
         pm.registerEvents(new InventoryDragListener(this), this);
 

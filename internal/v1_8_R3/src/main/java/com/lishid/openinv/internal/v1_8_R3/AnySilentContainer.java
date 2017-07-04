@@ -211,4 +211,7 @@ public class AnySilentContainer implements IAnySilentContainer {
         }
     }
 
+    @Override
+    public void deactivateContainer(final Player bukkitPlayer) {}
+
 }

@@ -6,16 +6,27 @@ import org.bukkit.entity.Player;
 public interface IAnySilentContainer {
 
     /**
-     * Checks if the given block is a container which can be unblocked or silenced.
-     * 
-     * @param block the BlockState
-     * @return true if the Block is a supported container
+     * Opens the container at the given coordinates for the Player. If you do not want blocked
+     * containers to open, be sure to check {@link #isAnyContainerNeeded(Player, Block)}
+     * first.
+     *
+     * @param player the Player opening the container
+     * @param silentchest whether the container's noise is to be silenced
+     * @param block the Block
+     * @return true if the container can be opened
      */
-    public boolean isAnySilentContainer(Block block);
+    public boolean activateContainer(Player player, boolean silentchest, Block block);
+
+    /**
+     * Closes the Player's currently open container silently, if necessary.
+     *
+     * @param player the Player closing a container
+     */
+    public void deactivateContainer(Player player);
 
     /**
      * Checks if the container at the given coordinates is blocked.
-     * 
+     *
      * @param player the Player opening the container
      * @param block the Block
      * @return true if the container is blocked
@@ -23,15 +34,11 @@ public interface IAnySilentContainer {
     public boolean isAnyContainerNeeded(Player player, Block block);
 
     /**
-     * Opens the container at the given coordinates for the Player. If you do not want blocked
-     * containers to open, be sure to check {@link #isAnyContainerNeeded(Player, Block)}
-     * first.
-     * 
-     * @param player
-     * @param silentchest whether the container's noise is to be silenced
-     * @param block the Block
-     * @return true if the container can be opened
+     * Checks if the given block is a container which can be unblocked or silenced.
+     *
+     * @param block the BlockState
+     * @return true if the Block is a supported container
      */
-    public boolean activateContainer(Player player, boolean silentchest, Block block);
+    public boolean isAnySilentContainer(Block block);
 
 }

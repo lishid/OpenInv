@@ -16,14 +16,14 @@
 
 package com.lishid.openinv.internal.v1_11_R1;
 
+import java.lang.reflect.Field;
+
 import com.lishid.openinv.internal.IAnySilentContainer;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.inventory.InventoryView;
 
 import net.minecraft.server.v1_11_R1.AxisAlignedBB;
 import net.minecraft.server.v1_11_R1.Block;
@@ -31,7 +31,6 @@ import net.minecraft.server.v1_11_R1.BlockChest;
 import net.minecraft.server.v1_11_R1.BlockEnderChest;
 import net.minecraft.server.v1_11_R1.BlockPosition;
 import net.minecraft.server.v1_11_R1.BlockShulkerBox;
-import net.minecraft.server.v1_11_R1.Container;
 import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.EntityOcelot;
 import net.minecraft.server.v1_11_R1.EntityPlayer;
@@ -40,17 +39,28 @@ import net.minecraft.server.v1_11_R1.IBlockData;
 import net.minecraft.server.v1_11_R1.ITileInventory;
 import net.minecraft.server.v1_11_R1.InventoryEnderChest;
 import net.minecraft.server.v1_11_R1.InventoryLargeChest;
-import net.minecraft.server.v1_11_R1.PacketPlayOutOpenWindow;
 import net.minecraft.server.v1_11_R1.StatisticList;
 import net.minecraft.server.v1_11_R1.TileEntity;
 import net.minecraft.server.v1_11_R1.TileEntityChest;
 import net.minecraft.server.v1_11_R1.TileEntityEnderChest;
 import net.minecraft.server.v1_11_R1.TileEntityShulkerBox;
 import net.minecraft.server.v1_11_R1.World;
-
-import org.bukkit.craftbukkit.v1_11_R1.event.CraftEventFactory;
+import net.minecraft.server.v1_11_R1.EnumGamemode;
+import net.minecraft.server.v1_11_R1.PlayerInteractManager;
 
 public class AnySilentContainer implements IAnySilentContainer {
+
+    private Field playerInteractManagerGamemode;
+
+    public AnySilentContainer() {
+        try {
+            this.playerInteractManagerGamemode = PlayerInteractManager.class.getDeclaredField("gamemode");
+            this.playerInteractManagerGamemode.setAccessible(true);
+        } catch (Exception e) {
+            System.err.println("[OpenInv] Unable to directly write player gamemode! SilentChest will fail.");
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public boolean isAnySilentContainer(org.bukkit.block.Block block) {
@@ -186,7 +196,6 @@ public class AnySilentContainer implements IAnySilentContainer {
 
         ITileInventory tileInventory = (ITileInventory) tile;
         Block block = world.getType(blockPosition).getBlock();
-        Container container = null;
 
         if (block instanceof BlockChest) {
             for (EnumDirection localEnumDirection : EnumDirection.EnumDirectionLimit.HORIZONTAL) {
@@ -218,68 +227,68 @@ public class AnySilentContainer implements IAnySilentContainer {
             } else if (blockChest.g == BlockChest.Type.TRAP) {
                 player.b(StatisticList.getStatistic("stat.trappedChestTriggered"));
             }
-
-            if (silentchest) {
-                container = new SilentContainerChest(player.inventory, tileInventory, player);
-            }
         }
 
         if (block instanceof BlockShulkerBox) {
             player.b(StatisticList.getStatistic("stat.shulkerBoxOpened"));
-
-            if (silentchest && tileInventory instanceof TileEntityShulkerBox) {
-                // Set value to current + 1. Ensures consistency later when resetting.
-                SilentContainerShulkerBox.setOpenValue((TileEntityShulkerBox) tileInventory,
-                        SilentContainerShulkerBox.getOpenValue((TileEntityShulkerBox) tileInventory) + 1);
-
-                container = new SilentContainerShulkerBox(player.inventory, tileInventory, player);
-            }
         }
 
-        // AnyChest only - SilentChest not active or container unsupported
-        if (!silentchest || container == null) {
+        // AnyChest only - SilentChest not active, container unsupported, or unnecessary.
+        if (!silentchest || player.playerInteractManager.getGameMode() == EnumGamemode.SPECTATOR) {
             player.openContainer(tileInventory);
             return true;
         }
 
-        // SilentChest
+        // SilentChest requires access to setting players' gamemode directly.
+        if (this.playerInteractManagerGamemode == null) {
+            return false;
+        }
+
+        EnumGamemode gamemode = player.playerInteractManager.getGameMode();
+        this.forceGameMode(player, EnumGamemode.SPECTATOR);
+        player.openContainer(tileInventory);
+        this.forceGameMode(player, gamemode);
+        return true;
+    }
+
+    @Override
+    public void deactivateContainer(final Player bukkitPlayer) {
+        if (this.playerInteractManagerGamemode == null) {
+            return;
+        }
+
+        InventoryView view = bukkitPlayer.getOpenInventory();
+        switch (view.getType()) {
+        case CHEST:
+        case ENDER_CHEST:
+        case SHULKER_BOX:
+            break;
+        default:
+            return;
+        }
+
+        EntityPlayer player = PlayerDataManager.getHandle(bukkitPlayer);
+
+        EnumGamemode gamemode = player.playerInteractManager.getGameMode();
+        this.forceGameMode(player, EnumGamemode.SPECTATOR);
+        player.activeContainer.b(player);
+        player.activeContainer = player.defaultContainer;
+        this.forceGameMode(player, gamemode);
+    }
+
+    private void forceGameMode(final EntityPlayer player, final EnumGamemode gameMode) {
+        if (this.playerInteractManagerGamemode == null) {
+            // No need to warn repeatedly, error on startup and lack of function should be enough.
+            return;
+        }
         try {
-            // Call InventoryOpenEvent
-            container = CraftEventFactory.callInventoryOpenEvent(player, container, false);
-            if (container == null) {
-                return false;
+            if (!this.playerInteractManagerGamemode.isAccessible()) {
+                // Just in case, ensure accessible.
+                this.playerInteractManagerGamemode.setAccessible(true);
             }
-
-            // Open window
-            int windowId = player.nextContainerCounter();
-            player.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, tileInventory.getContainerName(), tileInventory.getScoreboardDisplayName(), tileInventory.getSize()));
-            player.activeContainer = container;
-            player.activeContainer.windowId = windowId;
-            player.activeContainer.addSlotListener(player);
-
-            // Special handling for shulker boxes - reset value for viewers to what it was initially.
-            if (tile instanceof TileEntityShulkerBox) {
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        // TODO hacky
-                        Object tile = world.getTileEntity(blockPosition);
-                        if (!(tile instanceof TileEntityShulkerBox)) {
-                            return;
-                        }
-                        TileEntityShulkerBox box = (TileEntityShulkerBox) tile;
-                        // Reset back - we added 1, and calling TileEntityShulkerBox#startOpen adds 1 more.
-                        SilentContainerShulkerBox.setOpenValue(box,
-                                SilentContainerShulkerBox.getOpenValue((TileEntityShulkerBox) tile) - 2);
-                    }
-                }.runTaskLater(Bukkit.getPluginManager().getPlugin("OpenInv"), 2);
-            }
-
-            return true;
+            this.playerInteractManagerGamemode.set(player.playerInteractManager, gameMode);
         } catch (Exception e) {
             e.printStackTrace();
-            p.sendMessage(ChatColor.RED + "Error while sending silent container.");
-            return false;
         }
     }
 
