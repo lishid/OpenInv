@@ -1,8 +1,10 @@
 package com.lishid.openinv.util;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.Multimap;
@@ -10,7 +12,7 @@ import com.google.common.collect.TreeMultimap;
 
 /**
  * A minimal thread-safe time-based cache implementation backed by a HashMap and TreeMultimap.
- * 
+ *
  * @author Jikoo
  */
 public class Cache<K, V> {
@@ -22,23 +24,23 @@ public class Cache<K, V> {
 
     /**
      * Constructs a Cache with the specified retention duration, in use function, and post-removal function.
-     * 
+     *
      * @param retention duration after which keys are automatically invalidated if not in use
      * @param inUseCheck Function used to check if a key is considered in use
      * @param postRemoval Function used to perform any operations required when a key is invalidated
      */
-    public Cache(long retention, Function<V> inUseCheck, Function<V> postRemoval) {
+    public Cache(final long retention, final Function<V> inUseCheck, final Function<V> postRemoval) {
         this.internal = new HashMap<K, V>();
 
         this.expiry = TreeMultimap.create(new Comparator<Long>() {
                     @Override
-                    public int compare(Long long1, Long long2) {
+                    public int compare(final Long long1, final Long long2) {
                         return long1.compareTo(long2);
                     }
                 },
                 new Comparator<K>() {
                     @Override
-                    public int compare(K k1, K k2) {
+                    public int compare(final K k1, final K k2) {
                         return 0;
                     }
                 });
@@ -51,70 +53,70 @@ public class Cache<K, V> {
     /**
      * Set a key and value pair. Keys are unique. Using an existing key will cause the old value to
      * be overwritten and the expiration timer to be reset.
-     * 
+     *
      * @param key key with which the specified value is to be associated
      * @param value value to be associated with the specified key
      */
-    public void put(K key, V value) {
+    public void put(final K key, final V value) {
         // Invalidate key - runs lazy check and ensures value won't be cleaned up early
-        invalidate(key);
+        this.invalidate(key);
 
-        synchronized (internal) {
-            internal.put(key, value);
-            expiry.put(System.currentTimeMillis() + retention, key);
+        synchronized (this.internal) {
+            this.internal.put(key, value);
+            this.expiry.put(System.currentTimeMillis() + this.retention, key);
         }
     }
 
     /**
      * Returns the value to which the specified key is mapped, or null if no value is mapped for the key.
-     * 
+     *
      * @param key the key whose associated value is to be returned
      * @return the value to which the specified key is mapped, or null if no value is mapped for the key
      */
-    public V get(K key) {
+    public V get(final K key) {
         // Run lazy check to clean cache
-        lazyCheck();
+        this.lazyCheck();
 
-        synchronized (internal) {
-            return internal.get(key);
+        synchronized (this.internal) {
+            return this.internal.get(key);
         }
     }
 
     /**
      * Returns true if the specified key is mapped to a value.
-     * 
+     *
      * @param key key to check if a mapping exists for
      * @return true if a mapping exists for the specified key
      */
-    public boolean containsKey(K key) {
+    public boolean containsKey(final K key) {
         // Run lazy check to clean cache
-        lazyCheck();
+        this.lazyCheck();
 
-        synchronized (internal) {
-            return internal.containsKey(key);
+        synchronized (this.internal) {
+            return this.internal.containsKey(key);
         }
     }
 
     /**
      * Forcibly invalidates a key, even if it is considered to be in use.
-     * 
+     *
      * @param key key to invalidate
      */
-    public void invalidate(K key) {
+    public void invalidate(final K key) {
         // Run lazy check to clean cache
-        lazyCheck();
+        this.lazyCheck();
 
-        synchronized (internal) {
-            if (!internal.containsKey(key)) {
+        synchronized (this.internal) {
+            if (!this.internal.containsKey(key)) {
                 // Value either not present or cleaned by lazy check. Either way, we're good
                 return;
             }
 
             // Remove stored object
-            internal.remove(key);
+            this.internal.remove(key);
 
             // Remove expiration entry - prevents more work later, plus prevents issues with values invalidating early
-            for (Iterator<Map.Entry<Long, K>> iterator = expiry.entries().iterator(); iterator.hasNext();) {
+            for (Iterator<Map.Entry<Long, K>> iterator = this.expiry.entries().iterator(); iterator.hasNext();) {
                 if (key.equals(iterator.next().getValue())) {
                     iterator.remove();
                     break;
@@ -127,12 +129,12 @@ public class Cache<K, V> {
      * Forcibly invalidates all keys, even if they are considered to be in use.
      */
     public void invalidateAll() {
-        synchronized (internal) {
-            for (V value : internal.values()) {
-                postRemoval.run(value);
+        synchronized (this.internal) {
+            for (V value : this.internal.values()) {
+                this.postRemoval.run(value);
             }
-            expiry.clear();
-            internal.clear();
+            this.expiry.clear();
+            this.internal.clear();
         }
     }
 
@@ -142,9 +144,9 @@ public class Cache<K, V> {
      */
     private void lazyCheck() {
         long now = System.currentTimeMillis();
-        long nextExpiry = now + retention;
-        synchronized (internal) {
-            for (Iterator<Map.Entry<Long, K>> iterator = expiry.entries().iterator(); iterator
+        synchronized (this.internal) {
+            List<K> inUse = new ArrayList<K>();
+            for (Iterator<Map.Entry<Long, K>> iterator = this.expiry.entries().iterator(); iterator
                     .hasNext();) {
                 Map.Entry<Long, K> entry = iterator.next();
 
@@ -154,18 +156,23 @@ public class Cache<K, V> {
 
                 iterator.remove();
 
-                if (inUseCheck.run(internal.get(entry.getValue()))) {
-                    expiry.put(nextExpiry, entry.getValue());
+                if (this.inUseCheck.run(this.internal.get(entry.getValue()))) {
+                    inUse.add(entry.getValue());
                     continue;
                 }
 
-                V value = internal.remove(entry.getValue());
+                V value = this.internal.remove(entry.getValue());
 
                 if (value == null) {
                     continue;
                 }
 
-                postRemoval.run(value);
+                this.postRemoval.run(value);
+            }
+
+            long nextExpiry = now + this.retention;
+            for (K value : inUse) {
+                this.expiry.put(nextExpiry, value);
             }
         }
     }
