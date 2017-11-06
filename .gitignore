@@ -3,6 +3,7 @@
 **/.project
 **/.classpath
 **/.idea
+**/.iml
 **/target
 **/bin
 **/out

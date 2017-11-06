@@ -5,6 +5,16 @@ author: lishid
 authors: [Jikoo, ShadowRanger]
 description: >
              This plugin allows you to open a player's inventory as a chest and interact with it in real time.
+
+permissions:
+  openinv:
+    anychest.default:
+      description: Permission for AnyContainer to default on prior to toggling.
+      default: false
+    silentchest.default:
+      description: Permission for SilentChest to default on prior to toggling.
+      default: false
+
 commands:
   openinv:
     aliases: [oi, inv, open]
@@ -31,15 +41,15 @@ commands:
     usage: |-
            /<command> <item> [MinAmount] - Item is the ID or the Bukkit Material, MinAmount is the minimum amount required
   silentchest:
-    aliases: [sc, silent]
-    description: Toggle silent chest function, which stops sounds and animations when using containers.
+    aliases: [sc, silent, silentcontainer]
+    description: Toggle SilentContainer function, which stops sounds and animations when using containers.
     permission: OpenInv.*;OpenInv.silent
     usage: |-
            /<command> [Check] - Check or toggle silent chest
-  anychest:
-    aliases: [ac]
-    description: Toggle anychest function, which allows opening of blocked chests.
-    permission: OpenInv.*;OpenInv.anychest
+  anycontainer:
+    aliases: [ac, anychest]
+    description: Toggle AnyContainer function, which allows opening of blocked containers.
+    permission: OpenInv.*;OpenInv.anychest;OpenInv.anycontainer
     usage: |-
            /<command> [Check] - Checks or toggle anychest
   searchenchant:

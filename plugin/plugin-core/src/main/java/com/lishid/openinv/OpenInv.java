@@ -271,7 +271,16 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
     @Override
     public boolean getPlayerAnyChestStatus(final OfflinePlayer player) {
-        return this.getConfig().getBoolean("toggles.any-chest." + this.accessor.getPlayerDataManager().getPlayerDataID(player), false);
+        boolean defaultState = false;
+
+        if (player.isOnline()) {
+            Player onlinePlayer = player.getPlayer();
+            if (onlinePlayer != null) {
+                defaultState = onlinePlayer.hasPermission("openinv.anychest.default");
+            }
+        }
+
+        return this.getConfig().getBoolean("toggles.any-chest." + this.accessor.getPlayerDataManager().getPlayerDataID(player), defaultState);
     }
 
     @Override
@@ -281,7 +290,16 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
     @Override
     public boolean getPlayerSilentChestStatus(final OfflinePlayer player) {
-        return this.getConfig().getBoolean("toggles.silent-chest." + this.accessor.getPlayerDataManager().getPlayerDataID(player), false);
+        boolean defaultState = false;
+
+        if (player.isOnline()) {
+            Player onlinePlayer = player.getPlayer();
+            if (onlinePlayer != null) {
+                defaultState = onlinePlayer.hasPermission("openinv.silentchest.default");
+            }
+        }
+
+        return this.getConfig().getBoolean("toggles.silent-chest." + this.accessor.getPlayerDataManager().getPlayerDataID(player), defaultState);
     }
 
     @Override
