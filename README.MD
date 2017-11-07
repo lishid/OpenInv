@@ -11,8 +11,8 @@ OpenInv is a [Bukkit plugin](https://dev.bukkit.org/bukkit-plugins/openinv/) whi
   - Read-only mode! No edits allowed! Don't grant `OpenInv.editender`
   - Cross-world support! Don't grant `OpenInv.crossworld`
   - No opening others! Don't grant `OpenInv.openenderall`
-- **SilentChest**: Open containers without displaying an animation or making sound.
-- **AnyChest**: Open containers, even if blocked by ocelots or blocks.
+- **SilentContainer**: Open containers without displaying an animation or making sound.
+- **AnyContainer**: Open containers, even if blocked by ocelots or blocks.
 
 ## Commands
 <table width=100%>
@@ -42,14 +42,19 @@ OpenInv is a [Bukkit plugin](https://dev.bukkit.org/bukkit-plugins/openinv/) whi
     <td>Lists all online players that have a certain item in their ender chest.</td>
   </tr>
   <tr>
-    <td>/anychest [check]</td>
-    <td>ac</td>
-    <td>Check or toggle the AnyChest function, allowing opening blocked containers.</td>
+    <td>/searchenchant &lt[enchantment] [MinLevel]&gt</td>
+    <td>searchenchants</td>
+    <td>Lists all online players with a specific enchantment.</td>
   </tr>
   <tr>
-    <td>/silentchest [check]</td>
-    <td>sc</td>
-    <td>Check or toggle the SilentChest function, allowing opening containers silently.</td>
+    <td>/anycontainer [check]</td>
+    <td>ac, anychest</td>
+    <td>Check or toggle the AnyContainer function, allowing opening blocked containers.</td>
+  </tr>
+  <tr>
+    <td>/silentcontainer [check]</td>
+    <td>sc, silentchest</td>
+    <td>Check or toggle the SilentContainer function, allowing opening containers silently.</td>
   </tr>
 </table>
 
@@ -104,17 +109,29 @@ OpenInv is a [Bukkit plugin](https://dev.bukkit.org/bukkit-plugins/openinv/) whi
     <td>Required to use /searchinv and /searchender.</td>
   </tr>
   <tr>
+    <td>OpenInv.searchenchant</td>
+    <td>Required to use /searchenchant.</td>
+  </tr>
+  <tr>
     <td>OpenInv.anychest</td>
     <td>Required to use /anychest.</td>
   </tr>
   <tr>
+    <td>OpenInv.any.default</td>
+    <td>Cause AnyContainer to be enabled by default.</td>
+  </tr>
+  <tr>
     <td>OpenInv.silent</td>
-    <td>Required to use /silentchest.</td>
+    <td>Required to use /silentcontainer.</td>
+  </tr>
+  <tr>
+    <td>OpenInv.silent.default</td>
+    <td>Cause SilentContainer to be enabled by default.</td>
   </tr>
 </table>
 
 ## For Developers
-To compile, the relevant Craftbukkit/Spigot jars must be installed in your local repository using the install plugin.  
+To compile, the relevant Craftbukkit/Spigot jars must be installed in your local repository using the install plugin.
 Ex: `mvn install:install-file -Dpackaging=jar -Dfile=spigot-1.11-R0.1-SNAPSHOT.jar -DgroupId=org.spigotmc -DartifactId=spigot -Dversion=1.11-R0.1-SNAPSHOT`
 
 To compile for a specific version or set of versions, you'll need to use a profile. Provided profiles are `latest`, `modern` (versions 1.8+), and `all`. Select an existing profile using the `-P` argument (ex: `mvn clean package -am -P all`) or make your own. For more information, check out the [official guide](http://maven.apache.org/guides/introduction/introduction-to-profiles.html).

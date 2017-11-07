@@ -4,35 +4,44 @@ import org.bukkit.permissions.Permissible;
 
 public enum Permissions {
 
-    OPENINV("OpenInv.openinv"),
-    OVERRIDE("OpenInv.override"),
-    EXEMPT("OpenInv.exempt"),
-    CROSSWORLD("OpenInv.crossworld"),
-    SILENT("OpenInv.silent"),
-    ANYCHEST("OpenInv.anychest"),
-    ENDERCHEST("OpenInv.openender"),
-    ENDERCHEST_ALL("OpenInv.openenderall"),
-    SEARCH("OpenInv.search"),
-    EDITINV("OpenInv.editinv"),
-    EDITENDER("OpenInv.editender"),
-    OPENSELF("OpenInv.openself");
+    OPENINV("openinv"),
+    OVERRIDE("override"),
+    EXEMPT("exempt"),
+    CROSSWORLD("crossworld"),
+    SILENT("silent"),
+    ANYCHEST("anychest"),
+    ENDERCHEST("openender"),
+    ENDERCHEST_ALL("openenderall"),
+    SEARCH("search"),
+    EDITINV("editinv"),
+    EDITENDER("editender"),
+    OPENSELF("openself");
 
-    private final String permission;
+    private final String[] permission;
 
-    private Permissions(String permission) {
-        this.permission = permission;
+    Permissions(String... permission) {
+        this.permission = new String[permission.length + 1];
+        this.permission[0] = "OpenInv";
+        System.arraycopy(permission, 0, permission, 1, permission.length);
     }
 
     public boolean hasPermission(Permissible permissible) {
-        String[] parts = permission.split("\\.");
-        String perm = "";
-        for (int i = 0; i < parts.length; i++) {
-            if (permissible.hasPermission(perm + "*")) {
+        StringBuilder permissionBuilder = new StringBuilder();
+
+        // Support wildcard nodes.
+        for (int i = 0; i < permission.length; i++) {
+            if (permissible.hasPermission(permissionBuilder.toString() + "*")) {
                 return true;
             }
-            perm += parts[i] + ".";
+            permissionBuilder.append(permission[i]).append('.');
         }
-        return permissible.hasPermission(permission);
+
+        // Delete trailing period.
+        if (permissionBuilder.length() > 0) {
+            permissionBuilder.deleteCharAt(permissionBuilder.length() - 1);
+        }
+
+        return permissible.hasPermission(permissionBuilder.toString());
     }
 
 }
