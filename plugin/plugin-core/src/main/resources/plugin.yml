@@ -7,54 +7,53 @@ description: >
              This plugin allows you to open a player's inventory as a chest and interact with it in real time.
 
 permissions:
-  openinv:
-    anychest.default:
-      description: Permission for AnyContainer to default on prior to toggling.
-      default: false
-    silentchest.default:
-      description: Permission for SilentChest to default on prior to toggling.
-      default: false
+  openinv.any.default:
+    description: Permission for AnyContainer to default on prior to toggling.
+    default: false
+  openinv.silent.default:
+    description: Permission for SilentContainer to default on prior to toggling.
+    default: false
 
 commands:
   openinv:
     aliases: [oi, inv, open]
     description: Open a player's inventory
-    permission: OpenInv.*;OpenInv.openinv
+    permission: OpenInv.*;OpenInv.openinv;openinv.*;openinv.openinv
     usage: |-
            /<command> [Player] - Open a player's inventory
   openender:
     aliases: [oe]
     description: Opens the enderchest of a player
-    permission: OpenInv.*;OpenInv.openender
+    permission: OpenInv.*;OpenInv.openender;openinv.*;openinv.openender
     usage: |-
            /<command> [Player] - Open a player's enderchest
   searchinv:
     aliases: [si]
     description: Search and list players having a specific item
-    permission: OpenInv.*;OpenInv.search
+    permission: OpenInv.*;OpenInv.search;openinv.*;openinv.search
     usage: |-
            /<command> <Item> [MinAmount] - Item is the ID or the Bukkit Material, MinAmount is the minimum amount required
   searchender:
     aliases: [se]
-    permission: OpenInv.*;OpenInv.search
+    permission: OpenInv.*;OpenInv.search;openinv.*;openinv.search
     description: Searches and lists players having a specific item in their ender chest
     usage: |-
            /<command> <item> [MinAmount] - Item is the ID or the Bukkit Material, MinAmount is the minimum amount required
-  silentchest:
-    aliases: [sc, silent, silentcontainer]
+  silentcontainer:
+    aliases: [sc, silent, silentchest]
     description: Toggle SilentContainer function, which stops sounds and animations when using containers.
-    permission: OpenInv.*;OpenInv.silent
+    permission: OpenInv.*;OpenInv.silent;openinv.*;openinv.silent
     usage: |-
            /<command> [Check] - Check or toggle silent chest
   anycontainer:
     aliases: [ac, anychest]
     description: Toggle AnyContainer function, which allows opening of blocked containers.
-    permission: OpenInv.*;OpenInv.anychest;OpenInv.anycontainer
+    permission: OpenInv.*;OpenInv.anychest;openinv.*;openinv.any
     usage: |-
            /<command> [Check] - Checks or toggle anychest
   searchenchant:
     aliases: [searchenchants]
     description: Search and list players with a specific enchantment.
-    permission: OpenInv.*;OpenInv.searchenchant
+    permission: OpenInv.*;OpenInv.searchenchant;openinv.*;openinv.searchenchant
     usage: |-
            /<command> <[enchantment] [MinLevel]> - Enchantment is the enchantment type, MinLevel is the minimum level. One is optional
