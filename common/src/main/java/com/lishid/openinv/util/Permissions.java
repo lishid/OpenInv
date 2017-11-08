@@ -9,7 +9,9 @@ public enum Permissions {
     EXEMPT("exempt"),
     CROSSWORLD("crossworld"),
     SILENT("silent"),
+    SILENT_DEFAULT("silent", "default"),
     ANYCHEST("anychest"),
+    ANY_DEFAULT("any", "default"),
     ENDERCHEST("openender"),
     ENDERCHEST_ALL("openenderall"),
     SEARCH("search"),
@@ -19,10 +21,10 @@ public enum Permissions {
 
     private final String[] permission;
 
-    Permissions(String... permission) {
-        this.permission = new String[permission.length + 1];
+    Permissions(String... permissions) {
+        this.permission = new String[permissions.length + 1];
         this.permission[0] = "OpenInv";
-        System.arraycopy(permission, 0, permission, 1, permission.length);
+        System.arraycopy(permissions, 0, this.permission, 1, permissions.length);
     }
 
     public boolean hasPermission(Permissible permissible) {

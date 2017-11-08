@@ -7,7 +7,7 @@ OpenInv is a [Bukkit plugin](https://dev.bukkit.org/bukkit-plugins/openinv/) whi
   - Cross-world support! Don't grant `OpenInv.crossworld`
   - No self-opening! Don't grant `OpenInv.openself`
   - Drop items as the player! Place items in the unused slots to the right of the armor to drop them
-- **OpenEnder**: Open anyone's inventory, even if they're offline.
+- **OpenEnder**: Open anyone's ender chest, even if they're offline.
   - Read-only mode! No edits allowed! Don't grant `OpenInv.editender`
   - Cross-world support! Don't grant `OpenInv.crossworld`
   - No opening others! Don't grant `OpenInv.openenderall`
@@ -134,7 +134,7 @@ OpenInv is a [Bukkit plugin](https://dev.bukkit.org/bukkit-plugins/openinv/) whi
 To compile, the relevant Craftbukkit/Spigot jars must be installed in your local repository using the install plugin.
 Ex: `mvn install:install-file -Dpackaging=jar -Dfile=spigot-1.11-R0.1-SNAPSHOT.jar -DgroupId=org.spigotmc -DartifactId=spigot -Dversion=1.11-R0.1-SNAPSHOT`
 
-To compile for a specific version or set of versions, you'll need to use a profile. Provided profiles are `latest`, `modern` (versions 1.8+), and `all`. Select an existing profile using the `-P` argument (ex: `mvn clean package -am -P all`) or make your own. For more information, check out the [official guide](http://maven.apache.org/guides/introduction/introduction-to-profiles.html).
+To compile for a specific version or set of versions, you'll need to use a profile. Provided profiles are `latest`, `recent` (last 2 major Minecraft versions), and `all`. Select an existing profile using the `-P` argument (ex: `mvn clean package -am -P all`) or make your own. For more information, check out the [official guide](http://maven.apache.org/guides/introduction/introduction-to-profiles.html).
 
 The final file is target/OpenInv.jar
 

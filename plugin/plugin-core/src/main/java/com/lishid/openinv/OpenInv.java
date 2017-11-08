@@ -276,7 +276,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         if (player.isOnline()) {
             Player onlinePlayer = player.getPlayer();
             if (onlinePlayer != null) {
-                defaultState = onlinePlayer.hasPermission("openinv.anychest.default");
+                defaultState = Permissions.ANY_DEFAULT.hasPermission(onlinePlayer);
             }
         }
 
@@ -295,7 +295,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         if (player.isOnline()) {
             Player onlinePlayer = player.getPlayer();
             if (onlinePlayer != null) {
-                defaultState = onlinePlayer.hasPermission("openinv.silentchest.default");
+                defaultState = Permissions.SILENT_DEFAULT.hasPermission(onlinePlayer);
             }
         }
 
