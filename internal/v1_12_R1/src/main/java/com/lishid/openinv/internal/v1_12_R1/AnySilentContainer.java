@@ -1,11 +1,17 @@
 /*
- * Copyright (C) 2011-2014 lishid. All rights reserved. This program is free software: you can
- * redistribute it and/or modify it under the terms of the GNU General Public License as published
- * by the Free Software Foundation, version 3. This program is distributed in the hope that it will
- * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should
- * have received a copy of the GNU General Public License along with this program. If not, see
- * <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2011-2014 lishid.  All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation,  version 3.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.lishid.openinv.internal.v1_12_R1;
@@ -54,6 +60,101 @@ public class AnySilentContainer implements IAnySilentContainer {
             System.err.println("[OpenInv] Unable to directly write player gamemode! SilentChest will fail.");
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean isAnySilentContainer(final org.bukkit.block.Block block) {
+        if (block.getType() == Material.ENDER_CHEST) {
+            return true;
+        }
+        BlockState state = block.getState();
+        return state instanceof org.bukkit.block.Chest
+                || state instanceof org.bukkit.block.ShulkerBox;
+    }
+
+    @Override
+    public boolean isAnyContainerNeeded(final Player p, final org.bukkit.block.Block b) {
+        EntityPlayer player = PlayerDataManager.getHandle(p);
+        World world = player.world;
+        BlockPosition blockPosition = new BlockPosition(b.getX(), b.getY(), b.getZ());
+        IBlockData blockData = world.getType(blockPosition);
+        Block block = blockData.getBlock();
+
+        if (block instanceof BlockShulkerBox) {
+            return this.isBlockedShulkerBox(world, blockPosition, blockData);
+        }
+
+        if (block instanceof BlockEnderChest) {
+            // Ender chests are not blocked by ocelots.
+            return world.getType(blockPosition.up()).m();
+        }
+
+        // Check if chest is blocked or has an ocelot on top
+        if (this.isBlockedChest(world, blockPosition)) {
+            return true;
+        }
+
+        // Check for matching adjacent chests that are blocked or have an ocelot on top
+        for (EnumDirection localEnumDirection : EnumDirection.EnumDirectionLimit.HORIZONTAL) {
+            BlockPosition localBlockPosition = blockPosition.shift(localEnumDirection);
+            Block localBlock = world.getType(localBlockPosition).getBlock();
+
+            if (localBlock != block) {
+                continue;
+            }
+
+            TileEntity localTileEntity = world.getTileEntity(localBlockPosition);
+            if (!(localTileEntity instanceof TileEntityChest)) {
+                continue;
+            }
+
+            if (this.isBlockedChest(world, localBlockPosition)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isBlockedShulkerBox(final World world, final BlockPosition blockPosition,
+                                        final IBlockData blockData) {
+        // For reference, look at net.minecraft.server.BlockShulkerBox
+        TileEntity tile = world.getTileEntity(blockPosition);
+
+        if (!(tile instanceof TileEntityShulkerBox)) {
+            return false;
+        }
+
+        EnumDirection enumDirection = blockData.get(BlockShulkerBox.a);
+        if (((TileEntityShulkerBox) tile).p() == TileEntityShulkerBox.AnimationPhase.CLOSED) {
+            AxisAlignedBB axisAlignedBB = Block.j.b(0.5F * enumDirection.getAdjacentX(),
+                    0.5F * enumDirection.getAdjacentY(), 0.5F * enumDirection.getAdjacentZ())
+                    .a(enumDirection.getAdjacentX(), enumDirection.getAdjacentY(),
+                            enumDirection.getAdjacentZ());
+
+            return world.a(axisAlignedBB.a(blockPosition.shift(enumDirection)));
+        }
+
+        return false;
+    }
+
+    private boolean isBlockedChest(final World world, final BlockPosition blockPosition) {
+        // For reference, loot at net.minecraft.server.BlockChest
+        return world.getType(blockPosition.up()).l() || this.hasOcelotOnTop(world, blockPosition);
+    }
+
+    private boolean hasOcelotOnTop(final World world, final BlockPosition blockPosition) {
+        for (Entity localEntity : world.a(EntityOcelot.class,
+                new AxisAlignedBB(blockPosition.getX(), blockPosition.getY() + 1,
+                        blockPosition.getZ(), blockPosition.getX() + 1, blockPosition.getY() + 2,
+                        blockPosition.getZ() + 1))) {
+            EntityOcelot localEntityOcelot = (EntityOcelot) localEntity;
+            if (localEntityOcelot.isSitting()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override
@@ -187,101 +288,6 @@ public class AnySilentContainer implements IAnySilentContainer {
         } catch (IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
         }
-    }
-
-    private boolean hasOcelotOnTop(final World world, final BlockPosition blockPosition) {
-        for (Entity localEntity : world.a(EntityOcelot.class,
-                new AxisAlignedBB(blockPosition.getX(), blockPosition.getY() + 1,
-                        blockPosition.getZ(), blockPosition.getX() + 1, blockPosition.getY() + 2,
-                        blockPosition.getZ() + 1))) {
-            EntityOcelot localEntityOcelot = (EntityOcelot) localEntity;
-            if (localEntityOcelot.isSitting()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean isAnyContainerNeeded(final Player p, final org.bukkit.block.Block b) {
-        EntityPlayer player = PlayerDataManager.getHandle(p);
-        World world = player.world;
-        BlockPosition blockPosition = new BlockPosition(b.getX(), b.getY(), b.getZ());
-        IBlockData blockData = world.getType(blockPosition);
-        Block block = blockData.getBlock();
-
-        if (block instanceof BlockShulkerBox) {
-            return this.isBlockedShulkerBox(world, blockPosition, blockData);
-        }
-
-        if (block instanceof BlockEnderChest) {
-            // Ender chests are not blocked by ocelots.
-            return world.getType(blockPosition.up()).m();
-        }
-
-        // Check if chest is blocked or has an ocelot on top
-        if (this.isBlockedChest(world, blockPosition)) {
-            return true;
-        }
-
-        // Check for matching adjacent chests that are blocked or have an ocelot on top
-        for (EnumDirection localEnumDirection : EnumDirection.EnumDirectionLimit.HORIZONTAL) {
-            BlockPosition localBlockPosition = blockPosition.shift(localEnumDirection);
-            Block localBlock = world.getType(localBlockPosition).getBlock();
-
-            if (localBlock != block) {
-                continue;
-            }
-
-            TileEntity localTileEntity = world.getTileEntity(localBlockPosition);
-            if (!(localTileEntity instanceof TileEntityChest)) {
-                continue;
-            }
-
-            if (this.isBlockedChest(world, localBlockPosition)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    @Override
-    public boolean isAnySilentContainer(final org.bukkit.block.Block block) {
-        if (block.getType() == Material.ENDER_CHEST) {
-            return true;
-        }
-        BlockState state = block.getState();
-        return state instanceof org.bukkit.block.Chest
-                || state instanceof org.bukkit.block.ShulkerBox;
-    }
-
-    private boolean isBlockedChest(final World world, final BlockPosition blockPosition) {
-        // For reference, loot at net.minecraft.server.BlockChest
-        return world.getType(blockPosition.up()).l() || this.hasOcelotOnTop(world, blockPosition);
-    }
-
-    private boolean isBlockedShulkerBox(final World world, final BlockPosition blockPosition,
-            final IBlockData blockData) {
-        // For reference, look at net.minecraft.server.BlockShulkerBox
-        TileEntity tile = world.getTileEntity(blockPosition);
-
-        if (!(tile instanceof TileEntityShulkerBox)) {
-            return false;
-        }
-
-        EnumDirection enumDirection = blockData.get(BlockShulkerBox.a);
-        if (((TileEntityShulkerBox) tile).p() == TileEntityShulkerBox.AnimationPhase.CLOSED) {
-            AxisAlignedBB axisAlignedBB = Block.j.b(0.5F * enumDirection.getAdjacentX(),
-                    0.5F * enumDirection.getAdjacentY(), 0.5F * enumDirection.getAdjacentZ())
-                    .a(enumDirection.getAdjacentX(), enumDirection.getAdjacentY(),
-                            enumDirection.getAdjacentZ());
-
-            return world.a(axisAlignedBB.a(blockPosition.shift(enumDirection)));
-        }
-
-        return false;
     }
 
 }
