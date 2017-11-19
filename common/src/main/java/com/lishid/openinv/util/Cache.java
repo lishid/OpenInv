@@ -41,7 +41,7 @@ public class Cache<K, V> {
                 new Comparator<K>() {
                     @Override
                     public int compare(final K k1, final K k2) {
-                        return 0;
+                        return k1 == k2 || k1 != null && k1.equals(k2) ? 0 : 1;
                     }
                 });
 
