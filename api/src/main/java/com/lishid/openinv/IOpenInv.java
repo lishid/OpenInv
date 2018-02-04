@@ -42,7 +42,7 @@ public interface IOpenInv {
      *
      * @return false unless configured otherwise
      */
-	boolean disableSaving();
+    boolean disableSaving();
 
     /**
      * Gets the active ISilentContainer implementation. May return null if the server version is
@@ -51,35 +51,35 @@ public interface IOpenInv {
      * @return the ISilentContainer
      * @throws IllegalStateException if the server version is unsupported
      */
-	IAnySilentContainer getAnySilentContainer();
+    IAnySilentContainer getAnySilentContainer();
 
     /**
      * Gets an ISpecialEnderChest for the given Player. Returns null if the ISpecialEnderChest could
      * not be instantiated.
      *
-     * @deprecated Use {@link IOpenInv#getSpecialEnderChest(Player, boolean)}
      * @param player the Player
      * @param online true if the Player is currently online
      * @return the ISpecialEnderChest
      * @throws IllegalStateException if the server version is unsupported
+     * @deprecated Use {@link IOpenInv#getSpecialEnderChest(Player, boolean)}
      */
     @Deprecated
     @Nullable
-	ISpecialEnderChest getEnderChest(Player player, boolean online);
+    ISpecialEnderChest getEnderChest(Player player, boolean online);
 
     /**
      * Gets an ISpecialPlayerInventory for the given Player. Returns null if the
      * ISpecialPlayerInventory could not be instantiated.
      *
-     * @deprecated Use {@link IOpenInv#getSpecialInventory(Player, boolean)}
      * @param player the Player
      * @param online true if the Player is currently online
      * @return the ISpecialPlayerInventory
      * @throws IllegalStateException if the server version is unsupported
+     * @deprecated Use {@link IOpenInv#getSpecialInventory(Player, boolean)}
      */
     @Deprecated
     @Nullable
-	ISpecialPlayerInventory getInventory(Player player, boolean online);
+    ISpecialPlayerInventory getInventory(Player player, boolean online);
 
     /**
      * Gets the active IInventoryAccess implementation. May return null if the server version is
@@ -88,7 +88,7 @@ public interface IOpenInv {
      * @return the IInventoryAccess
      * @throws IllegalStateException if the server version is unsupported
      */
-	IInventoryAccess getInventoryAccess();
+    IInventoryAccess getInventoryAccess();
 
     /**
      * Gets the provided player's AnyChest setting.
@@ -97,7 +97,7 @@ public interface IOpenInv {
      * @return true if AnyChest is enabled
      * @throws IllegalStateException if the server version is unsupported
      */
-	boolean getPlayerAnyChestStatus(OfflinePlayer player);
+    boolean getPlayerAnyChestStatus(OfflinePlayer player);
 
     /**
      * Gets a unique identifier by which the OfflinePlayer can be referenced. Using the value
@@ -107,7 +107,7 @@ public interface IOpenInv {
      * @return the identifier
      * @throws IllegalStateException if the server version is unsupported
      */
-	String getPlayerID(OfflinePlayer offline);
+    String getPlayerID(OfflinePlayer offline);
 
     /**
      * Gets a player's SilentChest setting.
@@ -116,7 +116,7 @@ public interface IOpenInv {
      * @return true if SilentChest is enabled
      * @throws IllegalStateException if the server version is unsupported
      */
-	boolean getPlayerSilentChestStatus(OfflinePlayer player);
+    boolean getPlayerSilentChestStatus(OfflinePlayer player);
 
     /**
      * Gets an ISpecialEnderChest for the given Player.
@@ -124,10 +124,10 @@ public interface IOpenInv {
      * @param player the Player
      * @param online true if the Player is currently online
      * @return the ISpecialEnderChest
-     * @throws IllegalStateException if the server version is unsupported
+     * @throws IllegalStateException  if the server version is unsupported
      * @throws InstantiationException if the ISpecialEnderChest could not be instantiated
      */
-	ISpecialEnderChest getSpecialEnderChest(Player player, boolean online) throws InstantiationException;
+    ISpecialEnderChest getSpecialEnderChest(Player player, boolean online) throws InstantiationException;
 
     /**
      * Gets an ISpecialPlayerInventory for the given Player.
@@ -135,17 +135,17 @@ public interface IOpenInv {
      * @param player the Player
      * @param online true if the Player is currently online
      * @return the ISpecialPlayerInventory
-     * @throws IllegalStateException if the server version is unsupported
+     * @throws IllegalStateException  if the server version is unsupported
      * @throws InstantiationException if the ISpecialPlayerInventory could not be instantiated
      */
-	ISpecialPlayerInventory getSpecialInventory(Player player, boolean online) throws InstantiationException;
+    ISpecialPlayerInventory getSpecialInventory(Player player, boolean online) throws InstantiationException;
 
     /**
      * Checks if the server version is supported by OpenInv.
      *
      * @return true if the server version is supported
      */
-	boolean isSupportedVersion();
+    boolean isSupportedVersion();
 
     /**
      * Load a Player from an OfflinePlayer. May return null under some circumstances.
@@ -155,7 +155,7 @@ public interface IOpenInv {
      * @throws IllegalStateException if the server version is unsupported
      */
     @Nullable
-	Player loadPlayer(final OfflinePlayer offline);
+    Player loadPlayer(final OfflinePlayer offline);
 
     /**
      * Get an OfflinePlayer by name.
@@ -168,7 +168,7 @@ public interface IOpenInv {
      * @return the OfflinePlayer with the closest matching name or null if no players have ever logged in
      */
     @Nullable
-	OfflinePlayer matchPlayer(String name);
+    OfflinePlayer matchPlayer(String name);
 
     /**
      * Check the configuration value for whether or not OpenInv displays a notification to the user
@@ -176,7 +176,7 @@ public interface IOpenInv {
      *
      * @return true unless configured otherwise
      */
-	boolean notifyAnyChest();
+    boolean notifyAnyChest();
 
     /**
      * Check the configuration value for whether or not OpenInv displays a notification to the user
@@ -184,7 +184,7 @@ public interface IOpenInv {
      *
      * @return true unless configured otherwise
      */
-	boolean notifySilentChest();
+    boolean notifySilentChest();
 
     /**
      * Mark a Player as no longer in use by a Plugin to allow OpenInv to remove it from the cache
@@ -194,7 +194,7 @@ public interface IOpenInv {
      * @param plugin the Plugin no longer holding a reference to the Player
      * @throws IllegalStateException if the server version is unsupported
      */
-	void releasePlayer(Player player, Plugin plugin);
+    void releasePlayer(Player player, Plugin plugin);
 
     /**
      * Mark a Player as in use by a Plugin to prevent it from being removed from the cache. Used to
@@ -219,7 +219,7 @@ public interface IOpenInv {
      * @param plugin the Plugin holding the reference to the Player
      * @throws IllegalStateException if the server version is unsupported
      */
-	void retainPlayer(Player player, Plugin plugin);
+    void retainPlayer(Player player, Plugin plugin);
 
     /**
      * Sets a player's AnyChest setting.
@@ -228,7 +228,7 @@ public interface IOpenInv {
      * @param status the status
      * @throws IllegalStateException if the server version is unsupported
      */
-	void setPlayerAnyChestStatus(OfflinePlayer player, boolean status);
+    void setPlayerAnyChestStatus(OfflinePlayer player, boolean status);
 
     /**
      * Sets a player's SilentChest setting.
@@ -237,7 +237,7 @@ public interface IOpenInv {
      * @param status the status
      * @throws IllegalStateException if the server version is unsupported
      */
-	void setPlayerSilentChestStatus(OfflinePlayer player, boolean status);
+    void setPlayerSilentChestStatus(OfflinePlayer player, boolean status);
 
     /**
      * Forcibly unload a cached Player's data.
@@ -245,6 +245,6 @@ public interface IOpenInv {
      * @param player the OfflinePlayer to unload
      * @throws IllegalStateException if the server version is unsupported
      */
-	void unload(OfflinePlayer player);
+    void unload(OfflinePlayer player);
 
 }

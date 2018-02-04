@@ -26,25 +26,25 @@ public interface ISpecialPlayerInventory {
      *
      * @return the Inventory
      */
-	Inventory getBukkitInventory();
+    Inventory getBukkitInventory();
 
     /**
      * Sets the Player associated with this ISpecialPlayerInventory online.
      *
      * @param player the Player coming online
      */
-	void setPlayerOnline(Player player);
+    void setPlayerOnline(Player player);
 
     /**
      * Sets the Player associated with this ISpecialPlayerInventory offline.
      */
-	void setPlayerOffline();
+    void setPlayerOffline();
 
     /**
      * Gets whether or not this ISpecialPlayerInventory is in use.
      *
      * @return true if the ISpecialPlayerInventory is in use
      */
-	boolean isInUse();
+    boolean isInUse();
 
 }

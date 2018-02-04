@@ -26,25 +26,25 @@ public interface ISpecialEnderChest {
      *
      * @return the Inventory
      */
-	Inventory getBukkitInventory();
+    Inventory getBukkitInventory();
 
     /**
      * Sets the Player associated with this ISpecialEnderChest online.
      *
      * @param player the Player coming online
      */
-	void setPlayerOnline(Player player);
+    void setPlayerOnline(Player player);
 
     /**
      * Sets the Player associated with this ISpecialEnderChest offline.
      */
-	void setPlayerOffline();
+    void setPlayerOffline();
 
     /**
      * Gets whether or not this ISpecialEnderChest is in use.
      *
      * @return true if the ISpecialEnderChest is in use
      */
-	boolean isInUse();
+    boolean isInUse();
 
 }
