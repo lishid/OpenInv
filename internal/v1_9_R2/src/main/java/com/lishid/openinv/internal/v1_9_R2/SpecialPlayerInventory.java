@@ -1,15 +1,15 @@
 /*
- * Copyright (C) 2011-2014 lishid.  All rights reserved.
- * 
+ * Copyright (C) 2011-2018 lishid. All rights reserved.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation,  version 3.
- * 
+ * the Free Software Foundation, version 3.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,14 +27,13 @@ import org.bukkit.inventory.Inventory;
 import net.minecraft.server.v1_9_R2.ItemStack;
 import net.minecraft.server.v1_9_R2.PlayerInventory;
 
-import org.bukkit.craftbukkit.v1_9_R2.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_9_R2.inventory.CraftInventory;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
 
     private final ItemStack[] extra = new ItemStack[4];
     private final CraftInventory inventory = new CraftInventory(this);
-    private boolean playerOnline = false;
+    private boolean playerOnline;
 
     public SpecialPlayerInventory(Player bukkitPlayer, Boolean online) {
         super(PlayerDataManager.getHandle(bukkitPlayer));
@@ -101,11 +100,6 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     @Override
     public boolean isInUse() {
         return !this.getViewers().isEmpty();
-    }
-
-    @Override
-    public void onClose(CraftHumanEntity who) {
-        super.onClose(who);
     }
 
     @Override
@@ -289,6 +283,11 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             return player.getName().substring(0, 16);
         }
         return player.getName();
+    }
+
+    @Override
+    public boolean hasCustomName() {
+        return true;
     }
 
 }

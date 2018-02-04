@@ -1,15 +1,15 @@
 /*
- * Copyright (C) 2011-2014 lishid.  All rights reserved.
- * 
+ * Copyright (C) 2011-2018 lishid. All rights reserved.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation,  version 3.
- * 
+ * the Free Software Foundation, version 3.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -36,7 +36,7 @@ import org.bukkit.craftbukkit.v1_11_R1.inventory.CraftInventory;
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
 
     private final CraftInventory inventory = new CraftInventory(this);
-    private boolean playerOnline = false;
+    private boolean playerOnline;
 
     public SpecialPlayerInventory(Player bukkitPlayer, Boolean online) {
         super(PlayerDataManager.getHandle(bukkitPlayer));
@@ -70,7 +70,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             field = PlayerInventory.class.getDeclaredField("g");
             field.setAccessible(true);
             modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-            field.set(inventory, Arrays.asList(new NonNullList[] { items, armor, extraSlots }));
+            field.set(inventory, Arrays.asList(items, armor, extraSlots));
         } catch (NoSuchFieldException e) {
             // Unable to set final fields to item arrays, we're screwed. Noisily fail.
             e.printStackTrace();
@@ -89,7 +89,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     @Override
     public void setPlayerOnline(Player player) {
         if (!playerOnline) {
-            this.player = PlayerDataManager.getHandle(player);;
+            this.player = PlayerDataManager.getHandle(player);
             setItemArrays(this.player.inventory, items, armor, extraSlots);
             playerOnline = true;
         }
@@ -157,7 +157,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             return ItemStack.a;
         }
 
-        return list == null || list.get(i).isEmpty() ? ItemStack.a : ContainerUtil.a(list, i, j);
+        return list.get(i).isEmpty() ? ItemStack.a : ContainerUtil.a(list, i, j);
     }
 
     @Override
@@ -182,7 +182,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             return ItemStack.a;
         }
 
-        if (list != null && !list.get(i).isEmpty()) {
+        if (!list.get(i).isEmpty()) {
             ItemStack itemstack = list.get(i);
 
             list.set(i, ItemStack.a);
@@ -215,9 +215,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             return;
         }
 
-        if (list != null) {
-            list.set(i, itemstack);
-        }
+        list.set(i, itemstack);
     }
 
     private int getReversedItemSlotNum(int i) {
@@ -249,6 +247,11 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             return player.getName().substring(0, 16);
         }
         return player.getName();
+    }
+
+    @Override
+    public boolean hasCustomName() {
+        return true;
     }
 
     @Override

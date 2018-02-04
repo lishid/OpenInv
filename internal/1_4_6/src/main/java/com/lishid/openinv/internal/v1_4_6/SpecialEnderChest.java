@@ -1,15 +1,15 @@
 /*
- * Copyright (C) 2011-2014 lishid.  All rights reserved.
- * 
+ * Copyright (C) 2011-2018 lishid. All rights reserved.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation,  version 3.
- * 
+ * the Free Software Foundation, version 3.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -42,13 +42,14 @@ public class SpecialEnderChest extends InventorySubcontainer implements IInvento
     private final InventoryEnderChest enderChest;
     private final CraftInventory inventory = new CraftInventory(this);
     private final List<HumanEntity> transaction = new ArrayList<HumanEntity>();
-    private boolean playerOnline = false;
+    private boolean playerOnline;
     private CraftPlayer owner;
     private int maxStack = MAX_STACK;
 
     public SpecialEnderChest(Player player, Boolean online) {
-        super(((CraftPlayer) player).getHandle().getEnderChest().getName(),
-                ((CraftPlayer) player).getHandle().getEnderChest().getSize());
+        super(PlayerDataManager.getHandle(player).getEnderChest().getName(),
+                PlayerDataManager.getHandle(player).getEnderChest().getSize());
+        this.playerOnline = online;
         EntityPlayer nmsPlayer = PlayerDataManager.getHandle(player);
         this.enderChest = nmsPlayer.getEnderChest();
         this.owner = nmsPlayer.getBukkitEntity();

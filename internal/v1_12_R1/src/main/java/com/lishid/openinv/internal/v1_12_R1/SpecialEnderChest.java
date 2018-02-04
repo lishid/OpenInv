@@ -1,11 +1,17 @@
 /*
- * Copyright (C) 2011-2014 lishid. All rights reserved. This program is free software: you can
- * redistribute it and/or modify it under the terms of the GNU General Public License as published
- * by the Free Software Foundation, version 3. This program is distributed in the hope that it will
- * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should
- * have received a copy of the GNU General Public License along with this program. If not, see
- * <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2011-2018 lishid. All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.lishid.openinv.internal.v1_12_R1;
@@ -32,12 +38,13 @@ public class SpecialEnderChest extends InventorySubcontainer
 
     private final InventoryEnderChest enderChest;
     private final CraftInventory inventory = new CraftInventory(this);
-    private boolean playerOnline = false;
+    private boolean playerOnline;
 
     public SpecialEnderChest(final Player player, final Boolean online) {
         super(PlayerDataManager.getHandle(player).getEnderChest().getName(),
                 PlayerDataManager.getHandle(player).getEnderChest().hasCustomName(),
                 PlayerDataManager.getHandle(player).getEnderChest().getSize());
+        this.playerOnline = online;
         EntityPlayer nmsPlayer = PlayerDataManager.getHandle(player);
         this.enderChest = nmsPlayer.getEnderChest();
         this.bukkitOwner = nmsPlayer.getBukkitEntity();
@@ -64,13 +71,8 @@ public class SpecialEnderChest extends InventorySubcontainer
             Field field = InventorySubcontainer.class.getField("items");
             modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
             field.set(subcontainer, list);
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
+                | IllegalAccessException e) {
             e.printStackTrace();
         }
     }

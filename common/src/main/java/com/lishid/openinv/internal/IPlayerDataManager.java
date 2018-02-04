@@ -1,15 +1,15 @@
 /*
- * Copyright (C) 2011-2014 lishid.  All rights reserved.
- * 
+ * Copyright (C) 2011-2018 lishid. All rights reserved.
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation,  version 3.
- * 
+ * the Free Software Foundation, version 3.
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
@@ -27,33 +27,33 @@ public interface IPlayerDataManager {
      * Loads a Player for an OfflinePlayer.
      * </p>
      * This method is potentially blocking, and should not be called on the main thread.
-     * 
-     * @param offline
-     * @return
+     *
+     * @param offline the OfflinePlayer
+     * @return the Player loaded
      */
-    public Player loadPlayer(OfflinePlayer offline);
+	Player loadPlayer(OfflinePlayer offline);
 
     /**
      * Gets a unique identifying string for an OfflinePlayer.
-     * 
-     * @param player
-     * @return
+     *
+     * @param offline the OfflinePlayer
+     * @return the unique identifier
      */
-    public String getPlayerDataID(OfflinePlayer player);
+	String getPlayerDataID(OfflinePlayer offline);
 
     /**
      * Gets an OfflinePlayer by the given unique identifier.
-     * 
+     *
      * @param identifier the unique identifier
      * @return the OfflinePlayer, or null if no exact match was found
      */
-    public OfflinePlayer getPlayerByID(String identifier);
+	OfflinePlayer getPlayerByID(String identifier);
 
     /**
      * Gets a Collection of all Players currently online.
-     * 
+     *
      * @return the Collection of Players
      */
-    public Collection<? extends Player> getOnlinePlayers();
+	Collection<? extends Player> getOnlinePlayers();
 
 }

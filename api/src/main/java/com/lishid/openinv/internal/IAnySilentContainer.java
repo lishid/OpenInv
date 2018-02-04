@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2011-2018 lishid. All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.lishid.openinv.internal;
 
 import org.bukkit.block.Block;
@@ -15,14 +31,14 @@ public interface IAnySilentContainer {
      * @param block the Block
      * @return true if the container can be opened
      */
-    public boolean activateContainer(Player player, boolean silentchest, Block block);
+	boolean activateContainer(Player player, boolean silentchest, Block block);
 
     /**
      * Closes the Player's currently open container silently, if necessary.
      *
      * @param player the Player closing a container
      */
-    public void deactivateContainer(Player player);
+	void deactivateContainer(Player player);
 
     /**
      * Checks if the container at the given coordinates is blocked.
@@ -31,7 +47,7 @@ public interface IAnySilentContainer {
      * @param block the Block
      * @return true if the container is blocked
      */
-    public boolean isAnyContainerNeeded(Player player, Block block);
+	boolean isAnyContainerNeeded(Player player, Block block);
 
     /**
      * Checks if the given block is a container which can be unblocked or silenced.
@@ -39,6 +55,6 @@ public interface IAnySilentContainer {
      * @param block the BlockState
      * @return true if the Block is a supported container
      */
-    public boolean isAnySilentContainer(Block block);
+	boolean isAnySilentContainer(Block block);
 
 }

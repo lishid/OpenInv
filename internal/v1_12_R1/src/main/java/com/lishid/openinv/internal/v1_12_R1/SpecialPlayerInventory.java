@@ -1,11 +1,17 @@
 /*
- * Copyright (C) 2011-2014 lishid. All rights reserved. This program is free software: you can
- * redistribute it and/or modify it under the terms of the GNU General Public License as published
- * by the Free Software Foundation, version 3. This program is distributed in the hope that it will
- * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should
- * have received a copy of the GNU General Public License along with this program. If not, see
- * <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2011-2018 lishid. All rights reserved.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, version 3.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 package com.lishid.openinv.internal.v1_12_R1;
@@ -30,7 +36,7 @@ import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftInventory;
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
 
     private final CraftInventory inventory = new CraftInventory(this);
-    private boolean playerOnline = false;
+    private boolean playerOnline;
 
     public SpecialPlayerInventory(final Player bukkitPlayer, final Boolean online) {
         super(PlayerDataManager.getHandle(bukkitPlayer));
@@ -80,6 +86,11 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             return this.player.getName().substring(0, 16);
         }
         return this.player.getName();
+    }
+
+    @Override
+    public boolean hasCustomName() {
+        return true;
     }
 
     private int getReversedArmorSlotNum(final int i) {
@@ -138,9 +149,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             return;
         }
 
-        if (list != null) {
-            list.set(i, itemstack);
-        }
+        list.set(i, itemstack);
     }
 
     private void setItemArrays(final PlayerInventory inventory, final NonNullList<ItemStack> items,
@@ -169,13 +178,9 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             field = PlayerInventory.class.getDeclaredField("f");
             field.setAccessible(true);
             modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-            field.set(inventory, Arrays.asList(new NonNullList[] { items, armor, extraSlots }));
-        } catch (NoSuchFieldException e) {
+            field.set(inventory, Arrays.asList(items, armor, extraSlots));
+        } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException e) {
             // Unable to set final fields to item lists, we're screwed. Noisily fail.
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -189,7 +194,6 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     public void setPlayerOnline(final Player player) {
         if (!this.playerOnline) {
             this.player = PlayerDataManager.getHandle(player);
-            ;
             this.setItemArrays(this.player.inventory, this.items, this.armor, this.extraSlots);
             this.playerOnline = true;
         }
@@ -217,7 +221,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             return ItemStack.a;
         }
 
-        return list == null || list.get(i).isEmpty() ? ItemStack.a : ContainerUtil.a(list, i, j);
+        return list.get(i).isEmpty() ? ItemStack.a : ContainerUtil.a(list, i, j);
     }
 
     @Override
@@ -242,7 +246,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             return ItemStack.a;
         }
 
-        if (list != null && !list.get(i).isEmpty()) {
+        if (!list.get(i).isEmpty()) {
             ItemStack itemstack = list.get(i);
 
             list.set(i, ItemStack.a);

@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2011-2014 lishid.  All rights reserved.
+ * Copyright (C) 2011-2018 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation,  version 3.
+ * the Free Software Foundation, version 3.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -366,7 +366,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         Future<Player> future = Bukkit.getScheduler().callSyncMethod(this,
                 new Callable<Player>() {
             @Override
-            public Player call() throws Exception {
+            public Player call() {
                 return OpenInv.this.accessor.getPlayerDataManager().loadPlayer(offline);
             }
         });

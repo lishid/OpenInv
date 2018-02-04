@@ -1,13 +1,13 @@
 /*
- * Copyright (C) 2011-2014 lishid.  All rights reserved.
+ * Copyright (C) 2011-2018 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation,  version 3.
+ * the Free Software Foundation, version 3.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -30,7 +30,7 @@ public interface IInventoryAccess {
      * @return the ISpecialEnderChest or null
      */
     @Nullable
-    public ISpecialEnderChest getSpecialEnderChest(Inventory inventory);
+	ISpecialEnderChest getSpecialEnderChest(Inventory inventory);
 
     /**
      * Gets an ISpecialPlayerInventory from an Inventory or null if the Inventory is not backed by
@@ -40,7 +40,7 @@ public interface IInventoryAccess {
      * @return the ISpecialPlayerInventory or null
      */
     @Nullable
-    public ISpecialPlayerInventory getSpecialPlayerInventory(Inventory inventory);
+	ISpecialPlayerInventory getSpecialPlayerInventory(Inventory inventory);
 
     /**
      * Check if an Inventory is an ISpecialEnderChest implementation.
@@ -48,7 +48,7 @@ public interface IInventoryAccess {
      * @param inventory the Inventory
      * @return true if the Inventory is backed by an ISpecialEnderChest
      */
-    public boolean isSpecialEnderChest(Inventory inventory);
+	boolean isSpecialEnderChest(Inventory inventory);
 
     /**
      * Check if an Inventory is an ISpecialPlayerInventory implementation.
@@ -56,6 +56,6 @@ public interface IInventoryAccess {
      * @param inventory the Inventory
      * @return true if the Inventory is backed by an ISpecialPlayerInventory
      */
-    public boolean isSpecialPlayerInventory(Inventory inventory);
+	boolean isSpecialPlayerInventory(Inventory inventory);
 
 }
