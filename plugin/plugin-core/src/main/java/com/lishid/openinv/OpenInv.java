@@ -95,7 +95,8 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
                     // Check if inventory is stored, and if it is, remove it and eject all viewers
                     if (OpenInv.this.inventories.containsKey(key)) {
                         Inventory inv = OpenInv.this.inventories.remove(key).getBukkitInventory();
-                        for (HumanEntity entity : inv.getViewers()) {
+                        List<HumanEntity> viewers = inv.getViewers();
+                        for (HumanEntity entity : viewers.toArray(new HumanEntity[viewers.size()])) {
                             entity.closeInventory();
                         }
                     }
@@ -103,7 +104,8 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
                     // Check if ender chest is stored, and if it is, remove it and eject all viewers
                     if (OpenInv.this.enderChests.containsKey(key)) {
                         Inventory inv = OpenInv.this.enderChests.remove(key).getBukkitInventory();
-                        for (HumanEntity entity : inv.getViewers()) {
+                        List<HumanEntity> viewers = inv.getViewers();
+                        for (HumanEntity entity : viewers.toArray(new HumanEntity[viewers.size()])) {
                             entity.closeInventory();
                         }
                     }
@@ -517,6 +519,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             return;
         }
 
+        this.saveDefaultConfig();
         new ConfigUpdater(this).checkForUpdates();
 
         // Register listeners

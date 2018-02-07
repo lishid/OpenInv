@@ -31,8 +31,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 public class ConfigUpdater {
 
-    private static final int CONFIG_VERSION = 3;
-
     private final OpenInv plugin;
 
     public ConfigUpdater(OpenInv plugin) {
@@ -41,7 +39,7 @@ public class ConfigUpdater {
 
     public void checkForUpdates() {
         final int version = plugin.getConfig().getInt("config-version", 1);
-        if (version >= CONFIG_VERSION) {
+        if (version >= plugin.getConfig().getDefaults().getInt("config-version")) {
             return;
         }
 
@@ -58,12 +56,11 @@ public class ConfigUpdater {
         new BukkitRunnable() {
             @Override
             public void run() {
-                switch (version) {
-                case 1:
+                if (version < 2) {
                     updateConfig1To2();
-                case 2:
+                }
+                if (version < 3) {
                     updateConfig2To3();
-                    break;
                 }
 
                 new BukkitRunnable() {
