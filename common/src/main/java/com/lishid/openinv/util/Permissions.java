@@ -25,9 +25,9 @@ public enum Permissions {
     EXEMPT("exempt"),
     CROSSWORLD("crossworld"),
     SILENT("silent"),
-    SILENT_DEFAULT("silent", "default"),
+    SILENT_DEFAULT("silent.default"),
     ANYCHEST("anychest"),
-    ANY_DEFAULT("any", "default"),
+    ANY_DEFAULT("any.default"),
     ENDERCHEST("openender"),
     ENDERCHEST_ALL("openenderall"),
     SEARCH("search"),
@@ -35,31 +35,35 @@ public enum Permissions {
     EDITENDER("editender"),
     OPENSELF("openself");
 
-    private final String[] permission;
+    private final String permission;
 
-    Permissions(String... permissions) {
-        this.permission = new String[permissions.length + 1];
-        this.permission[0] = "OpenInv";
-        System.arraycopy(permissions, 0, this.permission, 1, permissions.length);
+    Permissions(String permission) {
+        this.permission = "OpenInv." + permission;
     }
 
     public boolean hasPermission(Permissible permissible) {
-        StringBuilder permissionBuilder = new StringBuilder();
 
-        // Support wildcard nodes.
-        for (int i = 0; i < permission.length; i++) {
-            if (permissible.hasPermission(permissionBuilder.toString() + "*")) {
-                return true;
+        boolean hasPermission = permissible.hasPermission(permission);
+        if (hasPermission || permissible.isPermissionSet(permission)) {
+            return hasPermission;
+        }
+
+        StringBuilder permissionDestroyer = new StringBuilder(permission);
+        for (int lastPeriod = permissionDestroyer.lastIndexOf("."); lastPeriod > 0;
+                lastPeriod = permissionDestroyer.lastIndexOf(".")) {
+            permissionDestroyer.delete(lastPeriod + 1, permissionDestroyer.length()).append('*');
+
+            hasPermission = permissible.hasPermission(permissionDestroyer.toString());
+            if (hasPermission || permissible.isPermissionSet(permissionDestroyer.toString())) {
+                return hasPermission;
             }
-            permissionBuilder.append(permission[i]).append('.');
+
+            permissionDestroyer.delete(lastPeriod, permissionDestroyer.length());
+
         }
 
-        // Delete trailing period.
-        if (permissionBuilder.length() > 0) {
-            permissionBuilder.deleteCharAt(permissionBuilder.length() - 1);
-        }
+        return permissible.hasPermission("*");
 
-        return permissible.hasPermission(permissionBuilder.toString());
     }
 
 }
