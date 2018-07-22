@@ -97,7 +97,7 @@ public class PlayerDataManager implements IPlayerDataManager {
                 new PlayerInteractManager(server.getWorldServer(0)));
 
         // Get the bukkit entity
-        Player target = entity == null ? null : entity.getBukkitEntity();
+        Player target = entity.getBukkitEntity();
         if (target != null) {
             // Load data
             target.loadData();
