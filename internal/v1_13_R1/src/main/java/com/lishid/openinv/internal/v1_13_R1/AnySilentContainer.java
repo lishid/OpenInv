@@ -21,6 +21,7 @@ import java.lang.reflect.Field;
 import com.lishid.openinv.internal.IAnySilentContainer;
 
 import net.minecraft.server.v1_13_R1.BlockChestTrapped;
+import net.minecraft.server.v1_13_R1.BlockPropertyChestType;
 import net.minecraft.server.v1_13_R1.ChatMessage;
 import net.minecraft.server.v1_13_R1.VoxelShapes;
 import org.bukkit.Material;
@@ -193,31 +194,34 @@ public class AnySilentContainer implements IAnySilentContainer {
         }
 
         ITileInventory tileInventory = (ITileInventory) tile;
-        Block block = world.getType(blockPosition).getBlock();
+        IBlockData blockData = world.getType(blockPosition);
+        Block block = blockData.getBlock();
 
         if (block instanceof BlockChest) {
-            for (EnumDirection localEnumDirection : EnumDirection.EnumDirectionLimit.HORIZONTAL) {
-                BlockPosition localBlockPosition = blockPosition.shift(localEnumDirection);
-                Block localBlock = world.getType(localBlockPosition).getBlock();
 
-                if (localBlock != block) {
-                    continue;
-                }
+            BlockPropertyChestType chestType = blockData.get(BlockChest.b);
 
-                TileEntity localTileEntity = world.getTileEntity(localBlockPosition);
-                if (!(localTileEntity instanceof TileEntityChest)) {
-                    continue;
-                }
+            if (chestType != BlockPropertyChestType.SINGLE) {
 
-                if (localEnumDirection == EnumDirection.WEST
-                        || localEnumDirection == EnumDirection.NORTH) {
-                    tileInventory = new InventoryLargeChest(new ChatMessage("container.chestDouble"),
-                            (TileEntityChest) localTileEntity, tileInventory);
-                } else {
-                    tileInventory = new InventoryLargeChest(new ChatMessage("container.chestDouble"),
-                            tileInventory, (TileEntityChest) localTileEntity);
+                BlockPosition adjacentBlockPosition = blockPosition.shift(BlockChest.k(blockData));
+                IBlockData adjacentBlockData = world.getType(adjacentBlockPosition);
+
+                if (adjacentBlockData.getBlock() == block) {
+
+                    BlockPropertyChestType adjacentChestType = adjacentBlockData.get(BlockChest.b);
+
+                    if (adjacentChestType != BlockPropertyChestType.SINGLE && chestType != adjacentChestType
+                            && adjacentBlockData.get(BlockChest.FACING) == blockData.get(BlockChest.FACING)) {
+
+                        TileEntity adjacentTile = world.getTileEntity(adjacentBlockPosition);
+
+                        if (adjacentTile instanceof TileEntityChest) {
+                            ITileInventory rightChest = chestType == BlockPropertyChestType.RIGHT ? tileInventory : (ITileInventory) adjacentTile;
+                            ITileInventory leftChest = chestType == BlockPropertyChestType.RIGHT ? (ITileInventory) adjacentTile : tileInventory;
+                            tileInventory = new InventoryLargeChest(new ChatMessage("container.chestDouble"), rightChest, leftChest);
+                        }
+                    }
                 }
-                break;
             }
 
             if (block instanceof BlockChestTrapped) {
