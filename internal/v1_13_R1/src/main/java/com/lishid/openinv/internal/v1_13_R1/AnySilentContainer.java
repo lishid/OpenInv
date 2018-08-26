@@ -16,26 +16,16 @@
 
 package com.lishid.openinv.internal.v1_13_R1;
 
-import java.lang.reflect.Field;
-
 import com.lishid.openinv.internal.IAnySilentContainer;
-
-import net.minecraft.server.v1_13_R1.BlockChestTrapped;
-import net.minecraft.server.v1_13_R1.BlockPropertyChestType;
-import net.minecraft.server.v1_13_R1.ChatMessage;
-import net.minecraft.server.v1_13_R1.VoxelShapes;
-import org.bukkit.Material;
-import org.bukkit.Statistic;
-import org.bukkit.block.BlockState;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryView;
-
 import net.minecraft.server.v1_13_R1.AxisAlignedBB;
 import net.minecraft.server.v1_13_R1.Block;
 import net.minecraft.server.v1_13_R1.BlockChest;
+import net.minecraft.server.v1_13_R1.BlockChestTrapped;
 import net.minecraft.server.v1_13_R1.BlockEnderChest;
 import net.minecraft.server.v1_13_R1.BlockPosition;
+import net.minecraft.server.v1_13_R1.BlockPropertyChestType;
 import net.minecraft.server.v1_13_R1.BlockShulkerBox;
+import net.minecraft.server.v1_13_R1.ChatMessage;
 import net.minecraft.server.v1_13_R1.Entity;
 import net.minecraft.server.v1_13_R1.EntityOcelot;
 import net.minecraft.server.v1_13_R1.EntityPlayer;
@@ -50,7 +40,15 @@ import net.minecraft.server.v1_13_R1.TileEntity;
 import net.minecraft.server.v1_13_R1.TileEntityChest;
 import net.minecraft.server.v1_13_R1.TileEntityEnderChest;
 import net.minecraft.server.v1_13_R1.TileEntityShulkerBox;
+import net.minecraft.server.v1_13_R1.VoxelShapes;
 import net.minecraft.server.v1_13_R1.World;
+import org.bukkit.Material;
+import org.bukkit.Statistic;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
+
+import java.lang.reflect.Field;
 
 public class AnySilentContainer implements IAnySilentContainer {
 
@@ -99,21 +97,23 @@ public class AnySilentContainer implements IAnySilentContainer {
         }
 
         // Check for matching adjacent chests that are blocked or have an ocelot on top
-        for (EnumDirection localEnumDirection : EnumDirection.EnumDirectionLimit.HORIZONTAL) {
-            BlockPosition localBlockPosition = blockPosition.shift(localEnumDirection);
-            Block localBlock = world.getType(localBlockPosition).getBlock();
+        BlockPropertyChestType chestType = blockData.get(BlockChest.b);
 
-            if (localBlock != block) {
-                continue;
-            }
+        if (chestType == BlockPropertyChestType.SINGLE) {
+            return false;
+        }
 
-            TileEntity localTileEntity = world.getTileEntity(localBlockPosition);
-            if (!(localTileEntity instanceof TileEntityChest)) {
-                continue;
-            }
+        BlockPosition adjacentBlockPosition = blockPosition.shift(BlockChest.k(blockData));
+        IBlockData adjacentBlockData = world.getType(adjacentBlockPosition);
 
-            if (this.isBlockedChest(world, localBlockPosition)) {
-                return true;
+        if (adjacentBlockData.getBlock() == block) {
+
+            BlockPropertyChestType adjacentChestType = adjacentBlockData.get(BlockChest.b);
+
+            if (adjacentChestType != BlockPropertyChestType.SINGLE && chestType != adjacentChestType
+                    && adjacentBlockData.get(BlockChest.FACING) == blockData.get(BlockChest.FACING)) {
+
+                return this.isBlockedChest(world, adjacentBlockPosition);
             }
         }
 
