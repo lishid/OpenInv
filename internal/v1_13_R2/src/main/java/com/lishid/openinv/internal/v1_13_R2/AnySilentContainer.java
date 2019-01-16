@@ -40,6 +40,7 @@ import net.minecraft.server.v1_13_R2.TileEntity;
 import net.minecraft.server.v1_13_R2.TileEntityChest;
 import net.minecraft.server.v1_13_R2.TileEntityEnderChest;
 import net.minecraft.server.v1_13_R2.TileEntityShulkerBox;
+import net.minecraft.server.v1_13_R2.VoxelShape;
 import net.minecraft.server.v1_13_R2.VoxelShapes;
 import net.minecraft.server.v1_13_R2.World;
 import org.bukkit.Material;
@@ -49,6 +50,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class AnySilentContainer implements IAnySilentContainer {
 
@@ -131,7 +134,16 @@ public class AnySilentContainer implements IAnySilentContainer {
 
         EnumDirection enumDirection = blockData.get(BlockShulkerBox.a);
         if (((TileEntityShulkerBox) tile).r() == TileEntityShulkerBox.AnimationPhase.CLOSED) {
-            AxisAlignedBB axisAlignedBB = VoxelShapes.b().a()
+            AxisAlignedBB axisAlignedBB;
+            try {
+                Method method = VoxelShape.class.getMethod("a");
+                axisAlignedBB = (AxisAlignedBB) method.invoke(VoxelShapes.b());
+            } catch (NoSuchMethodException e) {
+                axisAlignedBB = VoxelShapes.b().getBoundingBox();
+            } catch (InvocationTargetException | IllegalAccessException e) {
+                return false;
+            }
+            axisAlignedBB = axisAlignedBB
                     .b(0.5F * enumDirection.getAdjacentX(), 0.5F * enumDirection.getAdjacentY(), 0.5F * enumDirection.getAdjacentZ())
                     .a(enumDirection.getAdjacentX(), enumDirection.getAdjacentY(), enumDirection.getAdjacentZ());
             return !world.getCubes(null, axisAlignedBB.a(blockPosition.shift(enumDirection)));
