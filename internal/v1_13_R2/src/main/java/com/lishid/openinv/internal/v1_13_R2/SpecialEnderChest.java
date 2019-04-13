@@ -17,32 +17,31 @@
 package com.lishid.openinv.internal.v1_13_R2;
 
 import com.lishid.openinv.internal.ISpecialEnderChest;
-import net.minecraft.server.v1_13_R2.EntityPlayer;
-import net.minecraft.server.v1_13_R2.IInventory;
-import net.minecraft.server.v1_13_R2.InventoryEnderChest;
-import net.minecraft.server.v1_13_R2.InventorySubcontainer;
-import net.minecraft.server.v1_13_R2.ItemStack;
+import net.minecraft.server.v1_13_R2.*;
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftInventory;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import javax.annotation.Nullable;
 import java.util.List;
 
-public class SpecialEnderChest extends InventorySubcontainer
-        implements IInventory, ISpecialEnderChest {
+public class SpecialEnderChest implements IInventory, ISpecialEnderChest, AutoRecipeOutput {
 
-    private final InventoryEnderChest enderChest;
+    private EntityPlayer owner;
+    private final IChatBaseComponent displayName;
+    private NonNullList<ItemStack> items;
     private final CraftInventory inventory = new CraftInventory(this);
     private boolean playerOnline;
 
     public SpecialEnderChest(final Player player, final Boolean online) {
-        super(PlayerDataManager.getHandle(player).getEnderChest().getDisplayName(),
-                PlayerDataManager.getHandle(player).getEnderChest().getSize(), player);
+        this.owner = PlayerDataManager.getHandle(player);
+        this.displayName = this.owner.getEnderChest().getDisplayName();
         this.playerOnline = online;
-        this.enderChest = PlayerDataManager.getHandle(player).getEnderChest();
-        this.setItemLists(this, this.enderChest.getContents());
+        this.items = this.owner.getEnderChest().items;
     }
 
     @Override
@@ -55,21 +54,6 @@ public class SpecialEnderChest extends InventorySubcontainer
         return !this.getViewers().isEmpty();
     }
 
-    private void setItemLists(final InventorySubcontainer subcontainer, final List<ItemStack> list) {
-        try {
-            // Prepare to remove final modifier
-            Field modifiers = Field.class.getDeclaredField("modifiers");
-            modifiers.setAccessible(true);
-            // Access and replace main inventory array
-            Field field = InventorySubcontainer.class.getField("items");
-            modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-            field.set(subcontainer, list);
-        } catch (NoSuchFieldException | SecurityException | IllegalArgumentException
-                | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-    }
-
     @Override
     public void setPlayerOffline() {
         this.playerOnline = false;
@@ -79,18 +63,193 @@ public class SpecialEnderChest extends InventorySubcontainer
     public void setPlayerOnline(final Player player) {
         if (!this.playerOnline) {
             try {
-                EntityPlayer nmsPlayer = PlayerDataManager.getHandle(player);
-                this.bukkitOwner = nmsPlayer.getBukkitEntity();
-                this.setItemLists(nmsPlayer.getEnderChest(), this.items);
-            } catch (Exception e) {}
+                this.owner = PlayerDataManager.getHandle(player);
+                InventoryEnderChest enderChest = owner.getEnderChest();
+                for (int i = 0; i < enderChest.getSize(); ++i) {
+                    enderChest.setItem(i, this.items.get(i));
+                }
+                this.items = enderChest.items;
+            } catch (Exception ignored) {}
             this.playerOnline = true;
         }
     }
 
     @Override
     public void update() {
-        super.update();
-        this.enderChest.update();
+        this.owner.getEnderChest().update();
+    }
+
+    public List<ItemStack> getContents() {
+        return this.items;
+    }
+
+    public void onOpen(CraftHumanEntity who) {
+        this.owner.getEnderChest().onOpen(who);
+    }
+
+    public void onClose(CraftHumanEntity who) {
+        this.owner.getEnderChest().onClose(who);
+    }
+
+    public List<HumanEntity> getViewers() {
+        return this.owner.getEnderChest().getViewers();
+    }
+
+    public void setMaxStackSize(int i) {
+        this.owner.getEnderChest().setMaxStackSize(i);
+    }
+
+    public InventoryHolder getOwner() {
+        return this.owner.getEnderChest().getOwner();
+    }
+
+    public Location getLocation() {
+        return null;
+    }
+
+    public void a(IInventoryListener iinventorylistener) {
+        this.owner.getEnderChest().a(iinventorylistener);
+    }
+
+    public void b(IInventoryListener iinventorylistener) {
+        this.owner.getEnderChest().b(iinventorylistener);
+    }
+
+    public ItemStack getItem(int i) {
+        return i >= 0 && i < this.items.size() ? this.items.get(i) : ItemStack.a;
+    }
+
+    public ItemStack splitStack(int i, int j) {
+        ItemStack itemstack = ContainerUtil.a(this.items, i, j);
+        if (!itemstack.isEmpty()) {
+            this.update();
+        }
+
+        return itemstack;
+    }
+
+    public ItemStack a(ItemStack itemstack) {
+        ItemStack itemstack1 = itemstack.cloneItemStack();
+
+        for (int i = 0; i < this.getSize(); ++i) {
+            ItemStack itemstack2 = this.getItem(i);
+            if (itemstack2.isEmpty()) {
+                this.setItem(i, itemstack1);
+                this.update();
+                return ItemStack.a;
+            }
+
+            if (ItemStack.c(itemstack2, itemstack1)) {
+                int j = Math.min(this.getMaxStackSize(), itemstack2.getMaxStackSize());
+                int k = Math.min(itemstack1.getCount(), j - itemstack2.getCount());
+                if (k > 0) {
+                    itemstack2.add(k);
+                    itemstack1.subtract(k);
+                    if (itemstack1.isEmpty()) {
+                        this.update();
+                        return ItemStack.a;
+                    }
+                }
+            }
+        }
+
+        if (itemstack1.getCount() != itemstack.getCount()) {
+            this.update();
+        }
+
+        return itemstack1;
+    }
+
+    public ItemStack splitWithoutUpdate(int i) {
+        ItemStack itemstack = this.items.get(i);
+        if (itemstack.isEmpty()) {
+            return ItemStack.a;
+        } else {
+            this.items.set(i, ItemStack.a);
+            return itemstack;
+        }
+    }
+
+    public void setItem(int i, ItemStack itemstack) {
+        this.items.set(i, itemstack);
+        if (!itemstack.isEmpty() && itemstack.getCount() > this.getMaxStackSize()) {
+            itemstack.setCount(this.getMaxStackSize());
+        }
+
+        this.update();
+    }
+
+    public int getSize() {
+        return this.owner.getEnderChest().getSize();
+    }
+
+    public boolean P_() {
+
+        for (ItemStack itemstack : this.items) {
+            if (!itemstack.isEmpty()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public IChatBaseComponent getDisplayName() {
+        return this.displayName;
+    }
+
+    @Nullable
+    public IChatBaseComponent getCustomName() {
+        return this.displayName;
+    }
+
+    public boolean hasCustomName() {
+        return false;
+    }
+
+    public void a(@Nullable IChatBaseComponent ichatbasecomponent) {
+        // Ignored - name is always player's name.
+    }
+
+    public int getMaxStackSize() {
+        return 64;
+    }
+
+    public boolean a(EntityHuman entityhuman) {
+        return true;
+    }
+
+    public void startOpen(EntityHuman entityhuman) {
+    }
+
+    public void closeContainer(EntityHuman entityhuman) {
+    }
+
+    public boolean b(int i, ItemStack itemstack) {
+        return true;
+    }
+
+    public int getProperty(int i) {
+        return 0;
+    }
+
+    public void setProperty(int i, int j) {
+    }
+
+    public int h() {
+        return 0;
+    }
+
+    public void clear() {
+        this.items.clear();
+    }
+
+    public void a(AutoRecipeStackManager autorecipestackmanager) {
+
+        for (ItemStack itemstack : this.items) {
+            autorecipestackmanager.b(itemstack);
+        }
+
     }
 
 }
