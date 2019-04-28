@@ -131,10 +131,10 @@ public class OpenEnderPluginCommand implements CommandExecutor {
         }
 
         // Record the target
-        this.openEnderHistory.put(player, onlineTarget.getName());
+        this.openEnderHistory.put(player, this.plugin.getPlayerID(target));
 
         // Create the inventory
-        ISpecialEnderChest chest;
+        final ISpecialEnderChest chest;
         try {
             chest = this.plugin.getSpecialEnderChest(onlineTarget, online);
         } catch (Exception e) {

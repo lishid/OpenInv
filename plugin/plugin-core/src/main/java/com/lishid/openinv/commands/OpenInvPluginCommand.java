@@ -140,10 +140,10 @@ public class OpenInvPluginCommand implements CommandExecutor {
         }
 
         // Record the target
-        this.openInvHistory.put(player, onlineTarget.getName());
+        this.openInvHistory.put(player, this.plugin.getPlayerID(target));
 
         // Create the inventory
-        ISpecialPlayerInventory inv;
+        final ISpecialPlayerInventory inv;
         try {
             inv = this.plugin.getSpecialInventory(onlineTarget, online);
         } catch (Exception e) {
