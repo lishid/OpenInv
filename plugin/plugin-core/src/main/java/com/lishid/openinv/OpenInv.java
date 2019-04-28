@@ -543,7 +543,17 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     }
 
     public void releaseAllPlayers(final Plugin plugin) {
-        this.pluginUsage.removeAll(plugin.getClass());
+        Iterator<Map.Entry<String, Class<? extends Plugin>>> iterator = this.pluginUsage.entries().iterator();
+
+        if (!iterator.hasNext()) {
+            return;
+        }
+
+        for (Map.Entry<String, Class<? extends Plugin>> entry = iterator.next(); iterator.hasNext(); entry = iterator.next()) {
+            if (entry.getValue().equals(plugin.getClass())) {
+                iterator.remove();
+            }
+        }
     }
 
     @Override
