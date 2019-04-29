@@ -33,7 +33,7 @@
     <profile>
       <id>latest</id>
       <modules>
-        <module>v1_12_R1</module>
+        <module>v1_14_R1</module>
       </modules>
     </profile>
 
@@ -41,8 +41,8 @@
       <id>recent</id>
       <!-- The recent profile is for the most recent 2 versions. -->
       <modules>
-        <module>v1_13_R1</module>
         <module>v1_13_R2</module>
+        <module>v1_14_R1</module>
       </modules>
     </profile>
 
@@ -73,6 +73,7 @@
         <module>v1_12_R1</module>
         <module>v1_13_R1</module>
         <module>v1_13_R2</module>
+        <module>v1_14_R1</module>
       </modules>
     </profile>
 
