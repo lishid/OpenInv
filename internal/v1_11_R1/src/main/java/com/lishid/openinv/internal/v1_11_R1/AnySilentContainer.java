@@ -16,15 +16,8 @@
 
 package com.lishid.openinv.internal.v1_11_R1;
 
-import java.lang.reflect.Field;
-
 import com.lishid.openinv.internal.IAnySilentContainer;
-
-import org.bukkit.Material;
-import org.bukkit.block.BlockState;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryView;
-
+import java.lang.reflect.Field;
 import net.minecraft.server.v1_11_R1.AxisAlignedBB;
 import net.minecraft.server.v1_11_R1.Block;
 import net.minecraft.server.v1_11_R1.BlockChest;
@@ -35,18 +28,23 @@ import net.minecraft.server.v1_11_R1.Entity;
 import net.minecraft.server.v1_11_R1.EntityOcelot;
 import net.minecraft.server.v1_11_R1.EntityPlayer;
 import net.minecraft.server.v1_11_R1.EnumDirection;
+import net.minecraft.server.v1_11_R1.EnumGamemode;
 import net.minecraft.server.v1_11_R1.IBlockData;
 import net.minecraft.server.v1_11_R1.ITileInventory;
 import net.minecraft.server.v1_11_R1.InventoryEnderChest;
 import net.minecraft.server.v1_11_R1.InventoryLargeChest;
+import net.minecraft.server.v1_11_R1.PlayerInteractManager;
 import net.minecraft.server.v1_11_R1.StatisticList;
 import net.minecraft.server.v1_11_R1.TileEntity;
 import net.minecraft.server.v1_11_R1.TileEntityChest;
 import net.minecraft.server.v1_11_R1.TileEntityEnderChest;
 import net.minecraft.server.v1_11_R1.TileEntityShulkerBox;
 import net.minecraft.server.v1_11_R1.World;
-import net.minecraft.server.v1_11_R1.EnumGamemode;
-import net.minecraft.server.v1_11_R1.PlayerInteractManager;
+import org.bukkit.Material;
+import org.bukkit.block.BlockState;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
+import org.jetbrains.annotations.NotNull;
 
 public class AnySilentContainer implements IAnySilentContainer {
 
@@ -63,19 +61,19 @@ public class AnySilentContainer implements IAnySilentContainer {
     }
 
     @Override
-    public boolean isAnySilentContainer(org.bukkit.block.Block block) {
-        if (block.getType() == Material.ENDER_CHEST) {
+    public boolean isAnySilentContainer(@NotNull org.bukkit.block.Block bukkitBlock) {
+        if (bukkitBlock.getType() == Material.ENDER_CHEST) {
             return true;
         }
-        BlockState state = block.getState();
+        BlockState state = bukkitBlock.getState();
         return state instanceof org.bukkit.block.Chest || state instanceof org.bukkit.block.ShulkerBox;
     }
 
     @Override
-    public boolean isAnyContainerNeeded(Player p, org.bukkit.block.Block b) {
-        EntityPlayer player = PlayerDataManager.getHandle(p);
-        World world = player.world;
-        BlockPosition blockPosition = new BlockPosition(b.getX(), b.getY(), b.getZ());
+    public boolean isAnyContainerNeeded(@NotNull Player bukkitPlayer, @NotNull org.bukkit.block.Block bukkitBlock) {
+
+        World world = PlayerDataManager.getHandle(bukkitPlayer).world;
+        BlockPosition blockPosition = new BlockPosition(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
         IBlockData blockData = world.getType(blockPosition);
         Block block = blockData.getBlock();
 
@@ -162,19 +160,19 @@ public class AnySilentContainer implements IAnySilentContainer {
     }
 
     @Override
-    public boolean activateContainer(Player p, boolean silentchest, org.bukkit.block.Block b) {
+    public boolean activateContainer(@NotNull Player bukkitPlayer, boolean silent, @NotNull org.bukkit.block.Block bukkitBlock) {
 
-        EntityPlayer player = PlayerDataManager.getHandle(p);
+        EntityPlayer player = PlayerDataManager.getHandle(bukkitPlayer);
 
         // Silent ender chest is pretty much API-only
-        if (silentchest && b.getType() == Material.ENDER_CHEST) {
-            p.openInventory(p.getEnderChest());
+        if (silent && bukkitBlock.getType() == Material.ENDER_CHEST) {
+            bukkitPlayer.openInventory(bukkitPlayer.getEnderChest());
             player.b(StatisticList.getStatistic("stat.enderchestOpened"));
             return true;
         }
 
         final World world = player.world;
-        final BlockPosition blockPosition = new BlockPosition(b.getX(), b.getY(), b.getZ());
+        final BlockPosition blockPosition = new BlockPosition(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
         final Object tile = world.getTileEntity(blockPosition);
 
         if (tile == null) {
@@ -234,7 +232,7 @@ public class AnySilentContainer implements IAnySilentContainer {
         }
 
         // AnyChest only - SilentChest not active, container unsupported, or unnecessary.
-        if (!silentchest || player.playerInteractManager.getGameMode() == EnumGamemode.SPECTATOR) {
+        if (!silent || player.playerInteractManager.getGameMode() == EnumGamemode.SPECTATOR) {
             player.openContainer(tileInventory);
             return true;
         }
@@ -252,7 +250,7 @@ public class AnySilentContainer implements IAnySilentContainer {
     }
 
     @Override
-    public void deactivateContainer(final Player bukkitPlayer) {
+    public void deactivateContainer(@NotNull final Player bukkitPlayer) {
         if (this.playerInteractManagerGamemode == null) {
             return;
         }

@@ -16,15 +16,14 @@
 
 package com.lishid.openinv.util;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.TreeMultimap;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.collect.Multimap;
-import com.google.common.collect.TreeMultimap;
 
 /**
  * A minimal thread-safe time-based cache implementation backed by a HashMap and TreeMultimap.

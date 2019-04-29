@@ -16,24 +16,24 @@
 
 package com.lishid.openinv.internal.v1_13_R1;
 
+import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
-
-import com.lishid.openinv.internal.ISpecialPlayerInventory;
-
 import net.minecraft.server.v1_13_R1.ChatMessage;
-import net.minecraft.server.v1_13_R1.IChatBaseComponent;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-
 import net.minecraft.server.v1_13_R1.ContainerUtil;
 import net.minecraft.server.v1_13_R1.EntityHuman;
+import net.minecraft.server.v1_13_R1.IChatBaseComponent;
 import net.minecraft.server.v1_13_R1.ItemStack;
 import net.minecraft.server.v1_13_R1.NonNullList;
 import net.minecraft.server.v1_13_R1.PlayerInventory;
-
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftInventory;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
+import org.jetbrains.annotations.NotNull;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
 
@@ -52,9 +52,27 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         return true;
     }
 
+    @NotNull
     @Override
-    public Inventory getBukkitInventory() {
-        return this.inventory;
+    public InventoryView getBukkitView(final Player viewer) {
+        return new InventoryView() {
+            @Override
+            public Inventory getTopInventory() {
+                return inventory;
+            }
+            @Override
+            public Inventory getBottomInventory() {
+                return viewer.getInventory();
+            }
+            @Override
+            public HumanEntity getPlayer() {
+                return viewer;
+            }
+            @Override
+            public InventoryType getType() {
+                return InventoryType.PLAYER;
+            }
+        };
     }
 
     @Override
@@ -190,7 +208,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
-    public void setPlayerOnline(final Player player) {
+    public void setPlayerOnline(@NotNull final Player player) {
         if (!this.playerOnline) {
             this.player = PlayerDataManager.getHandle(player);
             this.setItemArrays(this.player.inventory, this.items, this.armor, this.extraSlots);

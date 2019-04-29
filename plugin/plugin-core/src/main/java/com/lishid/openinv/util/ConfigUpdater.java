@@ -16,14 +16,12 @@
 
 package com.lishid.openinv.util;
 
+import com.lishid.openinv.OpenInv;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import com.lishid.openinv.OpenInv;
-
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
@@ -107,12 +105,12 @@ public class ConfigUpdater {
             }
         }.runTask(plugin);
 
-        updateToggles("AnyChest", ".toggle", "toggles.any-chest");
-        updateToggles("ItemOpenInv", ".toggle", "toggles.items.open-inv");
-        updateToggles("SilentChest", ".toggle", "toggles.silent-chest");
+        updateToggles("AnyChest", "toggles.any-chest");
+        updateToggles("ItemOpenInv", "toggles.items.open-inv");
+        updateToggles("SilentChest", "toggles.silent-chest");
     }
 
-    private void updateToggles(final String sectionName, String suffix, final String newSectionName) {
+    private void updateToggles(final String sectionName, final String newSectionName) {
         // Ensure section exists
         if (!plugin.getConfig().isConfigurationSection(sectionName)) {
             return;
@@ -130,8 +128,9 @@ public class ConfigUpdater {
 
         for (String playerName : keys) {
             OfflinePlayer player = plugin.matchPlayer(playerName);
-            String dataID = plugin.getPlayerID(player);
-            toggles.put(dataID, section.getBoolean(playerName + suffix, false));
+            if (player != null) {
+                toggles.put(plugin.getPlayerID(player), section.getBoolean(playerName + ".toggle", false));
+            }
         }
 
         new BukkitRunnable() {

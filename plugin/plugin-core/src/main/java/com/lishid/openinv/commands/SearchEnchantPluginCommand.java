@@ -17,7 +17,6 @@
 package com.lishid.openinv.commands;
 
 import com.lishid.openinv.OpenInv;
-
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

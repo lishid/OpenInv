@@ -18,6 +18,7 @@ package com.lishid.openinv.internal;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public interface IAnySilentContainer {
 
@@ -26,19 +27,19 @@ public interface IAnySilentContainer {
      * containers to open, be sure to check {@link #isAnyContainerNeeded(Player, Block)}
      * first.
      *
-     * @param player      the Player opening the container
-     * @param silentchest whether the container's noise is to be silenced
-     * @param block       the Block
+     * @param player    the Player opening the container
+     * @param silent    whether the container's noise is to be silenced
+     * @param block     the Block
      * @return true if the container can be opened
      */
-    boolean activateContainer(Player player, boolean silentchest, Block block);
+    boolean activateContainer(@NotNull Player player, boolean silent, @NotNull Block block);
 
     /**
      * Closes the Player's currently open container silently, if necessary.
      *
      * @param player the Player closing a container
      */
-    void deactivateContainer(Player player);
+    void deactivateContainer(@NotNull Player player);
 
     /**
      * Checks if the container at the given coordinates is blocked.
@@ -47,7 +48,7 @@ public interface IAnySilentContainer {
      * @param block  the Block
      * @return true if the container is blocked
      */
-    boolean isAnyContainerNeeded(Player player, Block block);
+    boolean isAnyContainerNeeded(@NotNull Player player, @NotNull Block block);
 
     /**
      * Checks if the given block is a container which can be unblocked or silenced.
@@ -55,6 +56,6 @@ public interface IAnySilentContainer {
      * @param block the BlockState
      * @return true if the Block is a supported container
      */
-    boolean isAnySilentContainer(Block block);
+    boolean isAnySilentContainer(@NotNull Block block);
 
 }

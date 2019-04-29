@@ -16,14 +16,8 @@
 
 package com.lishid.openinv.internal.v1_10_R1;
 
-import java.lang.reflect.Field;
-
 import com.lishid.openinv.internal.IAnySilentContainer;
-
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryView;
-
+import java.lang.reflect.Field;
 import net.minecraft.server.v1_10_R1.AxisAlignedBB;
 import net.minecraft.server.v1_10_R1.Block;
 import net.minecraft.server.v1_10_R1.BlockChest;
@@ -43,6 +37,10 @@ import net.minecraft.server.v1_10_R1.TileEntity;
 import net.minecraft.server.v1_10_R1.TileEntityChest;
 import net.minecraft.server.v1_10_R1.TileEntityEnderChest;
 import net.minecraft.server.v1_10_R1.World;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
+import org.jetbrains.annotations.NotNull;
 
 public class AnySilentContainer implements IAnySilentContainer {
 
@@ -59,15 +57,15 @@ public class AnySilentContainer implements IAnySilentContainer {
     }
 
     @Override
-    public boolean isAnySilentContainer(org.bukkit.block.Block block) {
-        return block.getType() == Material.ENDER_CHEST || block.getState() instanceof org.bukkit.block.Chest;
+    public boolean isAnySilentContainer(@NotNull org.bukkit.block.Block bukkitBlock) {
+        return bukkitBlock.getType() == Material.ENDER_CHEST || bukkitBlock.getState() instanceof org.bukkit.block.Chest;
     }
 
     @Override
-    public boolean isAnyContainerNeeded(Player p, org.bukkit.block.Block b) {
-        EntityPlayer player = PlayerDataManager.getHandle(p);
-        World world = player.world;
-        BlockPosition blockPosition = new BlockPosition(b.getX(), b.getY(), b.getZ());
+    public boolean isAnyContainerNeeded(@NotNull Player bukkitPlayer, @NotNull org.bukkit.block.Block bukkitBlock) {
+
+        World world = PlayerDataManager.getHandle(bukkitPlayer).world;
+        BlockPosition blockPosition = new BlockPosition(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
         Block block = world.getType(blockPosition).getBlock();
 
         if (block instanceof BlockEnderChest) {
@@ -122,19 +120,19 @@ public class AnySilentContainer implements IAnySilentContainer {
     }
 
     @Override
-    public boolean activateContainer(Player p, boolean silentchest, org.bukkit.block.Block b) {
+    public boolean activateContainer(@NotNull Player bukkitPlayer, boolean silent, @NotNull org.bukkit.block.Block bukkitBlock) {
 
-        EntityPlayer player = PlayerDataManager.getHandle(p);
+        EntityPlayer player = PlayerDataManager.getHandle(bukkitPlayer);
 
         // Silent ender chest is pretty much API-only
-        if (silentchest && b.getType() == Material.ENDER_CHEST) {
-            p.openInventory(p.getEnderChest());
+        if (silent && bukkitBlock.getType() == Material.ENDER_CHEST) {
+            bukkitPlayer.openInventory(bukkitPlayer.getEnderChest());
             player.b(StatisticList.X);
             return true;
         }
 
         World world = player.world;
-        BlockPosition blockPosition = new BlockPosition(b.getX(), b.getY(), b.getZ());
+        BlockPosition blockPosition = new BlockPosition(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
         Object tile = world.getTileEntity(blockPosition);
 
         if (tile == null) {
@@ -190,7 +188,7 @@ public class AnySilentContainer implements IAnySilentContainer {
         }
 
         // AnyChest only - SilentChest not active, container unsupported, or unnecessary.
-        if (!silentchest || player.playerInteractManager.getGameMode() == EnumGamemode.SPECTATOR) {
+        if (!silent || player.playerInteractManager.getGameMode() == EnumGamemode.SPECTATOR) {
             player.openContainer(tileInventory);
             return true;
         }
@@ -208,7 +206,7 @@ public class AnySilentContainer implements IAnySilentContainer {
     }
 
     @Override
-    public void deactivateContainer(final Player bukkitPlayer) {
+    public void deactivateContainer(@NotNull final Player bukkitPlayer) {
         if (this.playerInteractManagerGamemode == null) {
             return;
         }

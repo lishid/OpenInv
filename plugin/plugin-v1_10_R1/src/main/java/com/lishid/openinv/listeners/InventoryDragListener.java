@@ -18,7 +18,6 @@ package com.lishid.openinv.listeners;
 
 import com.lishid.openinv.IOpenInv;
 import com.lishid.openinv.util.Permissions;
-
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

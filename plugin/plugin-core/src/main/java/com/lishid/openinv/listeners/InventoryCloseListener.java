@@ -17,7 +17,6 @@
 package com.lishid.openinv.listeners;
 
 import com.lishid.openinv.IOpenInv;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

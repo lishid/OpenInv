@@ -17,17 +17,29 @@
 package com.lishid.openinv.internal.v1_13_R2;
 
 import com.lishid.openinv.internal.ISpecialEnderChest;
-import net.minecraft.server.v1_13_R2.*;
+import java.util.List;
+import javax.annotation.Nullable;
+import net.minecraft.server.v1_13_R2.AutoRecipeOutput;
+import net.minecraft.server.v1_13_R2.AutoRecipeStackManager;
+import net.minecraft.server.v1_13_R2.ContainerUtil;
+import net.minecraft.server.v1_13_R2.EntityHuman;
+import net.minecraft.server.v1_13_R2.EntityPlayer;
+import net.minecraft.server.v1_13_R2.IChatBaseComponent;
+import net.minecraft.server.v1_13_R2.IInventory;
+import net.minecraft.server.v1_13_R2.IInventoryListener;
+import net.minecraft.server.v1_13_R2.InventoryEnderChest;
+import net.minecraft.server.v1_13_R2.ItemStack;
+import net.minecraft.server.v1_13_R2.NonNullList;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-
-import javax.annotation.Nullable;
-import java.util.List;
+import org.bukkit.inventory.InventoryView;
+import org.jetbrains.annotations.NotNull;
 
 public class SpecialEnderChest implements IInventory, ISpecialEnderChest, AutoRecipeOutput {
 
@@ -44,9 +56,31 @@ public class SpecialEnderChest implements IInventory, ISpecialEnderChest, AutoRe
         this.items = this.owner.getEnderChest().items;
     }
 
+    @NotNull
     @Override
-    public Inventory getBukkitInventory() {
-        return this.inventory;
+    public InventoryView getBukkitView(final Player viewer) {
+        return new InventoryView() {
+            @NotNull
+            @Override
+            public Inventory getTopInventory() {
+                return inventory;
+            }
+            @NotNull
+            @Override
+            public Inventory getBottomInventory() {
+                return viewer.getInventory();
+            }
+            @NotNull
+            @Override
+            public HumanEntity getPlayer() {
+                return viewer;
+            }
+            @NotNull
+            @Override
+            public InventoryType getType() {
+                return InventoryType.ENDER_CHEST;
+            }
+        };
     }
 
     @Override
@@ -60,7 +94,7 @@ public class SpecialEnderChest implements IInventory, ISpecialEnderChest, AutoRe
     }
 
     @Override
-    public void setPlayerOnline(final Player player) {
+    public void setPlayerOnline(@NotNull final Player player) {
         if (!this.playerOnline) {
             try {
                 this.owner = PlayerDataManager.getHandle(player);

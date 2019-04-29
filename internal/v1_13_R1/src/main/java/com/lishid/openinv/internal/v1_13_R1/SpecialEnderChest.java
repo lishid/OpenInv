@@ -16,22 +16,22 @@
 
 package com.lishid.openinv.internal.v1_13_R1;
 
+import com.lishid.openinv.internal.ISpecialEnderChest;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
-
-import com.lishid.openinv.internal.ISpecialEnderChest;
-
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-
 import net.minecraft.server.v1_13_R1.EntityPlayer;
 import net.minecraft.server.v1_13_R1.IInventory;
 import net.minecraft.server.v1_13_R1.InventoryEnderChest;
 import net.minecraft.server.v1_13_R1.InventorySubcontainer;
 import net.minecraft.server.v1_13_R1.ItemStack;
-
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftInventory;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
+import org.jetbrains.annotations.NotNull;
 
 public class SpecialEnderChest extends InventorySubcontainer
         implements IInventory, ISpecialEnderChest {
@@ -48,9 +48,27 @@ public class SpecialEnderChest extends InventorySubcontainer
         this.setItemLists(this, this.enderChest.getContents());
     }
 
+    @NotNull
     @Override
-    public Inventory getBukkitInventory() {
-        return this.inventory;
+    public InventoryView getBukkitView(final Player viewer) {
+        return new InventoryView() {
+            @Override
+            public Inventory getTopInventory() {
+                return inventory;
+            }
+            @Override
+            public Inventory getBottomInventory() {
+                return viewer.getInventory();
+            }
+            @Override
+            public HumanEntity getPlayer() {
+                return viewer;
+            }
+            @Override
+            public InventoryType getType() {
+                return InventoryType.ENDER_CHEST;
+            }
+        };
     }
 
     @Override
@@ -79,13 +97,13 @@ public class SpecialEnderChest extends InventorySubcontainer
     }
 
     @Override
-    public void setPlayerOnline(final Player player) {
+    public void setPlayerOnline(@NotNull final Player player) {
         if (!this.playerOnline) {
             try {
                 EntityPlayer nmsPlayer = PlayerDataManager.getHandle(player);
                 this.bukkitOwner = nmsPlayer.getBukkitEntity();
                 this.setItemLists(nmsPlayer.getEnderChest(), this.items);
-            } catch (Exception e) {}
+            } catch (Exception ignored) {}
             this.playerOnline = true;
         }
     }

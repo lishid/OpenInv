@@ -17,7 +17,6 @@
 package com.lishid.openinv.listeners;
 
 import com.lishid.openinv.OpenInv;
-
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;

@@ -17,11 +17,6 @@
 package com.lishid.openinv.internal.v1_7_R2;
 
 import com.lishid.openinv.internal.IAnySilentContainer;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.entity.Player;
-
 import net.minecraft.server.v1_7_R2.AxisAlignedBB;
 import net.minecraft.server.v1_7_R2.Block;
 import net.minecraft.server.v1_7_R2.BlockEnderChest;
@@ -35,43 +30,45 @@ import net.minecraft.server.v1_7_R2.PacketPlayOutOpenWindow;
 import net.minecraft.server.v1_7_R2.TileEntityChest;
 import net.minecraft.server.v1_7_R2.TileEntityEnderChest;
 import net.minecraft.server.v1_7_R2.World;
-
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_7_R2.event.CraftEventFactory;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class AnySilentContainer implements IAnySilentContainer {
 
     @Override
-    public boolean isAnySilentContainer(org.bukkit.block.Block block) {
-        return block.getType() == Material.ENDER_CHEST || block.getState() instanceof org.bukkit.block.Chest;
+    public boolean isAnySilentContainer(@NotNull org.bukkit.block.Block bukkitBlock) {
+        return bukkitBlock.getType() == Material.ENDER_CHEST || bukkitBlock.getState() instanceof org.bukkit.block.Chest;
     }
 
     @Override
-    public boolean isAnyContainerNeeded(Player p, org.bukkit.block.Block block) {
+    public boolean isAnyContainerNeeded(@NotNull Player bukkitPlayer, @NotNull org.bukkit.block.Block bukkitBlock) {
         // FOR REFERENCE, LOOK AT net.minecraft.server.BlockChest
-        EntityPlayer player = PlayerDataManager.getHandle(p);
-        World world = player.world;
+        World world = PlayerDataManager.getHandle(bukkitPlayer).world;
 
-        if (block instanceof BlockEnderChest) {
+        if (bukkitBlock instanceof BlockEnderChest) {
             // Ender chests are not blocked by ocelots.
-            return world.t(block.getX(), block.getY() + 1, block.getZ());
+            return world.t(bukkitBlock.getX(), bukkitBlock.getY() + 1, bukkitBlock.getZ());
         }
 
         // If block or ocelot on top
-        if (isBlockedChest(world, block.getX(), block.getY() + 1, block.getZ())) {
+        if (isBlockedChest(world, bukkitBlock.getX(), bukkitBlock.getY() + 1, bukkitBlock.getZ())) {
             return true;
         }
 
-        int id = Block.b(world.getType(block.getX(), block.getY(), block.getZ()));
+        int id = Block.b(world.getType(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ()));
 
         // If block next to chest is chest and has a block or ocelot on top
-        if (Block.b(world.getType(block.getX(), block.getY(), block.getZ() + 1)) == id) {
-            return isBlockedChest(world, block.getX(), block.getY() + 1, block.getZ() + 1);
-        } else if(Block.b(world.getType(block.getX(), block.getY(), block.getZ() - 1)) == id) {
-            return isBlockedChest(world, block.getX(), block.getY() + 1, block.getZ() - 1);
-        } else if (Block.b(world.getType(block.getX() + 1, block.getY(), block.getZ())) == id) {
-            return isBlockedChest(world, block.getX() + 1, block.getY() + 1, block.getZ());
-        } else if (Block.b(world.getType(block.getX() - 1, block.getY(), block.getZ())) == id) {
-            return isBlockedChest(world, block.getX() - 1, block.getY() + 1, block.getZ());
+        if (Block.b(world.getType(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ() + 1)) == id) {
+            return isBlockedChest(world, bukkitBlock.getX(), bukkitBlock.getY() + 1, bukkitBlock.getZ() + 1);
+        } else if(Block.b(world.getType(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ() - 1)) == id) {
+            return isBlockedChest(world, bukkitBlock.getX(), bukkitBlock.getY() + 1, bukkitBlock.getZ() - 1);
+        } else if (Block.b(world.getType(bukkitBlock.getX() + 1, bukkitBlock.getY(), bukkitBlock.getZ())) == id) {
+            return isBlockedChest(world, bukkitBlock.getX() + 1, bukkitBlock.getY() + 1, bukkitBlock.getZ());
+        } else if (Block.b(world.getType(bukkitBlock.getX() - 1, bukkitBlock.getY(), bukkitBlock.getZ())) == id) {
+            return isBlockedChest(world, bukkitBlock.getX() - 1, bukkitBlock.getY() + 1, bukkitBlock.getZ());
         }
 
         return false;
@@ -94,18 +91,18 @@ public class AnySilentContainer implements IAnySilentContainer {
     }
 
     @Override
-    public boolean activateContainer(Player p, boolean silentchest, org.bukkit.block.Block block) {
+    public boolean activateContainer(@NotNull Player bukkitPlayer, boolean silent, @NotNull org.bukkit.block.Block bukkitBlock) {
 
-        EntityPlayer player = PlayerDataManager.getHandle(p);
+        EntityPlayer player = PlayerDataManager.getHandle(bukkitPlayer);
 
         // Silent ender chest is API-only
-        if (silentchest && block.getType() == Material.ENDER_CHEST) {
-            p.openInventory(p.getEnderChest());
+        if (silent && bukkitBlock.getType() == Material.ENDER_CHEST) {
+            bukkitPlayer.openInventory(bukkitPlayer.getEnderChest());
             return true;
         }
 
         World world = player.world;
-        Object tile = world.getTileEntity(block.getX(), block.getY(), block.getZ());
+        Object tile = world.getTileEntity(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
 
         if (tile == null) {
             return false;
@@ -124,20 +121,20 @@ public class AnySilentContainer implements IAnySilentContainer {
         }
 
         IInventory inventory = (IInventory) tile;
-        int id = Block.b(world.getType(block.getX(), block.getY(), block.getZ()));
+        int id = Block.b(world.getType(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ()));
 
-        if (Block.b(world.getType(block.getX(), block.getY(), block.getZ() + 1)) == id) {
-            inventory = new InventoryLargeChest("container.chestDouble", inventory, (TileEntityChest) world.getTileEntity(block.getX(), block.getY(), block.getZ() + 1));
-        } else if(Block.b(world.getType(block.getX(), block.getY(), block.getZ() - 1)) == id) {
-            inventory = new InventoryLargeChest("container.chestDouble", (TileEntityChest) world.getTileEntity(block.getX(), block.getY(), block.getZ() - 1), inventory);
-        } else if (Block.b(world.getType(block.getX() + 1, block.getY(), block.getZ())) == id) {
-            inventory = new InventoryLargeChest("container.chestDouble", inventory, (TileEntityChest) world.getTileEntity(block.getX() + 1, block.getY(), block.getZ()));
-        } else if (Block.b(world.getType(block.getX() - 1, block.getY(), block.getZ())) == id) {
-            inventory = new InventoryLargeChest("container.chestDouble", (TileEntityChest) world.getTileEntity(block.getX() - 1, block.getY(), block.getZ()), inventory);
+        if (Block.b(world.getType(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ() + 1)) == id) {
+            inventory = new InventoryLargeChest("container.chestDouble", inventory, (TileEntityChest) world.getTileEntity(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ() + 1));
+        } else if(Block.b(world.getType(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ() - 1)) == id) {
+            inventory = new InventoryLargeChest("container.chestDouble", (TileEntityChest) world.getTileEntity(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ() - 1), inventory);
+        } else if (Block.b(world.getType(bukkitBlock.getX() + 1, bukkitBlock.getY(), bukkitBlock.getZ())) == id) {
+            inventory = new InventoryLargeChest("container.chestDouble", inventory, (TileEntityChest) world.getTileEntity(bukkitBlock.getX() + 1, bukkitBlock.getY(), bukkitBlock.getZ()));
+        } else if (Block.b(world.getType(bukkitBlock.getX() - 1, bukkitBlock.getY(), bukkitBlock.getZ())) == id) {
+            inventory = new InventoryLargeChest("container.chestDouble", (TileEntityChest) world.getTileEntity(bukkitBlock.getX() - 1, bukkitBlock.getY(), bukkitBlock.getZ()), inventory);
         }
 
         // AnyChest only
-        if (!silentchest) {
+        if (!silent) {
             player.openContainer(inventory);
             return true;
         }
@@ -161,12 +158,12 @@ public class AnySilentContainer implements IAnySilentContainer {
             return true;
         } catch (Exception e) {
             e.printStackTrace();
-            p.sendMessage(ChatColor.RED + "Error while sending silent container.");
+            bukkitPlayer.sendMessage(ChatColor.RED + "Error while sending silent container.");
             return false;
         }
     }
 
     @Override
-    public void deactivateContainer(final Player bukkitPlayer) {}
+    public void deactivateContainer(@NotNull final Player bukkitPlayer) {}
 
 }

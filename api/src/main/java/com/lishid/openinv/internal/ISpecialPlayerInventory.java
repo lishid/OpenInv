@@ -17,23 +17,27 @@
 package com.lishid.openinv.internal;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface ISpecialPlayerInventory {
 
     /**
-     * Gets the Inventory associated with this ISpecialPlayerInventory.
+     * Gets the InventoryView associated with this ISpecialPlayerInventory.
      *
-     * @return the Inventory
+     * @param viewer the Player opening the ISpecialPlayerInventory
+     * @return the InventoryView
      */
-    Inventory getBukkitInventory();
+    @NotNull
+    InventoryView getBukkitView(@Nullable Player viewer);
 
     /**
      * Sets the Player associated with this ISpecialPlayerInventory online.
      *
      * @param player the Player coming online
      */
-    void setPlayerOnline(Player player);
+    void setPlayerOnline(@NotNull Player player);
 
     /**
      * Sets the Player associated with this ISpecialPlayerInventory offline.

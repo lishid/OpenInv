@@ -16,30 +16,27 @@
 
 package com.lishid.openinv.internal.v1_7_R1;
 
+import com.lishid.openinv.internal.IPlayerDataManager;
 import java.util.Arrays;
 import java.util.Collection;
-
-import com.lishid.openinv.internal.IPlayerDataManager;
-
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Server;
-import org.bukkit.entity.Player;
-
 import net.minecraft.server.v1_7_R1.EntityPlayer;
 import net.minecraft.server.v1_7_R1.MinecraftServer;
 import net.minecraft.server.v1_7_R1.PlayerInteractManager;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
-
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Server;
 import org.bukkit.craftbukkit.v1_7_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_7_R1.entity.CraftPlayer;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerDataManager implements IPlayerDataManager {
 
     @Override
-    public Player loadPlayer(OfflinePlayer offline) {
+    public Player loadPlayer(@NotNull OfflinePlayer offline) {
         // Ensure the player has data
-        if (offline == null || !offline.hasPlayedBefore()) {
+        if (!offline.hasPlayedBefore()) {
             return null;
         }
 
@@ -50,7 +47,7 @@ public class PlayerDataManager implements IPlayerDataManager {
                 new PlayerInteractManager(server.getWorldServer(0)));
 
         // Get the bukkit entity
-        Player target = (entity == null) ? null : entity.getBukkitEntity();
+        Player target = entity.getBukkitEntity();
         if (target != null) {
             // Load data
             target.loadData();
@@ -59,13 +56,14 @@ public class PlayerDataManager implements IPlayerDataManager {
         return target;
     }
 
-    @Override
-    public String getPlayerDataID(OfflinePlayer offline) {
+    @NotNull
+	@Override
+    public String getPlayerDataID(@NotNull OfflinePlayer offline) {
         return offline.getName();
     }
 
     @Override
-    public OfflinePlayer getPlayerByID(String identifier) {
+    public OfflinePlayer getPlayerByID(@NotNull String identifier) {
         OfflinePlayer player = Bukkit.getOfflinePlayer(identifier);
         // Ensure player is a real player, otherwise return null
         if (player == null || !player.hasPlayedBefore() && !player.isOnline()) {
@@ -74,7 +72,8 @@ public class PlayerDataManager implements IPlayerDataManager {
         return player;
     }
 
-    @Override
+    @NotNull
+	@Override
     public Collection<? extends Player> getOnlinePlayers() {
         return Arrays.asList(Bukkit.getOnlinePlayers());
     }

@@ -24,7 +24,7 @@ import net.minecraft.server.v1_7_R3.PlayerInventory;
 
 class SilentContainerChest extends ContainerChest {
 
-    public SilentContainerChest(IInventory i1, IInventory i2) {
+    SilentContainerChest(IInventory i1, IInventory i2) {
         super(i1, i2);
         i2.l_();
     }

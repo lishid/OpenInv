@@ -17,9 +17,10 @@
 package com.lishid.openinv.internal;
 
 import java.util.Collection;
-
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public interface IPlayerDataManager {
 
@@ -31,7 +32,8 @@ public interface IPlayerDataManager {
      * @param offline the OfflinePlayer
      * @return the Player loaded
      */
-	Player loadPlayer(OfflinePlayer offline);
+    @Nullable
+    Player loadPlayer(@NotNull OfflinePlayer offline);
 
     /**
      * Gets a unique identifying string for an OfflinePlayer.
@@ -39,7 +41,8 @@ public interface IPlayerDataManager {
      * @param offline the OfflinePlayer
      * @return the unique identifier
      */
-	String getPlayerDataID(OfflinePlayer offline);
+    @NotNull
+    String getPlayerDataID(@NotNull OfflinePlayer offline);
 
     /**
      * Gets an OfflinePlayer by the given unique identifier.
@@ -47,13 +50,15 @@ public interface IPlayerDataManager {
      * @param identifier the unique identifier
      * @return the OfflinePlayer, or null if no exact match was found
      */
-	OfflinePlayer getPlayerByID(String identifier);
+    @Nullable
+    OfflinePlayer getPlayerByID(@NotNull String identifier);
 
     /**
      * Gets a Collection of all Players currently online.
      *
      * @return the Collection of Players
      */
-	Collection<? extends Player> getOnlinePlayers();
+    @NotNull
+    Collection<? extends Player> getOnlinePlayers();
 
 }

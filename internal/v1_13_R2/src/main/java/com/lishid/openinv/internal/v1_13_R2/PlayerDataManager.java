@@ -18,6 +18,8 @@ package com.lishid.openinv.internal.v1_13_R2;
 
 import com.lishid.openinv.internal.IPlayerDataManager;
 import com.mojang.authlib.GameProfile;
+import java.util.Collection;
+import java.util.UUID;
 import net.minecraft.server.v1_13_R2.DimensionManager;
 import net.minecraft.server.v1_13_R2.EntityPlayer;
 import net.minecraft.server.v1_13_R2.MinecraftServer;
@@ -28,9 +30,7 @@ import org.bukkit.Server;
 import org.bukkit.craftbukkit.v1_13_R2.CraftServer;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-
-import java.util.Collection;
-import java.util.UUID;
+import org.jetbrains.annotations.NotNull;
 
 public class PlayerDataManager implements IPlayerDataManager {
 
@@ -54,18 +54,19 @@ public class PlayerDataManager implements IPlayerDataManager {
         return nmsPlayer;
     }
 
-    @Override
+    @NotNull
+	@Override
     public Collection<? extends Player> getOnlinePlayers() {
         return Bukkit.getOnlinePlayers();
     }
 
     @Override
-    public OfflinePlayer getPlayerByID(final String identifier) {
+    public OfflinePlayer getPlayerByID(@NotNull final String identifier) {
         try {
             UUID uuid = UUID.fromString(identifier);
             OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
             // Ensure player is a real player, otherwise return null
-            if (player == null || !player.hasPlayedBefore() && !player.isOnline()) {
+            if (!player.hasPlayedBefore() && !player.isOnline()) {
                 return null;
             }
             return player;
@@ -75,15 +76,16 @@ public class PlayerDataManager implements IPlayerDataManager {
         }
     }
 
-    @Override
-    public String getPlayerDataID(final OfflinePlayer offline) {
+    @NotNull
+	@Override
+    public String getPlayerDataID(@NotNull final OfflinePlayer offline) {
         return offline.getUniqueId().toString();
     }
 
     @Override
-    public Player loadPlayer(final OfflinePlayer offline) {
+    public Player loadPlayer(@NotNull final OfflinePlayer offline) {
         // Ensure player has data
-        if (offline == null || !offline.hasPlayedBefore()) {
+        if (!offline.hasPlayedBefore()) {
             return null;
         }
 

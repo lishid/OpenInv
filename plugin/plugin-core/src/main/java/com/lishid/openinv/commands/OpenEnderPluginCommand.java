@@ -16,12 +16,10 @@
 
 package com.lishid.openinv.commands;
 
-import java.util.HashMap;
-
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.util.Permissions;
-
+import java.util.HashMap;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -144,7 +142,7 @@ public class OpenEnderPluginCommand implements CommandExecutor {
         }
 
         // Open the inventory
-        player.openInventory(chest.getBukkitInventory());
+        player.openInventory(chest.getBukkitView(player));
     }
 
 }

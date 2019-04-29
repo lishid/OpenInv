@@ -16,16 +16,14 @@
 
 package com.lishid.openinv.util;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-
 import com.lishid.openinv.internal.IAnySilentContainer;
 import com.lishid.openinv.internal.IInventoryAccess;
 import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
-
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -63,13 +61,14 @@ public class InternalAccessor {
         this.version = packageName.substring(packageName.lastIndexOf('.') + 1);
 
         try {
+            // TODO: implement support for CraftMagicNumbers#getMappingsVersion
             Class.forName("com.lishid.openinv.internal." + this.version + ".SpecialPlayerInventory");
             Class.forName("com.lishid.openinv.internal." + this.version + ".SpecialEnderChest");
             this.playerDataManager = this.createObject(IPlayerDataManager.class, "PlayerDataManager");
             this.inventoryAccess = this.createObject(IInventoryAccess.class, "InventoryAccess");
             this.anySilentContainer = this.createObject(IAnySilentContainer.class, "AnySilentContainer");
             this.supported = true;
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
     }
 
     private <T> T createObject(final Class<? extends T> assignableClass, final String className,

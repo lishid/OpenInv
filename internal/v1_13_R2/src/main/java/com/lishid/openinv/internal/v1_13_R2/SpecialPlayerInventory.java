@@ -18,6 +18,11 @@ package com.lishid.openinv.internal.v1_13_R2;
 
 import com.google.common.collect.ImmutableList;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.function.Predicate;
+import javax.annotation.Nullable;
 import net.minecraft.server.v1_13_R2.AutoRecipeStackManager;
 import net.minecraft.server.v1_13_R2.ChatMessage;
 import net.minecraft.server.v1_13_R2.ContainerUtil;
@@ -42,14 +47,11 @@ import org.bukkit.craftbukkit.v1_13_R2.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.function.Predicate;
+import org.bukkit.inventory.InventoryView;
+import org.jetbrains.annotations.NotNull;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
 
@@ -68,7 +70,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
-    public void setPlayerOnline(final Player player) {
+    public void setPlayerOnline(@NotNull final Player player) {
         if (!this.playerOnline) {
             EntityPlayer entityPlayer = PlayerDataManager.getHandle(player);
             entityPlayer.inventory.transaction.addAll(this.transaction);
@@ -86,9 +88,31 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         return true;
     }
 
+    @NotNull
     @Override
-    public Inventory getBukkitInventory() {
-        return this.inventory;
+    public InventoryView getBukkitView(final Player viewer) {
+        return new InventoryView() {
+            @NotNull
+            @Override
+            public Inventory getTopInventory() {
+                return inventory;
+            }
+            @NotNull
+            @Override
+            public Inventory getBottomInventory() {
+                return viewer.getInventory();
+            }
+            @NotNull
+            @Override
+            public HumanEntity getPlayer() {
+                return viewer;
+            }
+            @NotNull
+            @Override
+            public InventoryType getType() {
+                return InventoryType.PLAYER;
+            }
+        };
     }
 
     @Override
@@ -614,7 +638,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             int j = nbttagcompound.getByte("Slot") & 255;
             ItemStack itemstack = ItemStack.a(nbttagcompound);
             if (!itemstack.isEmpty()) {
-                if (j >= 0 && j < this.items.size()) {
+                if (j < this.items.size()) {
                     this.items.set(j, itemstack);
                 } else if (j >= 100 && j < this.armor.size() + 100) {
                     this.armor.set(j - 100, itemstack);

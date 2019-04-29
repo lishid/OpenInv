@@ -20,17 +20,15 @@ import com.lishid.openinv.internal.IInventoryAccess;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import com.lishid.openinv.util.InternalAccessor;
-
-import org.bukkit.inventory.Inventory;
-
 import net.minecraft.server.v1_8_R1.IInventory;
-
 import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftInventory;
+import org.bukkit.inventory.Inventory;
+import org.jetbrains.annotations.NotNull;
 
 public class InventoryAccess implements IInventoryAccess {
 
     @Override
-    public boolean isSpecialPlayerInventory(Inventory inventory) {
+    public boolean isSpecialPlayerInventory(@NotNull Inventory inventory) {
         if (inventory instanceof CraftInventory) {
             return ((CraftInventory) inventory).getInventory() instanceof ISpecialPlayerInventory;
         }
@@ -38,7 +36,7 @@ public class InventoryAccess implements IInventoryAccess {
     }
 
     @Override
-    public ISpecialPlayerInventory getSpecialPlayerInventory(Inventory inventory) {
+    public ISpecialPlayerInventory getSpecialPlayerInventory(@NotNull Inventory inventory) {
         IInventory inv;
         if (inventory instanceof CraftInventory) {
             inv = ((CraftInventory) inventory).getInventory();
@@ -53,7 +51,7 @@ public class InventoryAccess implements IInventoryAccess {
     }
 
     @Override
-    public boolean isSpecialEnderChest(Inventory inventory) {
+    public boolean isSpecialEnderChest(@NotNull Inventory inventory) {
         if (inventory instanceof CraftInventory) {
             return ((CraftInventory) inventory).getInventory() instanceof ISpecialEnderChest;
         }
@@ -61,7 +59,7 @@ public class InventoryAccess implements IInventoryAccess {
     }
 
     @Override
-    public ISpecialEnderChest getSpecialEnderChest(Inventory inventory) {
+    public ISpecialEnderChest getSpecialEnderChest(@NotNull Inventory inventory) {
         IInventory inv;
         if (inventory instanceof CraftInventory) {
             inv = ((CraftInventory) inventory).getInventory();
