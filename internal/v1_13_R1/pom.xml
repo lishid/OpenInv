@@ -21,7 +21,7 @@
   <parent>
     <groupId>com.lishid</groupId>
     <artifactId>openinvinternal</artifactId>
-    <version>4.0.0</version>
+    <version>4.0.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>openinvadapter1_13_R1</artifactId>
@@ -37,7 +37,7 @@
     <dependency>
       <groupId>com.lishid</groupId>
       <artifactId>openinvcommon</artifactId>
-      <version>4.0.0</version>
+      <version>4.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
