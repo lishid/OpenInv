@@ -26,11 +26,8 @@ import net.minecraft.server.v1_13_R1.InventoryEnderChest;
 import net.minecraft.server.v1_13_R1.InventorySubcontainer;
 import net.minecraft.server.v1_13_R1.ItemStack;
 import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftInventory;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 
 public class SpecialEnderChest extends InventorySubcontainer
@@ -48,27 +45,9 @@ public class SpecialEnderChest extends InventorySubcontainer
         this.setItemLists(this, this.enderChest.getContents());
     }
 
-    @NotNull
     @Override
-    public InventoryView getBukkitView(final Player viewer) {
-        return new InventoryView() {
-            @Override
-            public Inventory getTopInventory() {
-                return inventory;
-            }
-            @Override
-            public Inventory getBottomInventory() {
-                return viewer.getInventory();
-            }
-            @Override
-            public HumanEntity getPlayer() {
-                return viewer;
-            }
-            @Override
-            public InventoryType getType() {
-                return InventoryType.ENDER_CHEST;
-            }
-        };
+    public @NotNull Inventory getBukkitInventory() {
+        return inventory;
     }
 
     @Override

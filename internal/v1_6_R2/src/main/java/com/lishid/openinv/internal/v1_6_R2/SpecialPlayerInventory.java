@@ -20,11 +20,8 @@ import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import net.minecraft.server.v1_6_R2.ItemStack;
 import net.minecraft.server.v1_6_R2.PlayerInventory;
 import org.bukkit.craftbukkit.v1_6_R2.inventory.CraftInventory;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
@@ -40,27 +37,9 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         this.armor = player.inventory.armor;
     }
 
-    @NotNull
     @Override
-    public InventoryView getBukkitView(final Player viewer) {
-        return new InventoryView() {
-            @Override
-            public Inventory getTopInventory() {
-                return inventory;
-            }
-            @Override
-            public Inventory getBottomInventory() {
-                return viewer.getInventory();
-            }
-            @Override
-            public HumanEntity getPlayer() {
-                return viewer;
-            }
-            @Override
-            public InventoryType getType() {
-                return InventoryType.PLAYER;
-            }
-        };
+    public @NotNull Inventory getBukkitInventory() {
+        return inventory;
     }
 
     @Override

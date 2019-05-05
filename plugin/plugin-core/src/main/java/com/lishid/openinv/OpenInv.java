@@ -91,7 +91,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
                     // Check if inventory is stored, and if it is, remove it and eject all viewers
                     if (OpenInv.this.inventories.containsKey(key)) {
-                        Inventory inv = OpenInv.this.inventories.remove(key).getBukkitView(null).getTopInventory();
+                        Inventory inv = OpenInv.this.inventories.remove(key).getBukkitInventory();
                         List<HumanEntity> viewers = inv.getViewers();
                         for (HumanEntity entity : viewers.toArray(new HumanEntity[0])) {
                             entity.closeInventory();
@@ -100,7 +100,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
                     // Check if ender chest is stored, and if it is, remove it and eject all viewers
                     if (OpenInv.this.enderChests.containsKey(key)) {
-                        Inventory inv = OpenInv.this.enderChests.remove(key).getBukkitView(null).getTopInventory();
+                        Inventory inv = OpenInv.this.enderChests.remove(key).getBukkitInventory();
                         List<HumanEntity> viewers = inv.getViewers();
                         for (HumanEntity entity : viewers.toArray(new HumanEntity[0])) {
                             entity.closeInventory();
@@ -131,7 +131,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         }
 
         if (this.inventories.containsKey(key)) {
-            Iterator<HumanEntity> iterator = this.inventories.get(key).getBukkitView(null).getTopInventory().getViewers().iterator();
+            Iterator<HumanEntity> iterator = this.inventories.get(key).getBukkitInventory().getViewers().iterator();
             while (iterator.hasNext()) {
                 HumanEntity human = iterator.next();
                 // If player has permission or is in the same world, allow continued access
@@ -145,7 +145,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         }
 
         if (this.enderChests.containsKey(key)) {
-            Iterator<HumanEntity> iterator = this.enderChests.get(key).getBukkitView(null).getTopInventory().getViewers().iterator();
+            Iterator<HumanEntity> iterator = this.enderChests.get(key).getBukkitInventory().getViewers().iterator();
             while (iterator.hasNext()) {
                 HumanEntity human = iterator.next();
                 if (Permissions.CROSSWORLD.hasPermission(human) || human.getWorld() == null

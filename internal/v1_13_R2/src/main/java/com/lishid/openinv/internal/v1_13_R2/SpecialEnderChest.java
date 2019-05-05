@@ -35,52 +35,29 @@ import org.bukkit.craftbukkit.v1_13_R2.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 
 public class SpecialEnderChest implements IInventory, ISpecialEnderChest, AutoRecipeOutput {
 
     private EntityPlayer owner;
     private final IChatBaseComponent displayName;
+    private final CraftInventory inventory;
     private NonNullList<ItemStack> items;
-    private final CraftInventory inventory = new CraftInventory(this);
     private boolean playerOnline;
 
     public SpecialEnderChest(final Player player, final Boolean online) {
         this.owner = PlayerDataManager.getHandle(player);
         this.displayName = this.owner.getEnderChest().getDisplayName();
-        this.playerOnline = online;
+        this.inventory = new CraftInventory(this);
         this.items = this.owner.getEnderChest().items;
+        this.playerOnline = online;
     }
 
-    @NotNull
     @Override
-    public InventoryView getBukkitView(final Player viewer) {
-        return new InventoryView() {
-            @NotNull
-            @Override
-            public Inventory getTopInventory() {
-                return inventory;
-            }
-            @NotNull
-            @Override
-            public Inventory getBottomInventory() {
-                return viewer.getInventory();
-            }
-            @NotNull
-            @Override
-            public HumanEntity getPlayer() {
-                return viewer;
-            }
-            @NotNull
-            @Override
-            public InventoryType getType() {
-                return InventoryType.ENDER_CHEST;
-            }
-        };
+    public @NotNull Inventory getBukkitInventory() {
+        return this.inventory;
     }
 
     @Override

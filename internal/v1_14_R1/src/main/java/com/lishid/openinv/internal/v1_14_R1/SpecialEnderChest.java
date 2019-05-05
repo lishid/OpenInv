@@ -31,10 +31,8 @@ import org.bukkit.craftbukkit.v1_14_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 
 public class SpecialEnderChest extends InventoryEnderChest implements ISpecialEnderChest {
@@ -52,36 +50,9 @@ public class SpecialEnderChest extends InventoryEnderChest implements ISpecialEn
         this.items = this.owner.getEnderChest().items;
     }
 
-    @NotNull
     @Override
-    public InventoryView getBukkitView(Player viewer) {
-        return new InventoryView() {
-            @NotNull
-            @Override
-            public Inventory getTopInventory() {
-                return inventory;
-            }
-            @NotNull
-            @Override
-            public Inventory getBottomInventory() {
-                return viewer.getInventory();
-            }
-            @NotNull
-            @Override
-            public HumanEntity getPlayer() {
-                return viewer;
-            }
-            @NotNull
-            @Override
-            public InventoryType getType() {
-                return InventoryType.ENDER_CHEST;
-            }
-            @NotNull
-            @Override
-            public String getTitle() {
-                return viewer != null && viewer.equals(owner.getBukkitEntity()) ? InventoryType.ENDER_CHEST.getDefaultTitle() : owner.getName() + "'s Ender Chest";
-            }
-        };
+    public @NotNull Inventory getBukkitInventory() {
+        return inventory;
     }
 
     @Override

@@ -47,10 +47,8 @@ import org.bukkit.craftbukkit.v1_13_R2.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 
 public class SpecialPlayerInventory extends PlayerInventory implements ISpecialPlayerInventory {
@@ -88,31 +86,9 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         return true;
     }
 
-    @NotNull
     @Override
-    public InventoryView getBukkitView(final Player viewer) {
-        return new InventoryView() {
-            @NotNull
-            @Override
-            public Inventory getTopInventory() {
-                return inventory;
-            }
-            @NotNull
-            @Override
-            public Inventory getBottomInventory() {
-                return viewer.getInventory();
-            }
-            @NotNull
-            @Override
-            public HumanEntity getPlayer() {
-                return viewer;
-            }
-            @NotNull
-            @Override
-            public InventoryType getType() {
-                return InventoryType.PLAYER;
-            }
-        };
+    public @NotNull Inventory getBukkitInventory() {
+        return inventory;
     }
 
     @Override
