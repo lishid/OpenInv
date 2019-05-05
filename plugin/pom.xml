@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (C) 2011-2018 lishid. All rights reserved.
+  ~ Copyright (C) 2011-2019 lishid. All rights reserved.
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -24,14 +24,29 @@
     <version>4.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>openinvplugin</artifactId>
+  <artifactId>openinvplugincore</artifactId>
   <name>OpenInvPlugin</name>
 
-  <packaging>pom</packaging>
+  <dependencies>
+    <dependency>
+      <groupId>org.bukkit</groupId>
+      <artifactId>bukkit</artifactId>
+      <version>1.8.8-R0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>com.lishid</groupId>
+      <artifactId>openinvcommon</artifactId>
+      <version>4.0.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
 
-  <modules>
-    <module>plugin-v1_10_R1</module>
-    <module>plugin-core</module>
-  </modules>
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+  </build>
 
 </project>
