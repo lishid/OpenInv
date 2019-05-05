@@ -47,8 +47,6 @@ import org.bukkit.craftbukkit.v1_14_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -63,13 +61,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
 
     public SpecialPlayerInventory(final Player bukkitPlayer, final Boolean online) {
         super(PlayerDataManager.getHandle(bukkitPlayer));
-        this.inventory = new CraftInventory(this) {
-            @NotNull
-            @Override
-            public InventoryType getType() {
-                return InventoryType.CHEST;
-            }
-        };
+        this.inventory = new CraftInventory(this);
         this.playerOnline = online;
         this.player = super.player;
         this.items = this.player.inventory.items;
@@ -98,7 +90,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
-    public @NotNull Inventory getBukkitInventory() {
+    public @NotNull CraftInventory getBukkitInventory() {
         return this.inventory;
     }
 

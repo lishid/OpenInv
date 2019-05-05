@@ -16,37 +16,6 @@
 
 package com.lishid.openinv.internal;
 
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.jetbrains.annotations.NotNull;
-
-public interface ISpecialPlayerInventory {
-
-    /**
-     * Gets the Inventory associated with this ISpecialPlayerInventory.
-     *
-     * @return the Inventory
-     */
-    @NotNull
-    Inventory getBukkitInventory();
-
-    /**
-     * Sets the Player associated with this ISpecialPlayerInventory online.
-     *
-     * @param player the Player coming online
-     */
-    void setPlayerOnline(@NotNull Player player);
-
-    /**
-     * Sets the Player associated with this ISpecialPlayerInventory offline.
-     */
-    void setPlayerOffline();
-
-    /**
-     * Gets whether or not this ISpecialPlayerInventory is in use.
-     *
-     * @return true if the ISpecialPlayerInventory is in use
-     */
-    boolean isInUse();
+public interface ISpecialPlayerInventory extends ISpecialInventory {
 
 }

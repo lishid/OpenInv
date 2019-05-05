@@ -31,7 +31,6 @@ import org.bukkit.craftbukkit.v1_14_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
 
@@ -51,7 +50,7 @@ public class SpecialEnderChest extends InventoryEnderChest implements ISpecialEn
     }
 
     @Override
-    public @NotNull Inventory getBukkitInventory() {
+    public @NotNull CraftInventory getBukkitInventory() {
         return inventory;
     }
 

@@ -29,8 +29,7 @@ public interface IInventoryAccess {
      * @param inventory the Inventory
      * @return the ISpecialEnderChest or null
      */
-    @Nullable
-    ISpecialEnderChest getSpecialEnderChest(@NotNull Inventory inventory);
+    @Nullable ISpecialEnderChest getSpecialEnderChest(@NotNull Inventory inventory);
 
     /**
      * Gets an ISpecialPlayerInventory from an Inventory or null if the Inventory is not backed by
@@ -39,8 +38,7 @@ public interface IInventoryAccess {
      * @param inventory the Inventory
      * @return the ISpecialPlayerInventory or null
      */
-    @Nullable
-    ISpecialPlayerInventory getSpecialPlayerInventory(@NotNull Inventory inventory);
+    @Nullable ISpecialPlayerInventory getSpecialPlayerInventory(@NotNull Inventory inventory);
 
     /**
      * Check if an Inventory is an ISpecialEnderChest implementation.

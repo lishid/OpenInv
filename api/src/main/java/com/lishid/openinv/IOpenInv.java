@@ -19,9 +19,11 @@ package com.lishid.openinv;
 import com.lishid.openinv.internal.IAnySilentContainer;
 import com.lishid.openinv.internal.IInventoryAccess;
 import com.lishid.openinv.internal.ISpecialEnderChest;
+import com.lishid.openinv.internal.ISpecialInventory;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -49,8 +51,7 @@ public interface IOpenInv {
      * @return the ISilentContainer
      * @throws IllegalStateException if the server version is unsupported
      */
-    @NotNull
-    IAnySilentContainer getAnySilentContainer();
+    @NotNull IAnySilentContainer getAnySilentContainer();
 
     /**
      * Gets the active IInventoryAccess implementation.
@@ -58,8 +59,7 @@ public interface IOpenInv {
      * @return the IInventoryAccess
      * @throws IllegalStateException if the server version is unsupported
      */
-    @NotNull
-    IInventoryAccess getInventoryAccess();
+    @NotNull IInventoryAccess getInventoryAccess();
 
     /**
      * Gets the provided player's AnyChest setting.
@@ -78,8 +78,7 @@ public interface IOpenInv {
      * @return the identifier
      * @throws IllegalStateException if the server version is unsupported
      */
-    @NotNull
-    String getPlayerID(@NotNull OfflinePlayer offline);
+    @NotNull String getPlayerID(@NotNull OfflinePlayer offline);
 
     /**
      * Gets a player's SilentChest setting.
@@ -99,8 +98,7 @@ public interface IOpenInv {
      * @throws IllegalStateException  if the server version is unsupported
      * @throws InstantiationException if the ISpecialEnderChest could not be instantiated
      */
-    @NotNull
-    ISpecialEnderChest getSpecialEnderChest(@NotNull Player player, boolean online) throws InstantiationException;
+    @NotNull ISpecialEnderChest getSpecialEnderChest(@NotNull Player player, boolean online) throws InstantiationException;
 
     /**
      * Gets an ISpecialPlayerInventory for the given Player.
@@ -111,8 +109,7 @@ public interface IOpenInv {
      * @throws IllegalStateException  if the server version is unsupported
      * @throws InstantiationException if the ISpecialPlayerInventory could not be instantiated
      */
-    @NotNull
-    ISpecialPlayerInventory getSpecialInventory(@NotNull Player player, boolean online) throws InstantiationException;
+    @NotNull ISpecialPlayerInventory getSpecialInventory(@NotNull Player player, boolean online) throws InstantiationException;
 
     /**
      * Checks if the server version is supported by OpenInv.
@@ -128,8 +125,7 @@ public interface IOpenInv {
      * @return the Player, or null
      * @throws IllegalStateException if the server version is unsupported
      */
-    @Nullable
-    Player loadPlayer(@NotNull final OfflinePlayer offline);
+    @Nullable Player loadPlayer(@NotNull final OfflinePlayer offline);
 
     /**
      * Get an OfflinePlayer by name.
@@ -141,8 +137,16 @@ public interface IOpenInv {
      * @param name the name of the Player
      * @return the OfflinePlayer with the closest matching name or null if no players have ever logged in
      */
-    @Nullable
-    OfflinePlayer matchPlayer(@NotNull String name);
+    @Nullable OfflinePlayer matchPlayer(@NotNull String name);
+
+    /**
+     * Open an ISpecialInventory for a Player.
+     *
+     * @param player the Player
+     * @param inventory the ISpecialInventory
+     * @return the InventoryView for the opened ISpecialInventory
+     */
+    @Nullable InventoryView openInventory(@NotNull Player player, @NotNull ISpecialInventory inventory);
 
     /**
      * Check the configuration value for whether or not OpenInv displays a notification to the user

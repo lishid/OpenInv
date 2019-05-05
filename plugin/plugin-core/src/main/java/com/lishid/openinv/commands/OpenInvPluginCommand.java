@@ -151,7 +151,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
         }
 
         // Open the inventory
-        player.openInventory(inv.getBukkitInventory());
+        plugin.openInventory(player, inv);
     }
 
 }

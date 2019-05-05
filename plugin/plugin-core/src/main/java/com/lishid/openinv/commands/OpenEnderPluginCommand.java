@@ -142,7 +142,7 @@ public class OpenEnderPluginCommand implements CommandExecutor {
         }
 
         // Open the inventory
-        player.openInventory(chest.getBukkitInventory());
+        plugin.openInventory(player, chest);
     }
 
 }

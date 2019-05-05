@@ -17,19 +17,32 @@
 package com.lishid.openinv.internal.v1_14_R1;
 
 import com.lishid.openinv.internal.IPlayerDataManager;
+import com.lishid.openinv.internal.ISpecialInventory;
 import com.mojang.authlib.GameProfile;
 import java.util.Collection;
 import java.util.UUID;
+import net.minecraft.server.v1_14_R1.ChatComponentText;
+import net.minecraft.server.v1_14_R1.Container;
+import net.minecraft.server.v1_14_R1.Containers;
 import net.minecraft.server.v1_14_R1.DimensionManager;
+import net.minecraft.server.v1_14_R1.EntityHuman;
 import net.minecraft.server.v1_14_R1.EntityPlayer;
 import net.minecraft.server.v1_14_R1.MinecraftServer;
+import net.minecraft.server.v1_14_R1.PacketPlayOutOpenWindow;
 import net.minecraft.server.v1_14_R1.PlayerInteractManager;
+import net.minecraft.server.v1_14_R1.PlayerInventory;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
 import org.bukkit.craftbukkit.v1_14_R1.CraftServer;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftContainer;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayerDataManager implements IPlayerDataManager {
@@ -54,9 +67,8 @@ public class PlayerDataManager implements IPlayerDataManager {
         return nmsPlayer;
     }
 
-    @NotNull
     @Override
-    public Collection<? extends Player> getOnlinePlayers() {
+    public @NotNull Collection<? extends Player> getOnlinePlayers() {
         return Bukkit.getOnlinePlayers();
     }
 
@@ -76,9 +88,8 @@ public class PlayerDataManager implements IPlayerDataManager {
         }
     }
 
-    @NotNull
     @Override
-    public String getPlayerDataID(@NotNull final OfflinePlayer offline) {
+    public @NotNull String getPlayerDataID(@NotNull final OfflinePlayer offline) {
         return offline.getUniqueId().toString();
     }
 
@@ -103,6 +114,70 @@ public class PlayerDataManager implements IPlayerDataManager {
         }
         // Return the entity
         return target;
+    }
+
+    @Override
+    public InventoryView openInventory(@NotNull Player player, @NotNull ISpecialInventory inventory) {
+
+        EntityPlayer nmsPlayer = getHandle(player);
+
+        if (nmsPlayer == null || nmsPlayer.playerConnection == null) {
+            return null;
+        }
+
+        String title;
+        if (inventory instanceof SpecialEnderChest) {
+            HumanEntity owner = (HumanEntity) ((SpecialEnderChest) inventory).getBukkitOwner();
+            title = (owner.getName() != null ? owner.getName() : owner.getUniqueId().toString()) + "'s Ender Chest";
+        } else if (inventory instanceof SpecialPlayerInventory) {
+            EntityHuman owner = ((PlayerInventory) inventory).player;
+            title = (owner.getName() != null ? owner.getName() : owner.getUniqueID().toString()) + "'s Inventory";
+        } else {
+            return player.openInventory(inventory.getBukkitInventory());
+        }
+
+        Container container = new CraftContainer(new InventoryView() {
+            @Override
+            public @NotNull Inventory getTopInventory() {
+                return inventory.getBukkitInventory();
+            }
+            @Override
+            public @NotNull Inventory getBottomInventory() {
+                return player.getInventory();
+            }
+            @Override
+            public @NotNull HumanEntity getPlayer() {
+                return player;
+            }
+            @Override
+            public @NotNull InventoryType getType() {
+                return inventory.getBukkitInventory().getType();
+            }
+            @Override
+            public @NotNull String getTitle() {
+                return title;
+            }
+        }, nmsPlayer, nmsPlayer.nextContainerCounter()) {
+            @Override
+            public Containers<?> getType() {
+                return inventory instanceof SpecialEnderChest ? Containers.GENERIC_9X3 : Containers.GENERIC_9X5;
+            }
+        };
+
+        container.setTitle(new ChatComponentText(title));
+        container = CraftEventFactory.callInventoryOpenEvent(nmsPlayer, container);
+
+        if (container == null) {
+            return null;
+        }
+
+        nmsPlayer.playerConnection.sendPacket(new PacketPlayOutOpenWindow(container.windowId, container.getType(),
+                new ChatComponentText(container.getBukkitView().getTitle())));
+        nmsPlayer.activeContainer = container;
+        container.addSlotListener(nmsPlayer);
+
+        return container.getBukkitView();
+
     }
 
 }

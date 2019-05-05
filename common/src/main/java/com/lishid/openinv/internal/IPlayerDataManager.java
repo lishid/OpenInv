@@ -19,6 +19,7 @@ package com.lishid.openinv.internal;
 import java.util.Collection;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,8 +33,7 @@ public interface IPlayerDataManager {
      * @param offline the OfflinePlayer
      * @return the Player loaded
      */
-    @Nullable
-    Player loadPlayer(@NotNull OfflinePlayer offline);
+    @Nullable Player loadPlayer(@NotNull OfflinePlayer offline);
 
     /**
      * Gets a unique identifying string for an OfflinePlayer.
@@ -41,8 +41,7 @@ public interface IPlayerDataManager {
      * @param offline the OfflinePlayer
      * @return the unique identifier
      */
-    @NotNull
-    String getPlayerDataID(@NotNull OfflinePlayer offline);
+    @NotNull String getPlayerDataID(@NotNull OfflinePlayer offline);
 
     /**
      * Gets an OfflinePlayer by the given unique identifier.
@@ -50,15 +49,23 @@ public interface IPlayerDataManager {
      * @param identifier the unique identifier
      * @return the OfflinePlayer, or null if no exact match was found
      */
-    @Nullable
-    OfflinePlayer getPlayerByID(@NotNull String identifier);
+    @Nullable OfflinePlayer getPlayerByID(@NotNull String identifier);
 
     /**
      * Gets a Collection of all Players currently online.
      *
      * @return the Collection of Players
      */
-    @NotNull
-    Collection<? extends Player> getOnlinePlayers();
+    @NotNull Collection<? extends Player> getOnlinePlayers();
+
+    /**
+     * Opens an ISpecialInventory for a Player.
+     *
+     * @param player the Player opening the ISpecialInventory
+     * @param inventory the Inventory
+     *`
+     * @return the InventoryView opened
+     */
+    InventoryView openInventory(@NotNull Player player, @NotNull ISpecialInventory inventory);
 
 }

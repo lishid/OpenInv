@@ -16,37 +16,6 @@
 
 package com.lishid.openinv.internal;
 
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.jetbrains.annotations.NotNull;
-
-public interface ISpecialEnderChest {
-
-    /**
-     * Gets the Inventory associated with this ISpecialEnderChest.
-     *
-     * @return the Inventory
-     */
-    @NotNull
-    Inventory getBukkitInventory();
-
-    /**
-     * Sets the Player associated with this ISpecialEnderChest online.
-     *
-     * @param player the Player coming online
-     */
-    void setPlayerOnline(@NotNull Player player);
-
-    /**
-     * Sets the Player associated with this ISpecialEnderChest offline.
-     */
-    void setPlayerOffline();
-
-    /**
-     * Gets whether or not this ISpecialEnderChest is in use.
-     *
-     * @return true if the ISpecialEnderChest is in use
-     */
-    boolean isInUse();
+public interface ISpecialEnderChest extends ISpecialInventory {
 
 }

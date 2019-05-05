@@ -27,6 +27,7 @@ import com.lishid.openinv.commands.SilentChestPluginCommand;
 import com.lishid.openinv.internal.IAnySilentContainer;
 import com.lishid.openinv.internal.IInventoryAccess;
 import com.lishid.openinv.internal.ISpecialEnderChest;
+import com.lishid.openinv.internal.ISpecialInventory;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import com.lishid.openinv.listeners.InventoryClickListener;
 import com.lishid.openinv.listeners.InventoryCloseListener;
@@ -56,6 +57,7 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -456,6 +458,11 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
         // Only null if no players have played ever, otherwise even the worst match will do.
         return player;
+    }
+
+    @Override
+    public @Nullable InventoryView openInventory(@NotNull Player player, @NotNull ISpecialInventory inventory) {
+        return this.accessor.getPlayerDataManager().openInventory(player, inventory);
     }
 
     @Override

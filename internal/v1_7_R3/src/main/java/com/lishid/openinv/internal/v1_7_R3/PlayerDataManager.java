@@ -17,6 +17,7 @@
 package com.lishid.openinv.internal.v1_7_R3;
 
 import com.lishid.openinv.internal.IPlayerDataManager;
+import com.lishid.openinv.internal.ISpecialInventory;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.UUID;
@@ -30,6 +31,7 @@ import org.bukkit.Server;
 import org.bukkit.craftbukkit.v1_7_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_7_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayerDataManager implements IPlayerDataManager {
@@ -57,9 +59,8 @@ public class PlayerDataManager implements IPlayerDataManager {
         return target;
     }
 
-    @NotNull
-	@Override
-    public String getPlayerDataID(@NotNull OfflinePlayer offline) {
+    @Override
+    public @NotNull String getPlayerDataID(@NotNull OfflinePlayer offline) {
         return offline.getUniqueId().toString();
     }
 
@@ -79,9 +80,8 @@ public class PlayerDataManager implements IPlayerDataManager {
         }
     }
 
-    @NotNull
-	@Override
-    public Collection<? extends Player> getOnlinePlayers() {
+    @Override
+    public @NotNull Collection<? extends Player> getOnlinePlayers() {
         return Arrays.asList(Bukkit.getOnlinePlayers());
     }
 
@@ -103,6 +103,11 @@ public class PlayerDataManager implements IPlayerDataManager {
         }
 
         return nmsPlayer;
+    }
+
+    @Override
+    public InventoryView openInventory(@NotNull Player player, @NotNull ISpecialInventory inventory) {
+        return player.openInventory(inventory.getBukkitInventory());
     }
 
 }
