@@ -498,37 +498,47 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         PluginManager pm = this.getServer().getPluginManager();
 
         this.accessor = new InternalAccessor(this);
+
         // Version check
-        if (!this.accessor.isSupported()) {
+        if (this.accessor.isSupported()) {
+            // Update existing configuration. May require internal access.
+            new ConfigUpdater(this).checkForUpdates();
+
+            // Register listeners
+            pm.registerEvents(new PlayerListener(this), this);
+            pm.registerEvents(new PluginListener(this), this);
+            pm.registerEvents(new InventoryClickListener(this), this);
+            pm.registerEvents(new InventoryCloseListener(this), this);
+            // Bukkit will handle missing events for us, attempt to register InventoryDragEvent without a version check
+            pm.registerEvents(new InventoryDragListener(this), this);
+
+            // Register commands to their executors
+            OpenInvPluginCommand openInv = new OpenInvPluginCommand(this);
+            this.getCommand("openinv").setExecutor(openInv);
+            this.getCommand("openender").setExecutor(openInv);
+            SearchInvPluginCommand searchInv = new SearchInvPluginCommand(this);
+            this.getCommand("searchinv").setExecutor(searchInv);
+            this.getCommand("searchender").setExecutor(searchInv);
+            this.getCommand("searchenchant").setExecutor(new SearchEnchantPluginCommand(this));
+            this.getCommand("silentchest").setExecutor(new SilentChestPluginCommand(this));
+            this.getCommand("anychest").setExecutor(new AnyChestPluginCommand(this));
+        } else {
             this.getLogger().info("Your version of CraftBukkit (" + this.accessor.getVersion() + ") is not supported.");
             this.getLogger().info("If this version is a recent release, check for an update.");
             this.getLogger().info("If this is an older version, ensure that you've downloaded the legacy support version.");
-            pm.disablePlugin(this);
-            return;
         }
 
-        // Update existing configuration. May require internal access.
-        new ConfigUpdater(this).checkForUpdates();
+    }
 
-        // Register listeners
-        pm.registerEvents(new PlayerListener(this), this);
-        pm.registerEvents(new PluginListener(this), this);
-        pm.registerEvents(new InventoryClickListener(this), this);
-        pm.registerEvents(new InventoryCloseListener(this), this);
-        // Bukkit will handle missing events for us, attempt to register InventoryDragEvent without a version check
-        pm.registerEvents(new InventoryDragListener(this), this);
-
-        // Register commands to their executors
-        OpenInvPluginCommand openInv = new OpenInvPluginCommand(this);
-        this.getCommand("openinv").setExecutor(openInv);
-        this.getCommand("openender").setExecutor(openInv);
-        SearchInvPluginCommand searchInv = new SearchInvPluginCommand(this);
-        this.getCommand("searchinv").setExecutor(searchInv);
-        this.getCommand("searchender").setExecutor(searchInv);
-        this.getCommand("searchenchant").setExecutor(new SearchEnchantPluginCommand(this));
-        this.getCommand("silentchest").setExecutor(new SilentChestPluginCommand(this));
-        this.getCommand("anychest").setExecutor(new AnyChestPluginCommand(this));
-
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!this.accessor.isSupported()) {
+            sender.sendMessage("Your version of CraftBukkit (" + this.accessor.getVersion() + ") is not supported.");
+            sender.sendMessage("If this version is a recent release, check for an update.");
+            sender.sendMessage("If this is an older version, ensure that you've downloaded the legacy support version.");
+            return true;
+        }
+        return false;
     }
 
     public void releaseAllPlayers(final Plugin plugin) {
