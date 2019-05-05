@@ -23,28 +23,28 @@ import org.jetbrains.annotations.NotNull;
 public interface ISpecialInventory {
 
     /**
-     * Gets the Inventory associated with this ISpecialEnderChest.
+     * Gets the Inventory associated with this ISpecialInventory.
      *
      * @return the Inventory
      */
     @NotNull Inventory getBukkitInventory();
 
     /**
-     * Sets the Player associated with this ISpecialEnderChest online.
+     * Sets the Player associated with this ISpecialInventory online.
      *
      * @param player the Player coming online
      */
     void setPlayerOnline(@NotNull Player player);
 
     /**
-     * Sets the Player associated with this ISpecialEnderChest offline.
+     * Sets the Player associated with this ISpecialInventory offline.
      */
     void setPlayerOffline();
 
     /**
-     * Gets whether or not this ISpecialEnderChest is in use.
+     * Gets whether or not this ISpecialInventory is in use.
      *
-     * @return true if the ISpecialEnderChest is in use
+     * @return true if the ISpecialInventory is in use
      */
     boolean isInUse();
 
