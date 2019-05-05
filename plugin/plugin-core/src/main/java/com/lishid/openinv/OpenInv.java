@@ -19,7 +19,6 @@ package com.lishid.openinv;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.lishid.openinv.commands.AnyChestPluginCommand;
-import com.lishid.openinv.commands.OpenEnderPluginCommand;
 import com.lishid.openinv.commands.OpenInvPluginCommand;
 import com.lishid.openinv.commands.SearchEnchantPluginCommand;
 import com.lishid.openinv.commands.SearchInvPluginCommand;
@@ -53,6 +52,8 @@ import java.util.concurrent.Future;
 import javax.annotation.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -489,6 +490,10 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
     @Override
     public void onEnable() {
+
+        // Save default configuration if not present.
+        this.saveDefaultConfig();
+
         // Get plugin manager
         PluginManager pm = this.getServer().getPluginManager();
 
@@ -502,7 +507,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             return;
         }
 
-        this.saveDefaultConfig();
+        // Update existing configuration. May require internal access.
         new ConfigUpdater(this).checkForUpdates();
 
         // Register listeners
@@ -514,8 +519,9 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         pm.registerEvents(new InventoryDragListener(this), this);
 
         // Register commands to their executors
-        this.getCommand("openinv").setExecutor(new OpenInvPluginCommand(this));
-        this.getCommand("openender").setExecutor(new OpenEnderPluginCommand(this));
+        OpenInvPluginCommand openInv = new OpenInvPluginCommand(this);
+        this.getCommand("openinv").setExecutor(openInv);
+        this.getCommand("openender").setExecutor(openInv);
         SearchInvPluginCommand searchInv = new SearchInvPluginCommand(this);
         this.getCommand("searchinv").setExecutor(searchInv);
         this.getCommand("searchender").setExecutor(searchInv);

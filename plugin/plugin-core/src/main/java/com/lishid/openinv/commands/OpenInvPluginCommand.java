@@ -17,7 +17,7 @@
 package com.lishid.openinv.commands;
 
 import com.lishid.openinv.OpenInv;
-import com.lishid.openinv.internal.ISpecialPlayerInventory;
+import com.lishid.openinv.internal.ISpecialInventory;
 import com.lishid.openinv.util.Permissions;
 import java.util.HashMap;
 import org.bukkit.ChatColor;
@@ -32,6 +32,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
 
     private final OpenInv plugin;
     private final HashMap<Player, String> openInvHistory = new HashMap<Player, String>();
+    private final HashMap<Player, String> openEnderHistory = new HashMap<Player, String>();
 
     public OpenInvPluginCommand(final OpenInv plugin) {
         this.plugin = plugin;
@@ -50,13 +51,14 @@ public class OpenInvPluginCommand implements CommandExecutor {
         }
 
         final Player player = (Player) sender;
+        final boolean openinv = command.getName().equals("openinv");
 
         // History management
-        String history = this.openInvHistory.get(player);
+        String history = (openinv ? this.openInvHistory : this.openEnderHistory).get(player);
 
         if (history == null || history.isEmpty()) {
             history = player.getName();
-            this.openInvHistory.put(player, history);
+            (openinv ? this.openInvHistory : this.openEnderHistory).put(player, history);
         }
 
         final String name;
@@ -84,7 +86,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
                         if (!player.isOnline()) {
                             return;
                         }
-                        OpenInvPluginCommand.this.openInventory(player, offlinePlayer);
+                        OpenInvPluginCommand.this.openInventory(player, offlinePlayer, openinv);
                     }
                 }.runTask(OpenInvPluginCommand.this.plugin);
 
@@ -94,7 +96,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
         return true;
     }
 
-    private void openInventory(final Player player, final OfflinePlayer target) {
+    private void openInventory(final Player player, final OfflinePlayer target, boolean openinv) {
 
 
         Player onlineTarget;
@@ -114,12 +116,18 @@ public class OpenInvPluginCommand implements CommandExecutor {
 
         // Permissions checks
         if (onlineTarget.equals(player)) {
-            // Self-open check
-            if (!Permissions.OPENSELF.hasPermission(player)) {
-                player.sendMessage(ChatColor.RED + "You're not allowed to openinv yourself.");
+            // Inventory: Additional permission required to open own inventory
+            if (openinv && !Permissions.OPENSELF.hasPermission(player)) {
+                player.sendMessage(ChatColor.RED + "You're not allowed to open your own inventory!");
                 return;
             }
         } else {
+            // Enderchest: Additional permission required to open others' ender chests
+            if (!openinv && !Permissions.ENDERCHEST_ALL.hasPermission(player)) {
+                player.sendMessage(ChatColor.RED + "You do not have permission to access other players' ender chests.");
+                return;
+            }
+
             // Protected check
             if (!Permissions.OVERRIDE.hasPermission(player)
                     && Permissions.EXEMPT.hasPermission(onlineTarget)) {
@@ -129,7 +137,6 @@ public class OpenInvPluginCommand implements CommandExecutor {
 
             // Crossworld check
             if (!Permissions.CROSSWORLD.hasPermission(player)
-                    && !Permissions.OVERRIDE.hasPermission(player)
                     && !onlineTarget.getWorld().equals(player.getWorld())) {
                 player.sendMessage(
                         ChatColor.RED + onlineTarget.getDisplayName() + " is not in your world!");
@@ -138,12 +145,12 @@ public class OpenInvPluginCommand implements CommandExecutor {
         }
 
         // Record the target
-        this.openInvHistory.put(player, this.plugin.getPlayerID(target));
+        (openinv ? this.openInvHistory : this.openEnderHistory).put(player, this.plugin.getPlayerID(target));
 
         // Create the inventory
-        final ISpecialPlayerInventory inv;
+        final ISpecialInventory inv;
         try {
-            inv = this.plugin.getSpecialInventory(onlineTarget, online);
+            inv = openinv ? this.plugin.getSpecialInventory(onlineTarget, online) : this.plugin.getSpecialEnderChest(onlineTarget, online);
         } catch (Exception e) {
             player.sendMessage(ChatColor.RED + "An error occurred creating " + onlineTarget.getDisplayName() + "'s inventory!");
             e.printStackTrace();
