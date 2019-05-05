@@ -20,7 +20,7 @@
   <parent>
     <groupId>com.lishid</groupId>
     <artifactId>openinvparent</artifactId>
-    <version>4.0.0-SNAPSHOT</version>
+    <version>4.0.0</version>
   </parent>
 
   <artifactId>openinvinternal</artifactId>
