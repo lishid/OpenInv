@@ -59,7 +59,7 @@ public class SearchInvPluginCommand implements CommandExecutor {
         }
 
         StringBuilder players = new StringBuilder();
-        for (Player player : plugin.getOnlinePlayers()) {
+        for (Player player : plugin.getServer().getOnlinePlayers()) {
             Inventory inventory = command.getName().equals("searchinv") ? player.getInventory() : player.getEnderChest();
             if (inventory.contains(material, count)) {
                 players.append(player.getName()).append(", ");

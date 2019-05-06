@@ -16,7 +16,6 @@
 
 package com.lishid.openinv.internal;
 
-import java.util.Collection;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
@@ -34,29 +33,6 @@ public interface IPlayerDataManager {
      * @return the Player loaded
      */
     @Nullable Player loadPlayer(@NotNull OfflinePlayer offline);
-
-    /**
-     * Gets a unique identifying string for an OfflinePlayer.
-     *
-     * @param offline the OfflinePlayer
-     * @return the unique identifier
-     */
-    @NotNull String getPlayerDataID(@NotNull OfflinePlayer offline);
-
-    /**
-     * Gets an OfflinePlayer by the given unique identifier.
-     *
-     * @param identifier the unique identifier
-     * @return the OfflinePlayer, or null if no exact match was found
-     */
-    @Nullable OfflinePlayer getPlayerByID(@NotNull String identifier);
-
-    /**
-     * Gets a Collection of all Players currently online.
-     *
-     * @return the Collection of Players
-     */
-    @NotNull Collection<? extends Player> getOnlinePlayers();
 
     /**
      * Opens an ISpecialInventory for a Player.

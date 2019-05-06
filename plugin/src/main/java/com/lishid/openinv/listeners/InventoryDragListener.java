@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2018 lishid. All rights reserved.
+ * Copyright (C) 2011-2019 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 
 package com.lishid.openinv.listeners;
 
-import com.lishid.openinv.IOpenInv;
+import com.lishid.openinv.util.InventoryAccess;
 import com.lishid.openinv.util.Permissions;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.EventHandler;
@@ -32,20 +32,12 @@ import org.bukkit.inventory.Inventory;
  */
 public class InventoryDragListener implements Listener {
 
-    private final IOpenInv plugin;
-
-    public InventoryDragListener(IOpenInv plugin) {
-        this.plugin = plugin;
-    }
-
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onInventoryDrag(InventoryDragEvent event) {
         HumanEntity entity = event.getWhoClicked();
         Inventory inventory = event.getInventory();
-        if (plugin.getInventoryAccess().isSpecialPlayerInventory(inventory)
-                && !Permissions.EDITINV.hasPermission(entity)
-                || plugin.getInventoryAccess().isSpecialEnderChest(inventory)
-                        && !Permissions.EDITENDER.hasPermission(entity)) {
+        if (InventoryAccess.isPlayerInventory(inventory) && !Permissions.EDITINV.hasPermission(entity)
+                || InventoryAccess.isEnderChest(inventory) && !Permissions.EDITENDER.hasPermission(entity)) {
             event.setCancelled(true);
         }
     }

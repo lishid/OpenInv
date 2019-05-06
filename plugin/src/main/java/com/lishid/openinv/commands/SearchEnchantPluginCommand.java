@@ -67,7 +67,7 @@ public class SearchEnchantPluginCommand implements CommandExecutor {
         }
 
         StringBuilder players = new StringBuilder();
-        for (Player player : plugin.getOnlinePlayers()) {
+        for (Player player : plugin.getServer().getOnlinePlayers()) {
             boolean flagInventory = containsEnchantment(player.getInventory(), enchant, level);
             boolean flagEnder = containsEnchantment(player.getEnderChest(), enchant, level);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2018 lishid. All rights reserved.
+ * Copyright (C) 2011-2019 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,11 @@ import com.lishid.openinv.internal.IInventoryAccess;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialInventory;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
+import com.lishid.openinv.util.InventoryAccess;
+import com.lishid.openinv.util.StringMetric;
+import java.util.UUID;
+import java.util.logging.Logger;
+import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
@@ -59,7 +64,10 @@ public interface IOpenInv {
      * @return the IInventoryAccess
      * @throws IllegalStateException if the server version is unsupported
      */
-    @NotNull IInventoryAccess getInventoryAccess();
+    @Deprecated
+    default @NotNull IInventoryAccess getInventoryAccess() {
+        return new InventoryAccess();
+    }
 
     /**
      * Gets the provided player's AnyChest setting.
@@ -78,7 +86,9 @@ public interface IOpenInv {
      * @return the identifier
      * @throws IllegalStateException if the server version is unsupported
      */
-    @NotNull String getPlayerID(@NotNull OfflinePlayer offline);
+    default @NotNull String getPlayerID(@NotNull OfflinePlayer offline) {
+        return offline.getUniqueId().toString();
+    }
 
     /**
      * Gets a player's SilentChest setting.
@@ -137,7 +147,76 @@ public interface IOpenInv {
      * @param name the name of the Player
      * @return the OfflinePlayer with the closest matching name or null if no players have ever logged in
      */
-    @Nullable OfflinePlayer matchPlayer(@NotNull String name);
+    default @Nullable OfflinePlayer matchPlayer(@NotNull String name) {
+
+        // Warn if called on the main thread - if we resort to searching offline players, this may take several seconds.
+        if (Bukkit.getServer().isPrimaryThread()) {
+            this.getLogger().warning("Call to OpenInv#matchPlayer made on the main thread!");
+            this.getLogger().warning("This can cause the server to hang, potentially severely.");
+            this.getLogger().warning("Trace:");
+            for (StackTraceElement element : new Throwable().fillInStackTrace().getStackTrace()) {
+                this.getLogger().warning(element.toString());
+            }
+        }
+
+        OfflinePlayer player;
+
+        try {
+            UUID uuid = UUID.fromString(name);
+            player = Bukkit.getOfflinePlayer(uuid);
+            // Ensure player is a real player, otherwise return null
+            if (player.hasPlayedBefore() || player.isOnline()) {
+                return player;
+            }
+        } catch (IllegalArgumentException ignored) {
+            // Not a UUID
+        }
+
+        // Ensure name is valid if server is in online mode to avoid unnecessary searching
+        if (Bukkit.getServer().getOnlineMode() && !name.matches("[a-zA-Z0-9_]{3,16}")) {
+            return null;
+        }
+
+        player = Bukkit.getServer().getPlayerExact(name);
+
+        if (player != null) {
+            return player;
+        }
+
+        player = Bukkit.getServer().getOfflinePlayer(name);
+
+        if (player.hasPlayedBefore()) {
+            return player;
+        }
+
+        player = Bukkit.getServer().getPlayer(name);
+
+        if (player != null) {
+            return player;
+        }
+
+        float bestMatch = 0;
+        for (OfflinePlayer offline : Bukkit.getServer().getOfflinePlayers()) {
+            if (offline.getName() == null) {
+                // Loaded by UUID only, name has never been looked up.
+                continue;
+            }
+
+            float currentMatch = StringMetric.compareJaroWinkler(name, offline.getName());
+
+            if (currentMatch == 1.0F) {
+                return offline;
+            }
+
+            if (currentMatch > bestMatch) {
+                bestMatch = currentMatch;
+                player = offline;
+            }
+        }
+
+        // Only null if no players have played ever, otherwise even the worst match will do.
+        return player;
+    }
 
     /**
      * Open an ISpecialInventory for a Player.
@@ -224,5 +303,7 @@ public interface IOpenInv {
      * @throws IllegalStateException if the server version is unsupported
      */
     void unload(@NotNull OfflinePlayer offline);
+
+    Logger getLogger();
 
 }

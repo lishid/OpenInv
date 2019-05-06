@@ -22,11 +22,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 
-/**
- *
- *
- * @author Jikoo
- */
 public class InventoryCloseListener implements Listener {
 
     private final IOpenInv plugin;

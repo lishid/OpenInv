@@ -17,41 +17,20 @@
 package com.lishid.openinv.util;
 
 import com.lishid.openinv.internal.IAnySilentContainer;
-import com.lishid.openinv.internal.IInventoryAccess;
 import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 public class InternalAccessor {
 
-    public static <T> T grabFieldOfTypeFromObject(final Class<T> type, final Object object) {
-        // Use reflection to find the IInventory
-        Class<?> clazz = object.getClass();
-        T result = null;
-        for (Field f : clazz.getDeclaredFields()) {
-            f.setAccessible(true);
-            if (type.isAssignableFrom(f.getDeclaringClass())) {
-                try {
-                    result = type.cast(f.get(object));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return result;
-    }
-
     private final Plugin plugin;
     private final String version;
     private boolean supported = false;
     private IPlayerDataManager playerDataManager;
-    private IInventoryAccess inventoryAccess;
-
     private IAnySilentContainer anySilentContainer;
 
     public InternalAccessor(final Plugin plugin) {
@@ -65,9 +44,8 @@ public class InternalAccessor {
             Class.forName("com.lishid.openinv.internal." + this.version + ".SpecialPlayerInventory");
             Class.forName("com.lishid.openinv.internal." + this.version + ".SpecialEnderChest");
             this.playerDataManager = this.createObject(IPlayerDataManager.class, "PlayerDataManager");
-            this.inventoryAccess = this.createObject(IInventoryAccess.class, "InventoryAccess");
             this.anySilentContainer = this.createObject(IAnySilentContainer.class, "AnySilentContainer");
-            this.supported = true;
+            this.supported = InventoryAccess.isUseable();
         } catch (Exception ignored) {}
     }
 
@@ -126,19 +104,6 @@ public class InternalAccessor {
             throw new IllegalStateException(String.format("Unsupported server version %s!", this.version));
         }
         return this.anySilentContainer;
-    }
-
-    /**
-     * Creates an instance of the IInventoryAccess implementation for the current server version.
-     *
-     * @return the IInventoryAccess
-     * @throws IllegalStateException if server version is unsupported
-     */
-    public IInventoryAccess getInventoryAccess() {
-        if (!this.supported) {
-            throw new IllegalStateException(String.format("Unsupported server version %s!", this.version));
-        }
-        return this.inventoryAccess;
     }
 
     /**

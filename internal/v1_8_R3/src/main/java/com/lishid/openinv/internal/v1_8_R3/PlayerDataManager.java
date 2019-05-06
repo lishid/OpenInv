@@ -19,8 +19,6 @@ package com.lishid.openinv.internal.v1_8_R3;
 import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialInventory;
 import com.mojang.authlib.GameProfile;
-import java.util.Collection;
-import java.util.UUID;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
 import net.minecraft.server.v1_8_R3.PlayerInteractManager;
@@ -56,32 +54,6 @@ public class PlayerDataManager implements IPlayerDataManager {
         }
         // Return the entity
         return target;
-    }
-
-    @Override
-    public @NotNull String getPlayerDataID(@NotNull OfflinePlayer offline) {
-        return offline.getUniqueId().toString();
-    }
-
-    @Override
-    public OfflinePlayer getPlayerByID(@NotNull String identifier) {
-        try {
-            UUID uuid = UUID.fromString(identifier);
-            OfflinePlayer player = Bukkit.getOfflinePlayer(uuid);
-            // Ensure player is a real player, otherwise return null
-            if (player == null || !player.hasPlayedBefore() && !player.isOnline()) {
-                return null;
-            }
-            return player;
-        } catch (IllegalArgumentException e) {
-            // Not a UUID
-            return null;
-        }
-    }
-
-    @Override
-    public @NotNull Collection<? extends Player> getOnlinePlayers() {
-        return Bukkit.getOnlinePlayers();
     }
 
     public static EntityPlayer getHandle(Player player) {

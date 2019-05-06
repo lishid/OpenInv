@@ -61,22 +61,22 @@ public class PlayerListener implements Listener {
         }
 
         Player player = event.getPlayer();
-        boolean anychest = Permissions.ANYCHEST.hasPermission(player) && plugin.getPlayerAnyChestStatus(player);
-        boolean needsAnyChest = plugin.getAnySilentContainer().isAnyContainerNeeded(player, event.getClickedBlock());
+        boolean any = Permissions.ANYCHEST.hasPermission(player) && plugin.getPlayerAnyChestStatus(player);
+        boolean needsAny = plugin.getAnySilentContainer().isAnyContainerNeeded(player, event.getClickedBlock());
 
-        if (!anychest && needsAnyChest) {
+        if (!any && needsAny) {
             return;
         }
 
-        boolean silentchest = Permissions.SILENT.hasPermission(player) && plugin.getPlayerSilentChestStatus(player);
+        boolean silent = Permissions.SILENT.hasPermission(player) && plugin.getPlayerSilentChestStatus(player);
 
-        // If anychest or silentchest is active
-        if ((anychest || silentchest) && plugin.getAnySilentContainer().activateContainer(player, silentchest, event.getClickedBlock())) {
-            if (silentchest && plugin.notifySilentChest() && needsAnyChest && plugin.notifyAnyChest()) {
+        // If anycontainer or silentcontainer is active
+        if ((any || silent) && plugin.getAnySilentContainer().activateContainer(player, silent, event.getClickedBlock())) {
+            if (silent && plugin.notifySilentChest() && needsAny && plugin.notifyAnyChest()) {
                 player.sendMessage("You are opening a blocked container silently.");
-            } else if (silentchest && plugin.notifySilentChest()) {
+            } else if (silent && plugin.notifySilentChest()) {
                 player.sendMessage("You are opening a container silently.");
-            } else if (needsAnyChest && plugin.notifyAnyChest()) {
+            } else if (needsAny && plugin.notifyAnyChest()) {
                 player.sendMessage("You are opening a blocked container.");
             }
             event.setCancelled(true);

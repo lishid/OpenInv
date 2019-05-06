@@ -29,11 +29,14 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>bukkit</artifactId>
-      <version>1.4.5-R1.0</version>
-      <scope>system</scope>
-      <systemPath>${project.basedir}/../lib/bukkit-1.4.5-R1.0.jar</systemPath>
+      <groupId>org.jetbrains</groupId>
+      <artifactId>annotations</artifactId>
+      <version>17.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.spigotmc</groupId>
+      <artifactId>spigot-api</artifactId>
+      <version>1.8.8-R0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 

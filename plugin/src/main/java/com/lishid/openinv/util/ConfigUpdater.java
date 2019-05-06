@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -78,6 +77,7 @@ public class ConfigUpdater {
             public void run() {
                 plugin.getConfig().set("config-version", 3);
                 plugin.getConfig().set("items.open-inv", null);
+                plugin.getConfig().set("ItemOpenInv", null);
                 plugin.getConfig().set("toggles.items.open-inv", null);
                 plugin.getConfig().set("settings.disable-saving",
                         plugin.getConfig().getBoolean("DisableSaving", false));
@@ -91,22 +91,18 @@ public class ConfigUpdater {
             @Override
             public void run() {
                 // Get the old config settings
-                int itemOpenInvItemId = plugin.getConfig().getInt("ItemOpenInvItemID", 280);
                 boolean notifySilentChest = plugin.getConfig().getBoolean("NotifySilentChest", true);
                 boolean notifyAnyChest = plugin.getConfig().getBoolean("NotifyAnyChest", true);
                 plugin.getConfig().set("ItemOpenInvItemID", null);
                 plugin.getConfig().set("NotifySilentChest", null);
                 plugin.getConfig().set("NotifyAnyChest", null);
                 plugin.getConfig().set("config-version", 2);
-                plugin.getConfig().set("items.open-inv",
-                        getMaterialById(itemOpenInvItemId).toString());
                 plugin.getConfig().set("notify.any-chest", notifyAnyChest);
                 plugin.getConfig().set("notify.silent-chest", notifySilentChest);
             }
         }.runTask(plugin);
 
         updateToggles("AnyChest", "toggles.any-chest");
-        updateToggles("ItemOpenInv", "toggles.items.open-inv");
         updateToggles("SilentChest", "toggles.silent-chest");
     }
 
@@ -124,7 +120,7 @@ public class ConfigUpdater {
             return;
         }
 
-        final Map<String, Boolean> toggles = new HashMap<String, Boolean>();
+        final Map<String, Boolean> toggles = new HashMap<>();
 
         for (String playerName : keys) {
             OfflinePlayer player = plugin.matchPlayer(playerName);
@@ -154,13 +150,4 @@ public class ConfigUpdater {
         }.runTask(plugin);
     }
 
-    private Material getMaterialById(int id) {
-        Material material = Material.getMaterial(id);
-
-        if (material == null) {
-            material = Material.STICK;
-        }
-
-        return material;
-    }
 }

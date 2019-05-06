@@ -20,6 +20,7 @@ import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+@Deprecated
 public interface IInventoryAccess {
 
     /**
@@ -29,6 +30,7 @@ public interface IInventoryAccess {
      * @param inventory the Inventory
      * @return the ISpecialEnderChest or null
      */
+    @Deprecated
     @Nullable ISpecialEnderChest getSpecialEnderChest(@NotNull Inventory inventory);
 
     /**
@@ -38,6 +40,7 @@ public interface IInventoryAccess {
      * @param inventory the Inventory
      * @return the ISpecialPlayerInventory or null
      */
+    @Deprecated
     @Nullable ISpecialPlayerInventory getSpecialPlayerInventory(@NotNull Inventory inventory);
 
     /**
@@ -46,6 +49,7 @@ public interface IInventoryAccess {
      * @param inventory the Inventory
      * @return true if the Inventory is backed by an ISpecialEnderChest
      */
+    @Deprecated
     boolean isSpecialEnderChest(@NotNull Inventory inventory);
 
     /**
@@ -54,6 +58,7 @@ public interface IInventoryAccess {
      * @param inventory the Inventory
      * @return true if the Inventory is backed by an ISpecialPlayerInventory
      */
+    @Deprecated
     boolean isSpecialPlayerInventory(@NotNull Inventory inventory);
 
 }

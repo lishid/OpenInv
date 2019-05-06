@@ -29,11 +29,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.bukkit</groupId>
-      <artifactId>bukkit</artifactId>
-      <version>1.8.8-R0.1-SNAPSHOT</version>
-    </dependency>
-    <dependency>
       <groupId>com.lishid</groupId>
       <artifactId>openinvcommon</artifactId>
       <version>4.0.1-SNAPSHOT</version>

@@ -24,7 +24,6 @@ import com.lishid.openinv.commands.SearchEnchantPluginCommand;
 import com.lishid.openinv.commands.SearchInvPluginCommand;
 import com.lishid.openinv.commands.SilentChestPluginCommand;
 import com.lishid.openinv.internal.IAnySilentContainer;
-import com.lishid.openinv.internal.IInventoryAccess;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialInventory;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
@@ -38,15 +37,10 @@ import com.lishid.openinv.util.ConfigUpdater;
 import com.lishid.openinv.util.Function;
 import com.lishid.openinv.util.InternalAccessor;
 import com.lishid.openinv.util.Permissions;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.bukkit.Bukkit;
@@ -72,50 +66,52 @@ import org.jetbrains.annotations.Nullable;
  */
 public class OpenInv extends JavaPlugin implements IOpenInv {
 
-    private final Map<String, ISpecialPlayerInventory> inventories = new HashMap<String, ISpecialPlayerInventory>();
-    private final Map<String, ISpecialEnderChest> enderChests = new HashMap<String, ISpecialEnderChest>();
+    private final Map<String, ISpecialPlayerInventory> inventories = new HashMap<>();
+    private final Map<String, ISpecialEnderChest> enderChests = new HashMap<>();
     private final Multimap<String, Class<? extends Plugin>> pluginUsage = HashMultimap.create();
 
-    private final Cache<String, Player> playerCache = new Cache<String, Player>(300000L,
+    private final Cache<String, Player> playerCache = new Cache<>(300000L,
             new Function<Player>() {
                 @Override
                 public boolean run(final Player value) {
-                    String key = OpenInv.this.accessor.getPlayerDataManager().getPlayerDataID(value);
+
+                    String key = OpenInv.this.getPlayerID(value);
                     return OpenInv.this.inventories.containsKey(key)
                             && OpenInv.this.inventories.get(key).isInUse()
                             || OpenInv.this.enderChests.containsKey(key)
-                                    && OpenInv.this.enderChests.get(key).isInUse()
+                            && OpenInv.this.enderChests.get(key).isInUse()
                             || OpenInv.this.pluginUsage.containsKey(key);
                 }
             }, new Function<Player>() {
-                @Override
-                public boolean run(final Player value) {
-                    String key = OpenInv.this.accessor.getPlayerDataManager().getPlayerDataID(value);
+        @Override
+        public boolean run(final Player value) {
 
-                    // Check if inventory is stored, and if it is, remove it and eject all viewers
-                    if (OpenInv.this.inventories.containsKey(key)) {
-                        Inventory inv = OpenInv.this.inventories.remove(key).getBukkitInventory();
-                        List<HumanEntity> viewers = inv.getViewers();
-                        for (HumanEntity entity : viewers.toArray(new HumanEntity[0])) {
-                            entity.closeInventory();
-                        }
-                    }
+            String key = OpenInv.this.getPlayerID(value);
 
-                    // Check if ender chest is stored, and if it is, remove it and eject all viewers
-                    if (OpenInv.this.enderChests.containsKey(key)) {
-                        Inventory inv = OpenInv.this.enderChests.remove(key).getBukkitInventory();
-                        List<HumanEntity> viewers = inv.getViewers();
-                        for (HumanEntity entity : viewers.toArray(new HumanEntity[0])) {
-                            entity.closeInventory();
-                        }
-                    }
-
-                    if (!OpenInv.this.disableSaving() && !value.isOnline()) {
-                        value.saveData();
-                    }
-                    return true;
+            // Check if inventory is stored, and if it is, remove it and eject all viewers
+            if (OpenInv.this.inventories.containsKey(key)) {
+                Inventory inv = OpenInv.this.inventories.remove(key).getBukkitInventory();
+                List<HumanEntity> viewers = inv.getViewers();
+                for (HumanEntity entity : viewers.toArray(new HumanEntity[0])) {
+                    entity.closeInventory();
                 }
-            });
+            }
+
+            // Check if ender chest is stored, and if it is, remove it and eject all viewers
+            if (OpenInv.this.enderChests.containsKey(key)) {
+                Inventory inv = OpenInv.this.enderChests.remove(key).getBukkitInventory();
+                List<HumanEntity> viewers = inv.getViewers();
+                for (HumanEntity entity : viewers.toArray(new HumanEntity[0])) {
+                    entity.closeInventory();
+                }
+            }
+
+            if (!OpenInv.this.disableSaving() && !value.isOnline()) {
+                value.saveData();
+            }
+            return true;
+        }
+    });
 
     private InternalAccessor accessor;
 
@@ -126,7 +122,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
      */
     public void changeWorld(final Player player) {
 
-        String key = this.accessor.getPlayerDataManager().getPlayerDataID(player);
+        String key = this.getPlayerID(player);
 
         // Check if the player is cached. If not, neither of their inventories is open.
         if (!this.playerCache.containsKey(key)) {
@@ -169,12 +165,6 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     @Override
     public IAnySilentContainer getAnySilentContainer() {
         return this.accessor.getAnySilentContainer();
-    }
-
-    @NotNull
-    @Override
-    public IInventoryAccess getInventoryAccess() {
-        return this.accessor.getInventoryAccess();
     }
 
     private int getLevenshteinDistance(final String string1, final String string2) {
@@ -221,36 +211,6 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         return prevDistances[len1];
     }
 
-    @SuppressWarnings("unchecked")
-    public Collection<? extends Player> getOnlinePlayers() {
-
-        if (this.accessor.isSupported()) {
-            return this.accessor.getPlayerDataManager().getOnlinePlayers();
-        }
-
-        Method getOnlinePlayers;
-        try {
-            getOnlinePlayers = Bukkit.class.getDeclaredMethod("getOnlinePlayers");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Collections.emptyList();
-        }
-
-        Object onlinePlayers;
-        try {
-            onlinePlayers = getOnlinePlayers.invoke(null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Collections.emptyList();
-        }
-
-        if (onlinePlayers instanceof List) {
-            return (Collection<Player>) onlinePlayers;
-        }
-
-        return Arrays.asList((Player[]) onlinePlayers);
-    }
-
     @Override
     public boolean getPlayerAnyChestStatus(@NotNull final OfflinePlayer player) {
         boolean defaultState = false;
@@ -262,13 +222,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             }
         }
 
-        return this.getConfig().getBoolean("toggles.any-chest." + this.accessor.getPlayerDataManager().getPlayerDataID(player), defaultState);
-    }
-
-    @NotNull
-    @Override
-    public String getPlayerID(@NotNull final OfflinePlayer offline) {
-        return this.accessor.getPlayerDataManager().getPlayerDataID(offline);
+        return this.getConfig().getBoolean("toggles.any-chest." + this.getPlayerID(player), defaultState);
     }
 
     @Override
@@ -282,14 +236,14 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             }
         }
 
-        return this.getConfig().getBoolean("toggles.silent-chest." + this.accessor.getPlayerDataManager().getPlayerDataID(offline), defaultState);
+        return this.getConfig().getBoolean("toggles.silent-chest." + this.getPlayerID(offline), defaultState);
     }
 
     @NotNull
     @Override
     public ISpecialEnderChest getSpecialEnderChest(@NotNull final Player player, final boolean online)
             throws InstantiationException {
-        String id = this.accessor.getPlayerDataManager().getPlayerDataID(player);
+        String id = this.getPlayerID(player);
         if (this.enderChests.containsKey(id)) {
             return this.enderChests.get(id);
         }
@@ -303,7 +257,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     @Override
     public ISpecialPlayerInventory getSpecialInventory(@NotNull final Player player, final boolean online)
             throws InstantiationException {
-        String id = this.accessor.getPlayerDataManager().getPlayerDataID(player);
+        String id = this.getPlayerID(player);
         if (this.inventories.containsKey(id)) {
             return this.inventories.get(id);
         }
@@ -322,7 +276,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     @Override
     public Player loadPlayer(@NotNull final OfflinePlayer offline) {
 
-        String key = this.accessor.getPlayerDataManager().getPlayerDataID(offline);
+        String key = this.getPlayerID(offline);
         if (this.playerCache.containsKey(key)) {
             return this.playerCache.get(key);
         }
@@ -345,12 +299,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         }
 
         Future<Player> future = Bukkit.getScheduler().callSyncMethod(this,
-                new Callable<Player>() {
-            @Override
-            public Player call() {
-                return OpenInv.this.accessor.getPlayerDataManager().loadPlayer(offline);
-            }
-        });
+                () -> OpenInv.this.accessor.getPlayerDataManager().loadPlayer(offline));
 
         int ticks = 0;
         while (!future.isDone() && !future.isCancelled() && ticks < 10) {
@@ -369,10 +318,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
         try {
             loaded = future.get();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return null;
-        } catch (ExecutionException e) {
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             return null;
         }
@@ -382,83 +328,6 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         }
 
         return loaded;
-    }
-
-    @Nullable
-    @Override
-    public OfflinePlayer matchPlayer(@NotNull final String name) {
-
-        // Warn if called on the main thread - if we resort to searching offline players, this may take several seconds.
-        if (this.getServer().isPrimaryThread()) {
-            this.getLogger().warning("Call to OpenInv#matchPlayer made on the main thread!");
-            this.getLogger().warning("This can cause the server to hang, potentially severely.");
-            this.getLogger().warning("Trace:");
-            for (StackTraceElement element : new Throwable().fillInStackTrace().getStackTrace()) {
-                this.getLogger().warning(element.toString());
-            }
-        }
-
-        OfflinePlayer player;
-
-        if (this.isSupportedVersion()) {
-            // Attempt exact offline match first - adds UUID support for later versions
-            player = this.accessor.getPlayerDataManager().getPlayerByID(name);
-
-            if (player != null) {
-                return player;
-            }
-        }
-
-        // Ensure name is valid if server is in online mode to avoid unnecessary searching
-        if (this.getServer().getOnlineMode() && !name.matches("[a-zA-Z0-9_]{3,16}")) {
-            return null;
-        }
-
-        player = this.getServer().getPlayerExact(name);
-
-        if (player != null) {
-            return player;
-        }
-
-        player = this.getServer().getOfflinePlayer(name);
-
-        /*
-         * Compatibility: Pre-UUID, getOfflinePlayer always returns an OfflinePlayer. Post-UUID,
-         * getOfflinePlayer will return null if no matching player is found. To preserve
-         * compatibility, only return the player if they have played before. Ignoring current online
-         * status is fine, they'd have been found by getPlayerExact otherwise.
-         */
-        if (player != null && player.hasPlayedBefore()) {
-            return player;
-        }
-
-        player = this.getServer().getPlayer(name);
-
-        if (player != null) {
-            return player;
-        }
-
-        int bestMatch = Integer.MAX_VALUE;
-        for (OfflinePlayer offline : this.getServer().getOfflinePlayers()) {
-            if (offline.getName() == null) {
-                // Loaded by UUID only, name has never been looked up.
-                continue;
-            }
-
-            int currentMatch = this.getLevenshteinDistance(name, offline.getName());
-
-            if (currentMatch == 0) {
-                return offline;
-            }
-
-            if (currentMatch < bestMatch) {
-                bestMatch = currentMatch;
-                player = offline;
-            }
-        }
-
-        // Only null if no players have played ever, otherwise even the worst match will do.
-        return player;
     }
 
     @Override
@@ -507,10 +376,10 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             // Register listeners
             pm.registerEvents(new PlayerListener(this), this);
             pm.registerEvents(new PluginListener(this), this);
-            pm.registerEvents(new InventoryClickListener(this), this);
+            pm.registerEvents(new InventoryClickListener(), this);
             pm.registerEvents(new InventoryCloseListener(this), this);
             // Bukkit will handle missing events for us, attempt to register InventoryDragEvent without a version check
-            pm.registerEvents(new InventoryDragListener(this), this);
+            pm.registerEvents(new InventoryDragListener(), this);
 
             // Register commands to their executors
             OpenInvPluginCommand openInv = new OpenInvPluginCommand(this);
@@ -557,7 +426,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
     @Override
     public void releasePlayer(@NotNull final Player player, @NotNull final Plugin plugin) {
-        String key = this.accessor.getPlayerDataManager().getPlayerDataID(player);
+        String key = this.getPlayerID(player);
 
         if (!this.pluginUsage.containsEntry(key, plugin.getClass())) {
             return;
@@ -568,7 +437,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
     @Override
     public void retainPlayer(@NotNull final Player player, @NotNull final Plugin plugin) {
-        String key = this.accessor.getPlayerDataManager().getPlayerDataID(player);
+        String key = this.getPlayerID(player);
 
         if (this.pluginUsage.containsEntry(key, plugin.getClass())) {
             return;
@@ -579,7 +448,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
     @Override
     public void setPlayerAnyChestStatus(@NotNull final OfflinePlayer offline, final boolean status) {
-        this.getConfig().set("toggles.any-chest." + this.accessor.getPlayerDataManager().getPlayerDataID(offline), status);
+        this.getConfig().set("toggles.any-chest." + this.getPlayerID(offline), status);
         this.saveConfig();
     }
 
@@ -591,7 +460,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
      */
     public void setPlayerOffline(final Player player) {
 
-        String key = this.accessor.getPlayerDataManager().getPlayerDataID(player);
+        String key = this.getPlayerID(player);
 
         // Check if the player is cached. If not, neither of their inventories is open.
         if (!this.playerCache.containsKey(key)) {
@@ -615,7 +484,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
      */
     public void setPlayerOnline(final Player player) {
 
-        String key = this.accessor.getPlayerDataManager().getPlayerDataID(player);
+        String key = this.getPlayerID(player);
 
         // Check if the player is cached. If not, neither of their inventories is open.
         if (!this.playerCache.containsKey(key)) {
@@ -627,7 +496,6 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         if (this.inventories.containsKey(key)) {
             this.inventories.get(key).setPlayerOnline(player);
             new BukkitRunnable() {
-                @SuppressWarnings("deprecation") // Unlikely to ever be a viable alternative, Spigot un-deprecated.
                 @Override
                 public void run() {
                     if (player.isOnline()) {
@@ -644,7 +512,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
     @Override
     public void setPlayerSilentChestStatus(@NotNull final OfflinePlayer offline, final boolean status) {
-        this.getConfig().set("toggles.silent-chest." + this.accessor.getPlayerDataManager().getPlayerDataID(offline), status);
+        this.getConfig().set("toggles.silent-chest." + this.getPlayerID(offline), status);
         this.saveConfig();
     }
 
@@ -685,7 +553,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
     @Override
     public void unload(@NotNull final OfflinePlayer offline) {
-        this.playerCache.invalidate(this.accessor.getPlayerDataManager().getPlayerDataID(offline));
+        this.playerCache.invalidate(this.getPlayerID(offline));
     }
 
 }
