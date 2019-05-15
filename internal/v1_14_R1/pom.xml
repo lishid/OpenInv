@@ -22,7 +22,7 @@
   <parent>
     <groupId>com.lishid</groupId>
     <artifactId>openinvinternal</artifactId>
-    <version>4.0.1-SNAPSHOT</version>
+    <version>4.0.1</version>
   </parent>
 
   <artifactId>openinvadapter1_14_R1</artifactId>
@@ -32,13 +32,13 @@
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot</artifactId>
-      <version>1.14-R0.1-SNAPSHOT</version>
+      <version>1.14.1-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.lishid</groupId>
       <artifactId>openinvcommon</artifactId>
-      <version>4.0.1-SNAPSHOT</version>
+      <version>4.0.1</version>
     </dependency>
   </dependencies>
 
