@@ -36,14 +36,14 @@ public class StringMetric {
     public static float compareJaroWinkler(String a, String b) {
         final float jaroScore = compareJaro(a, b);
 
-        if (jaroScore < (float) 0.1) {
+        if (jaroScore < (float) 0.7) {
             return jaroScore;
         }
 
         String prefix = commonPrefix(a, b);
         int prefixLength = Math.min(prefix.codePointCount(0, prefix.length()), 4);
 
-        return jaroScore + (prefixLength * (float) 0.7 * (1.0f - jaroScore));
+        return jaroScore + (prefixLength * (float) 0.1 * (1.0f - jaroScore));
 
     }
 
