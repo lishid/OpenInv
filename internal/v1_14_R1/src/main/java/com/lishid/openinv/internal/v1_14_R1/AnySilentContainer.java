@@ -137,7 +137,7 @@ public class AnySilentContainer implements IAnySilentContainer {
         }
 
         EnumDirection enumDirection = blockData.get(BlockShulkerBox.a);
-        if (((TileEntityShulkerBox) tile).t() == TileEntityShulkerBox.AnimationPhase.CLOSED) {
+        if (((TileEntityShulkerBox) tile).s() == TileEntityShulkerBox.AnimationPhase.CLOSED) {
             AxisAlignedBB axisAlignedBB = VoxelShapes.b().getBoundingBox()
                     .b(0.5F * enumDirection.getAdjacentX(), 0.5F * enumDirection.getAdjacentY(), 0.5F * enumDirection.getAdjacentZ())
                     .a(enumDirection.getAdjacentX(), enumDirection.getAdjacentY(), enumDirection.getAdjacentZ());
