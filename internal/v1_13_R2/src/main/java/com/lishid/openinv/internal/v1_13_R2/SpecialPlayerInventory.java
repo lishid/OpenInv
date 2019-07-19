@@ -56,7 +56,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     private final CraftInventory inventory = new CraftInventory(this);
     private boolean playerOnline;
     private NonNullList<ItemStack> items, armor, extraSlots;
-    private final List<NonNullList<ItemStack>> f;
+    private List<NonNullList<ItemStack>> f;
 
     public SpecialPlayerInventory(final Player bukkitPlayer, final Boolean online) {
         super(PlayerDataManager.getHandle(bukkitPlayer));
@@ -73,10 +73,14 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             EntityPlayer entityPlayer = PlayerDataManager.getHandle(player);
             entityPlayer.inventory.transaction.addAll(this.transaction);
             this.player = entityPlayer;
-            this.player.inventory.a(this);
+            for (int i = 0; i < getSize(); ++i) {
+                this.player.inventory.setItem(i, getRawItem(i));
+            }
+            this.player.inventory.itemInHandIndex = this.itemInHandIndex;
             this.items = this.player.inventory.items;
             this.armor = this.player.inventory.armor;
             this.extraSlots = this.player.inventory.extraSlots;
+            this.f = ImmutableList.of(this.items, this.armor, this.extraSlots);
             this.playerOnline = true;
         }
     }
@@ -114,6 +118,19 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         }
 
         return list.get(i);
+    }
+
+    private ItemStack getRawItem(int i) {
+        NonNullList<ItemStack> list = null;
+        for (NonNullList<ItemStack> next : this.f) {
+            if (i < next.size()) {
+                list = next;
+                break;
+            }
+            i -= next.size();
+        }
+
+        return list == null ? ItemStack.a : list.get(i);
     }
 
     @Override
