@@ -21,6 +21,7 @@ import java.lang.reflect.Field;
 import javax.annotation.Nullable;
 import net.minecraft.server.v1_14_R1.AxisAlignedBB;
 import net.minecraft.server.v1_14_R1.Block;
+import net.minecraft.server.v1_14_R1.BlockBarrel;
 import net.minecraft.server.v1_14_R1.BlockChest;
 import net.minecraft.server.v1_14_R1.BlockChestTrapped;
 import net.minecraft.server.v1_14_R1.BlockEnderChest;
@@ -78,7 +79,8 @@ public class AnySilentContainer implements IAnySilentContainer {
         }
         BlockState state = bukkitBlock.getState();
         return state instanceof org.bukkit.block.Chest
-                || state instanceof org.bukkit.block.ShulkerBox;
+                || state instanceof org.bukkit.block.ShulkerBox
+                || state instanceof org.bukkit.block.Barrel;
     }
 
     @Override
@@ -258,6 +260,10 @@ public class AnySilentContainer implements IAnySilentContainer {
             bukkitPlayer.incrementStatistic(Statistic.SHULKER_BOX_OPENED);
         }
 
+        if (block instanceof BlockBarrel) {
+            bukkitPlayer.incrementStatistic(Statistic.OPEN_BARREL);
+        }
+
         // AnyChest only - SilentChest not active, container unsupported, or unnecessary.
         if (!silentchest || player.playerInteractManager.getGameMode() == EnumGamemode.SPECTATOR) {
             player.openContainer(tileInventory);
@@ -284,9 +290,10 @@ public class AnySilentContainer implements IAnySilentContainer {
 
         InventoryView view = bukkitPlayer.getOpenInventory();
         switch (view.getType()) {
-        case CHEST:
-        case ENDER_CHEST:
-        case SHULKER_BOX:
+            case CHEST:
+            case ENDER_CHEST:
+            case SHULKER_BOX:
+            case BARREL:
             break;
         default:
             return;
