@@ -57,7 +57,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     private boolean playerOnline;
     private EntityHuman player;
     private NonNullList<ItemStack> items, armor, extraSlots;
-    private final List<NonNullList<ItemStack>> f;
+    private List<NonNullList<ItemStack>> f;
 
     public SpecialPlayerInventory(final Player bukkitPlayer, final Boolean online) {
         super(PlayerDataManager.getHandle(bukkitPlayer));
@@ -83,6 +83,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             this.items = this.player.inventory.items;
             this.armor = this.player.inventory.armor;
             this.extraSlots = this.player.inventory.extraSlots;
+            this.f = ImmutableList.of(this.items, this.armor, this.extraSlots);
             this.playerOnline = true;
         }
     }

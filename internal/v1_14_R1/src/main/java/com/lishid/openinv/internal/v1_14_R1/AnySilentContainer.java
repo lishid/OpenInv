@@ -85,6 +85,10 @@ public class AnySilentContainer implements IAnySilentContainer {
 
     @Override
     public boolean isAnyContainerNeeded(@NotNull final Player p, @NotNull final org.bukkit.block.Block bukkitBlock) {
+        if (bukkitBlock.getType() == Material.BARREL) {
+            return false;
+        }
+
         EntityPlayer player = PlayerDataManager.getHandle(p);
         World world = player.world;
         BlockPosition blockPosition = new BlockPosition(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
