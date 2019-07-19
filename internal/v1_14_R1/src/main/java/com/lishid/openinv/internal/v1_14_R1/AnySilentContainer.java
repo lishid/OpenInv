@@ -31,8 +31,6 @@ import net.minecraft.server.v1_14_R1.BlockShulkerBox;
 import net.minecraft.server.v1_14_R1.ChatMessage;
 import net.minecraft.server.v1_14_R1.Container;
 import net.minecraft.server.v1_14_R1.ContainerChest;
-import net.minecraft.server.v1_14_R1.Entity;
-import net.minecraft.server.v1_14_R1.EntityCat;
 import net.minecraft.server.v1_14_R1.EntityHuman;
 import net.minecraft.server.v1_14_R1.EntityPlayer;
 import net.minecraft.server.v1_14_R1.EnumDirection;
@@ -49,13 +47,21 @@ import net.minecraft.server.v1_14_R1.TileEntityChest;
 import net.minecraft.server.v1_14_R1.TileEntityEnderChest;
 import net.minecraft.server.v1_14_R1.TileEntityShulkerBox;
 import net.minecraft.server.v1_14_R1.TileInventory;
-import net.minecraft.server.v1_14_R1.VoxelShapes;
 import net.minecraft.server.v1_14_R1.World;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
+import org.bukkit.block.Barrel;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.EnderChest;
+import org.bukkit.block.ShulkerBox;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Directional;
+import org.bukkit.block.data.type.Chest;
+import org.bukkit.entity.Cat;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 
 public class AnySilentContainer implements IAnySilentContainer {
@@ -84,92 +90,80 @@ public class AnySilentContainer implements IAnySilentContainer {
     }
 
     @Override
-    public boolean isAnyContainerNeeded(@NotNull final Player p, @NotNull final org.bukkit.block.Block bukkitBlock) {
-        if (bukkitBlock.getType() == Material.BARREL) {
+    public boolean isAnyContainerNeeded(@NotNull final Player p, @NotNull final org.bukkit.block.Block block) {
+        BlockState blockState = block.getState();
+
+        // Barrels do not require AnyContainer.
+        if (blockState instanceof Barrel) {
             return false;
         }
 
-        EntityPlayer player = PlayerDataManager.getHandle(p);
-        World world = player.world;
-        BlockPosition blockPosition = new BlockPosition(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
-        IBlockData blockData = world.getType(blockPosition);
-        Block block = blockData.getBlock();
-
-        if (block instanceof BlockShulkerBox) {
-            return this.isBlockedShulkerBox(world, blockPosition, blockData);
+        // Enderchests require a non-occluding block on top to open.
+        if (blockState instanceof EnderChest) {
+            return block.getRelative(0, 1, 0).getType().isOccluding();
         }
 
-        if (block instanceof BlockEnderChest) {
-            // Ender chests are not blocked by ocelots.
-            return world.getType(blockPosition.up()).isOccluding(world, blockPosition);
+        // Shulker boxes require 1/2 a block clear in the direction they open.
+        if (blockState instanceof ShulkerBox) {
+            BoundingBox boundingBox = block.getBoundingBox();
+            if (boundingBox.getVolume() > 1) {
+                // Shulker box is already open.
+                return false;
+            }
+
+            BlockData blockData = block.getBlockData();
+            if (!(blockData instanceof Directional)) {
+                // Shouldn't be possible. Just in case, demand AnyChest.
+                return true;
+            }
+
+            Directional directional = (Directional) blockData;
+            BlockFace face = directional.getFacing();
+            boundingBox.shift(face.getDirection());
+            // Return whether or not bounding boxes overlap.
+            return block.getRelative(face, 1).getBoundingBox().overlaps(boundingBox);
         }
 
-        // Check if chest is blocked or has an ocelot on top
-        if (this.isBlockedChest(world, blockPosition)) {
+        if (!(blockState instanceof org.bukkit.block.Chest)) {
+            return false;
+        }
+
+        if (isBlockedChest(block)) {
             return true;
         }
 
-        // Check for matching adjacent chests that are blocked or have an ocelot on top
-        BlockPropertyChestType chestType = blockData.get(BlockChest.b);
-
-        if (chestType == BlockPropertyChestType.SINGLE) {
+        BlockData blockData = block.getBlockData();
+        if (!(blockData instanceof Chest) || ((Chest) blockData).getType() == Chest.Type.SINGLE) {
             return false;
         }
 
-        BlockPosition adjacentBlockPosition = blockPosition.shift(BlockChest.j(blockData));
-        IBlockData adjacentBlockData = world.getType(adjacentBlockPosition);
+        Chest chest = (Chest) blockData;
+        int ordinal = (chest.getFacing().ordinal() + 4 + (chest.getType() == Chest.Type.RIGHT ? -1 : 1)) % 4;
+        BlockFace relativeFace = BlockFace.values()[ordinal];
+        org.bukkit.block.Block relative = block.getRelative(relativeFace);
 
-        if (adjacentBlockData.getBlock() == block) {
-
-            BlockPropertyChestType adjacentChestType = adjacentBlockData.get(BlockChest.b);
-
-            if (adjacentChestType != BlockPropertyChestType.SINGLE && chestType != adjacentChestType
-                    && adjacentBlockData.get(BlockChest.FACING) == blockData.get(BlockChest.FACING)) {
-
-                return this.isBlockedChest(world, adjacentBlockPosition);
-            }
-        }
-
-        return false;
-    }
-
-    private boolean isBlockedShulkerBox(final World world, final BlockPosition blockPosition,
-                                        final IBlockData blockData) {
-        // For reference, look at net.minecraft.server.BlockShulkerBox
-        TileEntity tile = world.getTileEntity(blockPosition);
-
-        if (!(tile instanceof TileEntityShulkerBox)) {
+        if (relative.getType() != block.getType()) {
             return false;
         }
 
-        EnumDirection enumDirection = blockData.get(BlockShulkerBox.a);
-        if (((TileEntityShulkerBox) tile).s() == TileEntityShulkerBox.AnimationPhase.CLOSED) {
-            AxisAlignedBB axisAlignedBB = VoxelShapes.b().getBoundingBox()
-                    .b(0.5F * enumDirection.getAdjacentX(), 0.5F * enumDirection.getAdjacentY(), 0.5F * enumDirection.getAdjacentZ())
-                    .a(enumDirection.getAdjacentX(), enumDirection.getAdjacentY(), enumDirection.getAdjacentZ());
-            return !world.getCubes(null, axisAlignedBB.a(blockPosition.shift(enumDirection)));
+        BlockData relativeData = relative.getBlockData();
+        if (!(relativeData instanceof Chest)) {
+            return false;
+        }
+        
+        Chest relativeChest = (Chest) relativeData;
+        if (relativeChest.getFacing() != chest.getFacing()
+                || relativeChest.getType() != (chest.getType() == Chest.Type.RIGHT ? Chest.Type.LEFT : Chest.Type.RIGHT)) {
+            return false;
         }
 
-        return false;
+        return isBlockedChest(relative);
     }
 
-    private boolean isBlockedChest(final World world, final BlockPosition blockPosition) {
-        // For reference, loot at net.minecraft.server.BlockChest
-        return world.getType(blockPosition.up()).isOccluding(world, blockPosition) || this.hasOcelotOnTop(world, blockPosition);
-    }
-
-    private boolean hasOcelotOnTop(final World world, final BlockPosition blockPosition) {
-        for (Entity entity : world.a(EntityCat.class,
-                new AxisAlignedBB(blockPosition.getX(), blockPosition.getY() + 1,
-                        blockPosition.getZ(), blockPosition.getX() + 1, blockPosition.getY() + 2,
-                        blockPosition.getZ() + 1))) {
-            EntityCat entityCat = (EntityCat) entity;
-            if (entityCat.isSitting()) {
-                return true;
-            }
-        }
-
-        return false;
+    private boolean isBlockedChest(org.bukkit.block.Block block) {
+        org.bukkit.block.Block relative = block.getRelative(0, 1, 0);
+        return relative.getType().isOccluding()
+                || block.getWorld().getNearbyEntities(BoundingBox.of(relative), entity -> entity instanceof Cat).size() > 0;
     }
 
     @Override
