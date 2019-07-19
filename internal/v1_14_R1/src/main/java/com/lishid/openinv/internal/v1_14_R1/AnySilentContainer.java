@@ -18,8 +18,6 @@ package com.lishid.openinv.internal.v1_14_R1;
 
 import com.lishid.openinv.internal.IAnySilentContainer;
 import java.lang.reflect.Field;
-import javax.annotation.Nullable;
-import net.minecraft.server.v1_14_R1.AxisAlignedBB;
 import net.minecraft.server.v1_14_R1.Block;
 import net.minecraft.server.v1_14_R1.BlockBarrel;
 import net.minecraft.server.v1_14_R1.BlockChest;
@@ -33,7 +31,7 @@ import net.minecraft.server.v1_14_R1.Container;
 import net.minecraft.server.v1_14_R1.ContainerChest;
 import net.minecraft.server.v1_14_R1.EntityHuman;
 import net.minecraft.server.v1_14_R1.EntityPlayer;
-import net.minecraft.server.v1_14_R1.EnumDirection;
+import net.minecraft.server.v1_14_R1.EnumChatFormat;
 import net.minecraft.server.v1_14_R1.EnumGamemode;
 import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.IChatBaseComponent;
@@ -45,7 +43,7 @@ import net.minecraft.server.v1_14_R1.PlayerInventory;
 import net.minecraft.server.v1_14_R1.TileEntity;
 import net.minecraft.server.v1_14_R1.TileEntityChest;
 import net.minecraft.server.v1_14_R1.TileEntityEnderChest;
-import net.minecraft.server.v1_14_R1.TileEntityShulkerBox;
+import net.minecraft.server.v1_14_R1.TileEntityLootable;
 import net.minecraft.server.v1_14_R1.TileInventory;
 import net.minecraft.server.v1_14_R1.World;
 import org.bukkit.Material;
@@ -181,7 +179,7 @@ public class AnySilentContainer implements IAnySilentContainer {
 
         final World world = player.world;
         final BlockPosition blockPosition = new BlockPosition(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
-        final Object tile = world.getTileEntity(blockPosition);
+        final TileEntity tile = world.getTileEntity(blockPosition);
 
         if (tile == null) {
             return false;
@@ -226,16 +224,17 @@ public class AnySilentContainer implements IAnySilentContainer {
                         if (adjacentTile instanceof TileEntityChest && tileInventory instanceof  TileEntityChest) {
                             TileEntityChest rightChest = chestType == BlockPropertyChestType.RIGHT ? ((TileEntityChest) tileInventory) : (TileEntityChest) adjacentTile;
                             TileEntityChest leftChest = chestType == BlockPropertyChestType.RIGHT ? (TileEntityChest) adjacentTile : ((TileEntityChest) tileInventory);
+
+                            if (rightChest.lootTable != null || leftChest.lootTable != null) {
+                                player.a(new ChatMessage("Loot not generated! Please disable /silentcontainer.").a(EnumChatFormat.RED), true);
+                                return false;
+                            }
+
                             tileInventory = new ITileInventory() {
-                                @Nullable
                                 public Container createMenu(int containerCounter, PlayerInventory playerInventory, EntityHuman entityHuman) {
-                                    if (leftChest.e(entityHuman) && rightChest.e(entityHuman)) {
-                                        leftChest.d(playerInventory.player);
-                                        rightChest.d(playerInventory.player);
-                                        return ContainerChest.b(containerCounter, playerInventory, new InventoryLargeChest(rightChest, leftChest));
-                                    } else {
-                                        return null;
-                                    }
+                                    leftChest.d(playerInventory.player);
+                                    rightChest.d(playerInventory.player);
+                                    return ContainerChest.b(containerCounter, playerInventory, new InventoryLargeChest(rightChest, leftChest));
                                 }
 
                                 public IChatBaseComponent getScoreboardDisplayName() {
@@ -271,6 +270,14 @@ public class AnySilentContainer implements IAnySilentContainer {
         // SilentChest requires access to setting players' gamemode directly.
         if (this.playerInteractManagerGamemode == null) {
             return false;
+        }
+
+        if (tile instanceof TileEntityLootable) {
+            TileEntityLootable lootable = (TileEntityLootable) tile;
+            if (lootable.lootTable != null) {
+                player.a(new ChatMessage("Loot not generated! Please disable /silentcontainer.").a(EnumChatFormat.RED), true);
+                return false;
+            }
         }
 
         EnumGamemode gamemode = player.playerInteractManager.getGameMode();
