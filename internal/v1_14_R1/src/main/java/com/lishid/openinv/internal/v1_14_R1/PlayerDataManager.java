@@ -132,7 +132,22 @@ public class PlayerDataManager implements IPlayerDataManager {
         }, nmsPlayer, nmsPlayer.nextContainerCounter()) {
             @Override
             public Containers<?> getType() {
-                return inventory instanceof SpecialEnderChest ? Containers.GENERIC_9X3 : Containers.GENERIC_9X5;
+                switch (inventory.getBukkitInventory().getSize()) {
+                    case 9:
+                        return Containers.GENERIC_9X1;
+                    case 18:
+                        return Containers.GENERIC_9X2;
+                    case 27:
+                    default:
+                        return Containers.GENERIC_9X3;
+                    case 36:
+                        return Containers.GENERIC_9X4;
+                    case 41: // PLAYER
+                    case 45:
+                        return Containers.GENERIC_9X5;
+                    case 54:
+                        return Containers.GENERIC_9X6;
+                }
             }
         };
 
