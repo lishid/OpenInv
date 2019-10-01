@@ -18,6 +18,8 @@ package com.lishid.openinv.internal.v1_14_R1;
 
 import com.google.common.collect.ImmutableList;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
+import com.lishid.openinv.util.Pair;
+import com.lishid.openinv.util.SingleFieldList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
@@ -37,7 +39,6 @@ import net.minecraft.server.v1_14_R1.ItemArmor;
 import net.minecraft.server.v1_14_R1.ItemStack;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import net.minecraft.server.v1_14_R1.NBTTagList;
-import net.minecraft.server.v1_14_R1.NonNullList;
 import net.minecraft.server.v1_14_R1.PacketPlayOutSetSlot;
 import net.minecraft.server.v1_14_R1.PlayerInventory;
 import net.minecraft.server.v1_14_R1.ReportedException;
@@ -45,6 +46,7 @@ import net.minecraft.server.v1_14_R1.World;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftHumanEntity;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftInventoryCrafting;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
@@ -56,8 +58,10 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     private final CraftInventory inventory;
     private boolean playerOnline;
     private EntityHuman player;
-    private NonNullList<ItemStack> items, armor, extraSlots;
-    private List<NonNullList<ItemStack>> f;
+    private List<ItemStack> items, armor, extraSlots, crafting;
+    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection") // Backing field is mutable.
+    private final List<ItemStack> cursor = new SingleFieldList<>(this::getCarried, this::setCarried);
+    private List<List<ItemStack>> f;
 
     public SpecialPlayerInventory(final Player bukkitPlayer, final Boolean online) {
         super(PlayerDataManager.getHandle(bukkitPlayer));
@@ -67,7 +71,8 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         this.items = this.player.inventory.items;
         this.armor = this.player.inventory.armor;
         this.extraSlots = this.player.inventory.extraSlots;
-        this.f = ImmutableList.of(this.items, this.armor, this.extraSlots);
+        this.crafting = ((CraftInventoryCrafting) this.player.defaultContainer.getBukkitView().getTopInventory()).getInventory().getContents();
+        this.f = ImmutableList.of(this.items, this.armor, this.extraSlots, this.crafting, this.cursor);
     }
 
     @Override
@@ -79,11 +84,13 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             for (int i = 0; i < getSize(); ++i) {
                 this.player.inventory.setItem(i, getRawItem(i));
             }
+            // Crafting/cursor are not insertable while player is offline and do not need special treatment.
             this.player.inventory.itemInHandIndex = this.itemInHandIndex;
             this.items = this.player.inventory.items;
             this.armor = this.player.inventory.armor;
             this.extraSlots = this.player.inventory.extraSlots;
-            this.f = ImmutableList.of(this.items, this.armor, this.extraSlots);
+            this.crafting = ((CraftInventoryCrafting) this.player.defaultContainer.getBukkitView().getTopInventory()).getInventory().getContents();
+            this.f = ImmutableList.of(this.items, this.armor, this.extraSlots, this.crafting, this.cursor);
             this.playerOnline = true;
         }
     }
@@ -124,8 +131,8 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     private ItemStack getRawItem(int i) {
-        NonNullList<ItemStack> list = null;
-        for (NonNullList<ItemStack> next : this.f) {
+        List<ItemStack> list = null;
+        for (List<ItemStack> next : this.f) {
             if (i < next.size()) {
                 list = next;
                 break;
@@ -171,7 +178,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
 
     @Override
     public int getSize() {
-        return 45;
+        return 54;
     }
 
     @Override
@@ -179,30 +186,35 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         return !this.getViewers().isEmpty();
     }
 
-    @Override
-    public void setItem(int i, final ItemStack itemstack) {
-        List<ItemStack> list = this.items;
-
-        if (i >= list.size()) {
+    private Pair<List<ItemStack>, Integer> getLocalizedIndex(int i) {
+        List<ItemStack> localList = null;
+        for (List<ItemStack> list : this.f) {
+            if (i < list.size()) {
+                localList = list;
+                break;
+            }
             i -= list.size();
-            list = this.armor;
-        } else {
+        }
+
+        if (localList == this.armor) {
+            i = this.getReversedArmorSlotNum(i);
+        } else if (localList == this.items) {
             i = this.getReversedItemSlotNum(i);
         }
 
-        if (i >= list.size()) {
-            i -= list.size();
-            list = this.extraSlots;
-        } else if (list == this.armor) {
-            i = this.getReversedArmorSlotNum(i);
-        }
+        return new Pair<>(localList, i);
+    }
 
-        if (i >= list.size()) {
+    @Override
+    public void setItem(int i, final ItemStack itemstack) {
+        Pair<List<ItemStack>, Integer> localizedIndex = getLocalizedIndex(i);
+        if (localizedIndex.getLeft() == null
+                // TODO: should this be a constant instead of comparing to transient slot containers?
+                || !playerOnline && (localizedIndex.getLeft() == crafting || localizedIndex.getLeft() == cursor)) {
             this.player.drop(itemstack, true);
-            return;
+        } else {
+            localizedIndex.getLeft().set(localizedIndex.getRight(), itemstack);
         }
-
-        list.set(i, itemstack);
     }
 
     @Override
@@ -212,50 +224,25 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
 
     @Override
     public ItemStack splitStack(int i, final int j) {
-        List<ItemStack> list = this.items;
+        Pair<List<ItemStack>, Integer> localizedIndex = getLocalizedIndex(i);
 
-        if (i >= list.size()) {
-            i -= list.size();
-            list = this.armor;
-        } else {
-            i = this.getReversedItemSlotNum(i);
-        }
-
-        if (i >= list.size()) {
-            i -= list.size();
-            list = this.extraSlots;
-        } else if (list == this.armor) {
-            i = this.getReversedArmorSlotNum(i);
-        }
-
-        if (i >= list.size()) {
+        if (localizedIndex.getLeft() == null) {
             return ItemStack.a;
         }
 
-        return list.get(i).isEmpty() ? ItemStack.a : ContainerUtil.a(list, i, j);
+        return localizedIndex.getLeft().get(i).isEmpty() ? ItemStack.a : ContainerUtil.a(localizedIndex.getLeft(), localizedIndex.getRight(), j);
     }
 
     @Override
     public ItemStack splitWithoutUpdate(int i) {
-        List<ItemStack> list = this.items;
+        Pair<List<ItemStack>, Integer> localizedIndex = getLocalizedIndex(i);
 
-        if (i >= list.size()) {
-            i -= list.size();
-            list = this.armor;
-        } else {
-            i = this.getReversedItemSlotNum(i);
-        }
-
-        if (i >= list.size()) {
-            i -= list.size();
-            list = this.extraSlots;
-        } else if (list == this.armor) {
-            i = this.getReversedArmorSlotNum(i);
-        }
-
-        if (i >= list.size()) {
+        if (localizedIndex.getLeft() == null) {
             return ItemStack.a;
         }
+
+        List<ItemStack> list = localizedIndex.getLeft();
+        i = localizedIndex.getRight();
 
         if (!list.get(i).isEmpty()) {
             ItemStack itemstack = list.get(i);
@@ -326,7 +313,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             }
 
             if (!this.a(itemstack, itemstack1)) {
-                remains -= (itemstack1.getMaxStackSize() < this.getMaxStackSize() ? itemstack1.getMaxStackSize() : this.getMaxStackSize()) - itemstack1.getCount();
+                remains -= Math.min(itemstack1.getMaxStackSize(), this.getMaxStackSize()) - itemstack1.getCount();
             }
 
             if (remains <= 0) {

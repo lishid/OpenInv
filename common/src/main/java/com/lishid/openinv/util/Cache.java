@@ -19,11 +19,11 @@ package com.lishid.openinv.util;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A minimal thread-safe time-based cache implementation backed by a HashMap and TreeMultimap.
@@ -45,20 +45,9 @@ public class Cache<K, V> {
      * @param postRemoval Function used to perform any operations required when a key is invalidated
      */
     public Cache(final long retention, final Function<V> inUseCheck, final Function<V> postRemoval) {
-        this.internal = new HashMap<K, V>();
+        this.internal = new HashMap<>();
 
-        this.expiry = TreeMultimap.create(new Comparator<Long>() {
-                    @Override
-                    public int compare(final Long long1, final Long long2) {
-                        return long1.compareTo(long2);
-                    }
-                },
-                new Comparator<K>() {
-                    @Override
-                    public int compare(final K k1, final K k2) {
-                        return k1 == k2 || k1 != null && k1.equals(k2) ? 0 : 1;
-                    }
-                });
+        this.expiry = TreeMultimap.create(Long::compareTo, (k1, k2) -> Objects.equals(k1, k2) ? 0 : 1);
 
         this.retention = retention;
         this.inUseCheck = inUseCheck;
@@ -160,7 +149,7 @@ public class Cache<K, V> {
     private void lazyCheck() {
         long now = System.currentTimeMillis();
         synchronized (this.internal) {
-            List<K> inUse = new ArrayList<K>();
+            List<K> inUse = new ArrayList<>();
             for (Iterator<Map.Entry<Long, K>> iterator = this.expiry.entries().iterator(); iterator
                     .hasNext();) {
                 Map.Entry<Long, K> entry = iterator.next();

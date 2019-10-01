@@ -100,6 +100,7 @@ public class PlayerDataManager implements IPlayerDataManager {
         String title;
         if (inventory instanceof SpecialEnderChest) {
             HumanEntity owner = (HumanEntity) ((SpecialEnderChest) inventory).getBukkitOwner();
+            //noinspection ConstantConditions // Owner name can be null when loaded under certain conditions.
             title = (owner.getName() != null ? owner.getName() : owner.getUniqueId().toString()) + "'s Ender Chest";
         } else if (inventory instanceof SpecialPlayerInventory) {
             EntityHuman owner = ((PlayerInventory) inventory).player;
@@ -142,9 +143,9 @@ public class PlayerDataManager implements IPlayerDataManager {
                         return Containers.GENERIC_9X3;
                     case 36:
                         return Containers.GENERIC_9X4;
-                    case 41: // PLAYER
                     case 45:
                         return Containers.GENERIC_9X5;
+                    case 41: // PLAYER
                     case 54:
                         return Containers.GENERIC_9X6;
                 }
