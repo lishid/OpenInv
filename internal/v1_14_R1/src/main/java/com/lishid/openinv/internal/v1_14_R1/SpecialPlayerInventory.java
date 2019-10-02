@@ -34,6 +34,7 @@ import net.minecraft.server.v1_14_R1.EntityPlayer;
 import net.minecraft.server.v1_14_R1.EnumItemSlot;
 import net.minecraft.server.v1_14_R1.IBlockData;
 import net.minecraft.server.v1_14_R1.IChatBaseComponent;
+import net.minecraft.server.v1_14_R1.IInventory;
 import net.minecraft.server.v1_14_R1.Item;
 import net.minecraft.server.v1_14_R1.ItemArmor;
 import net.minecraft.server.v1_14_R1.ItemStack;
@@ -60,6 +61,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     private EntityHuman player;
     private List<ItemStack> items, armor, extraSlots, crafting;
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection") // Backing field is mutable.
+    // TODO: cursor requires an additional slot listener
     private final List<ItemStack> cursor = new SingleFieldList<>(this::getCarried, this::setCarried);
     private List<List<ItemStack>> f;
 
@@ -71,8 +73,12 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         this.items = this.player.inventory.items;
         this.armor = this.player.inventory.armor;
         this.extraSlots = this.player.inventory.extraSlots;
-        this.crafting = ((CraftInventoryCrafting) this.player.defaultContainer.getBukkitView().getTopInventory()).getInventory().getContents();
+        this.crafting = this.getCrafting().getContents();
         this.f = ImmutableList.of(this.items, this.armor, this.extraSlots, this.crafting, this.cursor);
+    }
+
+    private IInventory getCrafting() {
+        return ((CraftInventoryCrafting) this.player.defaultContainer.getBukkitView().getTopInventory()).getInventory();
     }
 
     @Override
@@ -89,7 +95,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             this.items = this.player.inventory.items;
             this.armor = this.player.inventory.armor;
             this.extraSlots = this.player.inventory.extraSlots;
-            this.crafting = ((CraftInventoryCrafting) this.player.defaultContainer.getBukkitView().getTopInventory()).getInventory().getContents();
+            this.crafting = this.getCrafting().getContents();
             this.f = ImmutableList.of(this.items, this.armor, this.extraSlots, this.crafting, this.cursor);
             this.playerOnline = true;
         }
@@ -267,11 +273,13 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     @Override
     public void onOpen(CraftHumanEntity who) {
         this.transaction.add(who);
+        this.getCrafting().getViewers().add(who);
     }
 
     @Override
     public void onClose(CraftHumanEntity who) {
         this.transaction.remove(who);
+        this.getCrafting().getViewers().remove(who);
     }
 
     @Override
