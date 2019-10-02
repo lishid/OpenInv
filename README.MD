@@ -132,11 +132,15 @@ OpenInv is a [Bukkit plugin](https://dev.bukkit.org/bukkit-plugins/openinv/) whi
 
 ## For Developers
 To compile, the relevant Craftbukkit/Spigot jars must be installed in your local repository using the install plugin.
-Ex: `mvn install:install-file -Dpackaging=jar -Dfile=spigot-1.11-R0.1-SNAPSHOT.jar -DgroupId=org.spigotmc -DartifactId=spigot -Dversion=1.11-R0.1-SNAPSHOT`
+Ex: `mvn install:install-file -Dpackaging=jar -Dfile=spigot-1.8-R0.1-SNAPSHOT.jar -DgroupId=org.spigotmc -DartifactId=spigot -Dversion=1.8-R0.1-SNAPSHOT`
 
-To compile for a specific version or set of versions, you'll need to use a profile. Provided profiles are `latest`, `recent` (last 2 major Minecraft versions), and `all`. Select an existing profile using the `-P` argument (ex: `mvn clean package -am -P all`) or make your own. For more information, check out the [official guide](http://maven.apache.org/guides/introduction/introduction-to-profiles.html).
+To compile for a single version, specify the NMS revision you are targeting: `mvn -pl <NMS module> -am clean install`
 
-The final file is target/OpenInv.jar
+To compile for a set of versions, you'll need to use a profile. The only provided profile is `all`. Select a profile using the `-P` argument: `mvn clean package -am -P all`
+
+For more information, check out the [official Maven guide](http://maven.apache.org/guides/introduction/introduction-to-profiles.html).
+
+The final file is `target/OpenInv.jar`
 
 ## License
 ```
