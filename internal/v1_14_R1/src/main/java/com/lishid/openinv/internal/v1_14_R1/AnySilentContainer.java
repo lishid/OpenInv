@@ -309,6 +309,8 @@ public class AnySilentContainer implements IAnySilentContainer {
         EnumGamemode gamemode = player.playerInteractManager.getGameMode();
         this.forceGameMode(player, EnumGamemode.SPECTATOR);
         player.activeContainer.b(player);
+        player.activeContainer.a(player, false);
+        player.activeContainer.transferTo(player.defaultContainer, player.getBukkitEntity());
         player.activeContainer = player.defaultContainer;
         this.forceGameMode(player, gamemode);
     }
