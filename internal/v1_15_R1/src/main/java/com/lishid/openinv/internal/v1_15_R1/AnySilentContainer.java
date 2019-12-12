@@ -29,6 +29,7 @@ import net.minecraft.server.v1_15_R1.BlockShulkerBox;
 import net.minecraft.server.v1_15_R1.ChatMessage;
 import net.minecraft.server.v1_15_R1.Container;
 import net.minecraft.server.v1_15_R1.ContainerChest;
+import net.minecraft.server.v1_15_R1.Containers;
 import net.minecraft.server.v1_15_R1.EntityHuman;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.EnumChatFormat;
@@ -189,8 +190,32 @@ public class AnySilentContainer implements IAnySilentContainer {
             // Anychest ender chest. See net.minecraft.server.BlockEnderChest
             InventoryEnderChest enderChest = player.getEnderChest();
             enderChest.a((TileEntityEnderChest) tile);
-            player.openContainer(new TileInventory((containerCounter, playerInventory, ignored) ->
-                    ContainerChest.a(containerCounter, playerInventory, enderChest), BlockEnderChest.e));
+            player.openContainer(new TileInventory((containerCounter, playerInventory, ignored) -> {
+                Containers containers;
+                int rows = enderChest.getSize() / 9;
+                switch (rows) {
+                    case 1:
+                        containers = Containers.GENERIC_9X1;
+                        break;
+                    case 2:
+                        containers = Containers.GENERIC_9X2;
+                        break;
+                    case 3:
+                    default:
+                        containers = Containers.GENERIC_9X3;
+                        break;
+                    case 4:
+                        containers = Containers.GENERIC_9X4;
+                        break;
+                    case 5:
+                        containers = Containers.GENERIC_9X5;
+                        break;
+                    case 6:
+                        containers = Containers.GENERIC_9X6;
+                        break;
+                }
+                return new ContainerChest(containers, containerCounter, playerInventory, enderChest, rows);
+            }, BlockEnderChest.e));
             bukkitPlayer.incrementStatistic(Statistic.ENDERCHEST_OPENED);
             return true;
         }
