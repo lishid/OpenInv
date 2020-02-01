@@ -18,11 +18,10 @@ package com.lishid.openinv;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.lishid.openinv.commands.AnyChestPluginCommand;
+import com.lishid.openinv.commands.ContainerSettingPluginCommand;
 import com.lishid.openinv.commands.OpenInvPluginCommand;
 import com.lishid.openinv.commands.SearchEnchantPluginCommand;
 import com.lishid.openinv.commands.SearchInvPluginCommand;
-import com.lishid.openinv.commands.SilentChestPluginCommand;
 import com.lishid.openinv.internal.IAnySilentContainer;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialInventory;
@@ -165,50 +164,6 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     @Override
     public IAnySilentContainer getAnySilentContainer() {
         return this.accessor.getAnySilentContainer();
-    }
-
-    private int getLevenshteinDistance(final String string1, final String string2) {
-        if (string1 == null || string2 == null) {
-            throw new IllegalArgumentException("Strings must not be null");
-        }
-
-        if (string1.isEmpty()) {
-            return string2.length();
-        }
-        if (string2.isEmpty()) {
-            return string2.length();
-        }
-        if (string1.equals(string2)) {
-            return 0;
-        }
-
-        int len1 = string1.length();
-        int len2 = string2.length();
-
-        int[] prevDistances = new int[len1 + 1];
-        int[] distances = new int[len1 + 1];
-
-        for (int i = 0; i <= len1; ++i) {
-            prevDistances[i] = i;
-        }
-
-        for (int i = 1; i <= len2; ++i) {
-            // TODO: include tweaks available in Simmetrics?
-            char string2char = string2.charAt(i - 1);
-            distances[0] = i;
-
-            for (int j = 1; j <= len1; ++j) {
-                int cost = string1.charAt(j - 1) == string2char ? 0 : 1;
-
-                distances[j] = Math.min(Math.min(distances[j - 1] + 1, prevDistances[j] + 1), prevDistances[j - 1] + cost);
-            }
-
-            int[] swap = prevDistances;
-            prevDistances = distances;
-            distances = swap;
-        }
-
-        return prevDistances[len1];
     }
 
     @Override
@@ -389,8 +344,14 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             this.getCommand("searchinv").setExecutor(searchInv);
             this.getCommand("searchender").setExecutor(searchInv);
             this.getCommand("searchenchant").setExecutor(new SearchEnchantPluginCommand(this));
-            this.getCommand("silentchest").setExecutor(new SilentChestPluginCommand(this));
-            this.getCommand("anychest").setExecutor(new AnyChestPluginCommand(this));
+            ContainerSettingPluginCommand settingCommand = new ContainerSettingPluginCommand(this);
+            PluginCommand command = this.getCommand("silentcontainer");
+            command.setExecutor(settingCommand);
+            command.setTabCompleter(settingCommand);
+            command = this.getCommand("anycontainer");
+            command.setExecutor(settingCommand);
+            command.setTabCompleter(settingCommand);
+
         } else {
             this.getLogger().info("Your version of CraftBukkit (" + this.accessor.getVersion() + ") is not supported.");
             this.getLogger().info("If this version is a recent release, check for an update.");

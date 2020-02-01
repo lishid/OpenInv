@@ -43,7 +43,7 @@ commands:
     description: Search and list players having a specific item
     permission: OpenInv.search
     usage: |-
-           /<command> <Item> [MinAmount] - Item is the ID or the Bukkit Material, MinAmount is the minimum amount required
+           /<command> <Item> [MinAmount] - Item is the Bukkit Material, MinAmount is the minimum amount required
   searchender:
     aliases: [se]
     permission: OpenInv.search
@@ -52,16 +52,16 @@ commands:
            /<command> <item> [MinAmount] - Item is the ID or the Bukkit Material, MinAmount is the minimum amount required
   silentcontainer:
     aliases: [sc, silent, silentchest]
-    description: Toggle SilentContainer function, which stops sounds and animations when using containers.
+    description: SilentContainer stops sounds and animations when using containers.
     permission: OpenInv.silent
     usage: |-
-           /<command> [Check] - Check or toggle silent chest
+           /<command> [check|on|off] - Check, toggle, or set SilentContainer
   anycontainer:
     aliases: [ac, anychest]
-    description: Toggle AnyContainer function, which allows opening of blocked containers.
+    description: AnyContainer allows using blocked containers.
     permission: OpenInv.anychest
     usage: |-
-           /<command> [Check] - Checks or toggle anychest
+           /<command> [check|on|off] - Check, toggle, or set AnyContainer
   searchenchant:
     aliases: [searchenchants]
     description: Search and list players with a specific enchantment.
