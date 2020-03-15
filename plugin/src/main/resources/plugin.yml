@@ -24,6 +24,7 @@ permissions:
       OpenInv.silent: true
       OpenInv.anychest: true
       OpenInv.searchenchant: true
+      OpenInv.searchcontainer
 
 commands:
   openinv:
@@ -43,13 +44,13 @@ commands:
     description: Search and list players having a specific item
     permission: OpenInv.search
     usage: |-
-           /<command> <Item> [MinAmount] - Item is the Bukkit Material, MinAmount is the minimum amount required
+           /<command> <Material> [MinAmount] - MinAmount is optional, the minimum amount required
   searchender:
     aliases: [se]
     permission: OpenInv.search
     description: Searches and lists players having a specific item in their ender chest
     usage: |-
-           /<command> <item> [MinAmount] - Item is the Bukkit Material, MinAmount is the minimum amount required
+           /<command> <Material> [MinAmount] - MinAmount is optional, the minimum amount required
   silentcontainer:
     aliases: [sc, silent, silentchest]
     description: SilentContainer stops sounds and animations when using containers.
@@ -67,4 +68,9 @@ commands:
     description: Search and list players with a specific enchantment.
     permission: OpenInv.searchenchant
     usage: |-
-           /<command> <[enchantment] [MinLevel]> - Enchantment is the enchantment type, MinLevel is the minimum level. One is optional
+           /<command> <[Enchantment] [MinLevel]> - Enchantment is the enchantment type, MinLevel is the minimum level. One is optional
+  searchcontainer:
+    aliases: [searchchest]
+    description: Search and list containers with a specific material.
+    permission: OpenInv.searchcontainer
+    usage: /<command> <Material> [ChunkRadius] - ChunkRadius is optional, the length that will be searched for matching items. Default 5

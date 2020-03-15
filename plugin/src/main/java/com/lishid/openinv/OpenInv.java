@@ -20,6 +20,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.lishid.openinv.commands.ContainerSettingCommand;
 import com.lishid.openinv.commands.OpenInvCommand;
+import com.lishid.openinv.commands.SearchContainerCommand;
 import com.lishid.openinv.commands.SearchEnchantCommand;
 import com.lishid.openinv.commands.SearchInvCommand;
 import com.lishid.openinv.internal.IAnySilentContainer;
@@ -334,6 +335,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             this.getCommand("openinv").setExecutor(openInv);
             this.getCommand("openender").setExecutor(openInv);
             SearchInvCommand searchInv = new SearchInvCommand(this);
+            this.getCommand("searchcontainer").setExecutor(new SearchContainerCommand());
             this.getCommand("searchinv").setExecutor(searchInv);
             this.getCommand("searchender").setExecutor(searchInv);
             this.getCommand("searchenchant").setExecutor(new SearchEnchantCommand(this));

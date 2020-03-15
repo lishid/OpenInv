@@ -56,7 +56,7 @@ public class SearchInvCommand implements TabExecutor {
         }
 
         if (material == null) {
-            sender.sendMessage(ChatColor.RED + "Unknown item");
+            sender.sendMessage(ChatColor.RED + "Unknown item: \"" + args[0] + "\"");
             return false;
         }
 

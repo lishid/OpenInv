@@ -34,8 +34,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class OpenInvCommand implements TabExecutor {
 
     private final OpenInv plugin;
-    private final HashMap<Player, String> openInvHistory = new HashMap<Player, String>();
-    private final HashMap<Player, String> openEnderHistory = new HashMap<Player, String>();
+    private final HashMap<Player, String> openInvHistory = new HashMap<>();
+    private final HashMap<Player, String> openEnderHistory = new HashMap<>();
 
     public OpenInvCommand(final OpenInv plugin) {
         this.plugin = plugin;
@@ -48,7 +48,7 @@ public class OpenInvCommand implements TabExecutor {
             return true;
         }
 
-        if (args.length > 0 && args[0].equalsIgnoreCase("?")) {
+        if (args.length > 0 && (args[0].equalsIgnoreCase("help") || args[0].equals("?"))) {
             this.plugin.showHelp((Player) sender);
             return true;
         }
