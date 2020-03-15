@@ -49,7 +49,7 @@ commands:
     permission: OpenInv.search
     description: Searches and lists players having a specific item in their ender chest
     usage: |-
-           /<command> <item> [MinAmount] - Item is the ID or the Bukkit Material, MinAmount is the minimum amount required
+           /<command> <item> [MinAmount] - Item is the Bukkit Material, MinAmount is the minimum amount required
   silentcontainer:
     aliases: [sc, silent, silentchest]
     description: SilentContainer stops sounds and animations when using containers.

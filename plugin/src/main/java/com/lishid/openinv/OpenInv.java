@@ -18,10 +18,10 @@ package com.lishid.openinv;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.lishid.openinv.commands.ContainerSettingPluginCommand;
-import com.lishid.openinv.commands.OpenInvPluginCommand;
-import com.lishid.openinv.commands.SearchEnchantPluginCommand;
-import com.lishid.openinv.commands.SearchInvPluginCommand;
+import com.lishid.openinv.commands.ContainerSettingCommand;
+import com.lishid.openinv.commands.OpenInvCommand;
+import com.lishid.openinv.commands.SearchEnchantCommand;
+import com.lishid.openinv.commands.SearchInvCommand;
 import com.lishid.openinv.internal.IAnySilentContainer;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialInventory;
@@ -33,7 +33,6 @@ import com.lishid.openinv.listeners.PlayerListener;
 import com.lishid.openinv.listeners.PluginListener;
 import com.lishid.openinv.util.Cache;
 import com.lishid.openinv.util.ConfigUpdater;
-import com.lishid.openinv.util.Function;
 import com.lishid.openinv.util.InternalAccessor;
 import com.lishid.openinv.util.Permissions;
 import java.util.HashMap;
@@ -331,20 +330,16 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             pm.registerEvents(new InventoryDragListener(), this);
 
             // Register commands to their executors
-            OpenInvPluginCommand openInv = new OpenInvPluginCommand(this);
+            OpenInvCommand openInv = new OpenInvCommand(this);
             this.getCommand("openinv").setExecutor(openInv);
             this.getCommand("openender").setExecutor(openInv);
-            SearchInvPluginCommand searchInv = new SearchInvPluginCommand(this);
+            SearchInvCommand searchInv = new SearchInvCommand(this);
             this.getCommand("searchinv").setExecutor(searchInv);
             this.getCommand("searchender").setExecutor(searchInv);
-            this.getCommand("searchenchant").setExecutor(new SearchEnchantPluginCommand(this));
-            ContainerSettingPluginCommand settingCommand = new ContainerSettingPluginCommand(this);
-            PluginCommand command = this.getCommand("silentcontainer");
-            command.setExecutor(settingCommand);
-            command.setTabCompleter(settingCommand);
-            command = this.getCommand("anycontainer");
-            command.setExecutor(settingCommand);
-            command.setTabCompleter(settingCommand);
+            this.getCommand("searchenchant").setExecutor(new SearchEnchantCommand(this));
+            ContainerSettingCommand settingCommand = new ContainerSettingCommand(this);
+            this.getCommand("silentcontainer").setExecutor(settingCommand);
+            this.getCommand("anycontainer").setExecutor(settingCommand);
 
         } else {
             this.getLogger().info("Your version of CraftBukkit (" + this.accessor.getVersion() + ") is not supported.");

@@ -17,7 +17,7 @@
 package com.lishid.openinv.commands;
 
 import com.lishid.openinv.OpenInv;
-import java.util.ArrayList;
+import com.lishid.openinv.util.TabCompleter;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -25,16 +25,15 @@ import java.util.function.Function;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-public class ContainerSettingPluginCommand implements CommandExecutor, TabCompleter {
+public class ContainerSettingCommand implements TabExecutor {
 
     private final OpenInv plugin;
 
-    public ContainerSettingPluginCommand(final OpenInv plugin) {
+    public ContainerSettingCommand(final OpenInv plugin) {
         this.plugin = plugin;
     }
 
@@ -78,16 +77,7 @@ public class ContainerSettingPluginCommand implements CommandExecutor, TabComple
             return Collections.emptyList();
         }
 
-        String argument = args[0].toLowerCase();
-        List<String> completions = new ArrayList<>();
-
-        for (String subcommand : new String[] {"check", "on", "off"}) {
-            if (subcommand.startsWith(argument)) {
-                completions.add(subcommand);
-            }
-        }
-
-        return completions;
+        return TabCompleter.completeString(args[0], new String[] {"check", "on", "off"});
     }
 
 }

@@ -17,19 +17,22 @@
 package com.lishid.openinv.commands;
 
 import com.lishid.openinv.OpenInv;
+import com.lishid.openinv.util.TabCompleter;
+import java.util.Collections;
+import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-public class SearchInvPluginCommand implements CommandExecutor {
+public class SearchInvCommand implements TabExecutor {
 
     private final OpenInv plugin;
 
-    public SearchInvPluginCommand(OpenInv plugin) {
+    public SearchInvCommand(OpenInv plugin) {
         this.plugin = plugin;
     }
 
@@ -40,8 +43,7 @@ public class SearchInvPluginCommand implements CommandExecutor {
         int count = 1;
 
         if (args.length >= 1) {
-            String[] gData = args[0].split(":");
-            material = Material.matchMaterial(gData[0]);
+            material = Material.getMaterial(args[0]);
         }
 
         if (args.length >= 2) {
@@ -75,6 +77,20 @@ public class SearchInvPluginCommand implements CommandExecutor {
 
         sender.sendMessage("Players with the item " + material.toString() + ": " + players.toString());
         return true;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length < 1 || args.length > 2 || !command.testPermissionSilent(sender)) {
+            return Collections.emptyList();
+        }
+
+        String argument = args[args.length - 1];
+        if (args.length == 1) {
+            return TabCompleter.completeEnum(argument, Material.class);
+        } else {
+            return TabCompleter.completeInteger(argument);
+        }
     }
 
 }

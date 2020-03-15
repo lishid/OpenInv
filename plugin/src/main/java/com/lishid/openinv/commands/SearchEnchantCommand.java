@@ -17,10 +17,13 @@
 package com.lishid.openinv.commands;
 
 import com.lishid.openinv.OpenInv;
+import com.lishid.openinv.util.TabCompleter;
+import java.util.Collections;
+import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -33,11 +36,11 @@ import org.bukkit.inventory.meta.ItemMeta;
  *
  * @author Jikoo
  */
-public class SearchEnchantPluginCommand implements CommandExecutor {
+public class SearchEnchantCommand implements TabExecutor {
 
     private final OpenInv plugin;
 
-    public SearchEnchantPluginCommand(OpenInv plugin) {
+    public SearchEnchantCommand(OpenInv plugin) {
         this.plugin = plugin;
     }
 
@@ -128,6 +131,19 @@ public class SearchEnchantPluginCommand implements CommandExecutor {
             }
         }
         return false;
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+        if (!command.testPermissionSilent(sender) || args.length < 1 || args.length > 2) {
+            return Collections.emptyList();
+        }
+
+        if (args.length == 1) {
+            return TabCompleter.completeObject(args[0], Enchantment::getName, Enchantment.values());
+        } else {
+            return TabCompleter.completeInteger(args[1]);
+        }
     }
 
 }

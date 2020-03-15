@@ -19,22 +19,25 @@ package com.lishid.openinv.commands;
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.ISpecialInventory;
 import com.lishid.openinv.util.Permissions;
+import com.lishid.openinv.util.TabCompleter;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-public class OpenInvPluginCommand implements CommandExecutor {
+public class OpenInvCommand implements TabExecutor {
 
     private final OpenInv plugin;
     private final HashMap<Player, String> openInvHistory = new HashMap<Player, String>();
     private final HashMap<Player, String> openEnderHistory = new HashMap<Player, String>();
 
-    public OpenInvPluginCommand(final OpenInv plugin) {
+    public OpenInvCommand(final OpenInv plugin) {
         this.plugin = plugin;
     }
 
@@ -73,7 +76,7 @@ public class OpenInvPluginCommand implements CommandExecutor {
         new BukkitRunnable() {
             @Override
             public void run() {
-                final OfflinePlayer offlinePlayer = OpenInvPluginCommand.this.plugin.matchPlayer(name);
+                final OfflinePlayer offlinePlayer = OpenInvCommand.this.plugin.matchPlayer(name);
 
                 if (offlinePlayer == null || !offlinePlayer.hasPlayedBefore() && !offlinePlayer.isOnline()) {
                     player.sendMessage(ChatColor.RED + "Player not found!");
@@ -86,9 +89,9 @@ public class OpenInvPluginCommand implements CommandExecutor {
                         if (!player.isOnline()) {
                             return;
                         }
-                        OpenInvPluginCommand.this.openInventory(player, offlinePlayer, openinv);
+                        OpenInvCommand.this.openInventory(player, offlinePlayer, openinv);
                     }
-                }.runTask(OpenInvPluginCommand.this.plugin);
+                }.runTask(OpenInvCommand.this.plugin);
 
             }
         }.runTaskAsynchronously(this.plugin);
@@ -159,6 +162,15 @@ public class OpenInvPluginCommand implements CommandExecutor {
 
         // Open the inventory
         plugin.openInventory(player, inv);
+    }
+
+    @Override
+    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+        if (!command.testPermissionSilent(sender) || args.length != 1) {
+            return Collections.emptyList();
+        }
+
+        return TabCompleter.completeOnlinePlayer(sender, args[0]);
     }
 
 }
