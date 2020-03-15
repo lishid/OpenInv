@@ -19,11 +19,12 @@ package com.lishid.openinv.util;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * A minimal thread-safe time-based cache implementation backed by a HashMap and TreeMultimap.
@@ -35,7 +36,7 @@ public class Cache<K, V> {
     private final Map<K, V> internal;
     private final Multimap<Long, K> expiry;
     private final long retention;
-    private final Function<V> inUseCheck, postRemoval;
+    private final Function<V, Boolean> inUseCheck, postRemoval;
 
     /**
      * Constructs a Cache with the specified retention duration, in use function, and post-removal function.
@@ -44,21 +45,10 @@ public class Cache<K, V> {
      * @param inUseCheck Function used to check if a key is considered in use
      * @param postRemoval Function used to perform any operations required when a key is invalidated
      */
-    public Cache(final long retention, final Function<V> inUseCheck, final Function<V> postRemoval) {
-        this.internal = new HashMap<K, V>();
+    public Cache(final long retention, final Function<V, Boolean> inUseCheck, final Function<V, Boolean> postRemoval) {
+        this.internal = new HashMap<>();
 
-        this.expiry = TreeMultimap.create(new Comparator<Long>() {
-                    @Override
-                    public int compare(final Long long1, final Long long2) {
-                        return long1.compareTo(long2);
-                    }
-                },
-                new Comparator<K>() {
-                    @Override
-                    public int compare(final K k1, final K k2) {
-                        return k1 == k2 || k1 != null && k1.equals(k2) ? 0 : 1;
-                    }
-                });
+        this.expiry = TreeMultimap.create(Long::compareTo, (k1, k2) -> Objects.equals(k1, k2) ? 0 : 1);
 
         this.retention = retention;
         this.inUseCheck = inUseCheck;
@@ -146,7 +136,7 @@ public class Cache<K, V> {
     public void invalidateAll() {
         synchronized (this.internal) {
             for (V value : this.internal.values()) {
-                this.postRemoval.run(value);
+                this.postRemoval.apply(value);
             }
             this.expiry.clear();
             this.internal.clear();
@@ -160,7 +150,7 @@ public class Cache<K, V> {
     private void lazyCheck() {
         long now = System.currentTimeMillis();
         synchronized (this.internal) {
-            List<K> inUse = new ArrayList<K>();
+            List<K> inUse = new ArrayList<>();
             for (Iterator<Map.Entry<Long, K>> iterator = this.expiry.entries().iterator(); iterator
                     .hasNext();) {
                 Map.Entry<Long, K> entry = iterator.next();
@@ -171,7 +161,7 @@ public class Cache<K, V> {
 
                 iterator.remove();
 
-                if (this.inUseCheck.run(this.internal.get(entry.getValue()))) {
+                if (this.inUseCheck.apply(this.internal.get(entry.getValue()))) {
                     inUse.add(entry.getValue());
                     continue;
                 }
@@ -182,7 +172,7 @@ public class Cache<K, V> {
                     continue;
                 }
 
-                this.postRemoval.run(value);
+                this.postRemoval.apply(value);
             }
 
             long nextExpiry = now + this.retention;

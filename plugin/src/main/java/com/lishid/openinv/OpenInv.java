@@ -70,47 +70,41 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     private final Multimap<String, Class<? extends Plugin>> pluginUsage = HashMultimap.create();
 
     private final Cache<String, Player> playerCache = new Cache<>(300000L,
-            new Function<Player>() {
-                @Override
-                public boolean run(final Player value) {
+            value -> {
+                String key = OpenInv.this.getPlayerID(value);
 
-                    String key = OpenInv.this.getPlayerID(value);
-                    return OpenInv.this.inventories.containsKey(key)
-                            && OpenInv.this.inventories.get(key).isInUse()
-                            || OpenInv.this.enderChests.containsKey(key)
-                            && OpenInv.this.enderChests.get(key).isInUse()
-                            || OpenInv.this.pluginUsage.containsKey(key);
+                return OpenInv.this.inventories.containsKey(key)
+                        && OpenInv.this.inventories.get(key).isInUse()
+                        || OpenInv.this.enderChests.containsKey(key)
+                        && OpenInv.this.enderChests.get(key).isInUse()
+                        || OpenInv.this.pluginUsage.containsKey(key);
+            },
+            value -> {
+                String key = OpenInv.this.getPlayerID(value);
+
+                // Check if inventory is stored, and if it is, remove it and eject all viewers
+                if (OpenInv.this.inventories.containsKey(key)) {
+                    Inventory inv = OpenInv.this.inventories.remove(key).getBukkitInventory();
+                    List<HumanEntity> viewers = inv.getViewers();
+                    for (HumanEntity entity : viewers.toArray(new HumanEntity[0])) {
+                        entity.closeInventory();
+                    }
                 }
-            }, new Function<Player>() {
-        @Override
-        public boolean run(final Player value) {
 
-            String key = OpenInv.this.getPlayerID(value);
-
-            // Check if inventory is stored, and if it is, remove it and eject all viewers
-            if (OpenInv.this.inventories.containsKey(key)) {
-                Inventory inv = OpenInv.this.inventories.remove(key).getBukkitInventory();
-                List<HumanEntity> viewers = inv.getViewers();
-                for (HumanEntity entity : viewers.toArray(new HumanEntity[0])) {
-                    entity.closeInventory();
+                // Check if ender chest is stored, and if it is, remove it and eject all viewers
+                if (OpenInv.this.enderChests.containsKey(key)) {
+                    Inventory inv = OpenInv.this.enderChests.remove(key).getBukkitInventory();
+                    List<HumanEntity> viewers = inv.getViewers();
+                    for (HumanEntity entity : viewers.toArray(new HumanEntity[0])) {
+                        entity.closeInventory();
+                    }
                 }
-            }
 
-            // Check if ender chest is stored, and if it is, remove it and eject all viewers
-            if (OpenInv.this.enderChests.containsKey(key)) {
-                Inventory inv = OpenInv.this.enderChests.remove(key).getBukkitInventory();
-                List<HumanEntity> viewers = inv.getViewers();
-                for (HumanEntity entity : viewers.toArray(new HumanEntity[0])) {
-                    entity.closeInventory();
+                if (!OpenInv.this.disableSaving() && !value.isOnline()) {
+                    value.saveData();
                 }
-            }
-
-            if (!OpenInv.this.disableSaving() && !value.isOnline()) {
-                value.saveData();
-            }
-            return true;
-        }
-    });
+                return true;
+            });
 
     private InternalAccessor accessor;
 
