@@ -59,6 +59,9 @@ public class ConfigUpdater {
                 if (version < 3) {
                     updateConfig2To3();
                 }
+                if (version < 4) {
+                    updateConfig3To4();
+                }
 
                 new BukkitRunnable() {
                     @Override
@@ -69,6 +72,17 @@ public class ConfigUpdater {
                 }.runTaskLater(plugin, 1L); // Run on 1 tick delay; on older versions Bukkit's scheduler is not guaranteed FIFO
             }
         }.runTaskAsynchronously(plugin);
+    }
+
+    private void updateConfig3To4() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                plugin.getConfig().set("notify", null);
+                plugin.getConfig().set("settings.locale", "en_US");
+                plugin.getConfig().set("config-version", 4);
+            }
+        }.runTask(plugin);
     }
 
     private void updateConfig2To3() {

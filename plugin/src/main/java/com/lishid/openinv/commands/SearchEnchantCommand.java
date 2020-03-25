@@ -21,6 +21,7 @@ import com.lishid.openinv.util.TabCompleter;
 import java.util.Collections;
 import java.util.List;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
@@ -29,6 +30,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Command adding the ability to search online players' inventories for enchantments of a specific
@@ -45,7 +47,7 @@ public class SearchEnchantCommand implements TabExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 0) {
             return false;
         }
@@ -54,14 +56,28 @@ public class SearchEnchantCommand implements TabExecutor {
         int level = 0;
 
         for (String argument : args) {
-            Enchantment localEnchant = Enchantment.getByName(argument.toUpperCase());
-            if (localEnchant != null) {
-                enchant = localEnchant;
-                continue;
-            }
             try {
                 level = Integer.parseInt(argument);
+                continue;
             } catch (NumberFormatException ignored) {}
+
+            argument = argument.toLowerCase();
+            int colon = argument.indexOf(':');
+            NamespacedKey key;
+            try {
+                if (colon > -1 && colon < argument.length() - 1) {
+                    key = new NamespacedKey(argument.substring(0, colon), argument.substring(colon + 1));
+                } else {
+                    key = NamespacedKey.minecraft(argument);
+                }
+            } catch (IllegalArgumentException ignored) {
+                continue;
+            }
+
+            Enchantment localEnchant = Enchantment.getByKey(key);
+            if (localEnchant != null) {
+                enchant = localEnchant;
+            }
         }
 
         // Arguments not set correctly
@@ -97,12 +113,14 @@ public class SearchEnchantCommand implements TabExecutor {
             // Matches found, delete trailing comma and space
             players.delete(players.length() - 2, players.length());
         } else {
-            sender.sendMessage("No players found with " + (enchant == null ? "any enchant" : enchant.getName())
-                    + " of level " + level + " or higher.");
+            plugin.sendMessage(sender, "messages.info.player.noMatches",
+                    "%target%", (enchant != null ? enchant.getKey().toString() : "") + " >= " + level);
             return true;
         }
 
-        sender.sendMessage("Players: " + players.toString());
+        plugin.sendMessage(sender, "messages.info.player.matches",
+                "%target%", (enchant != null ? enchant.getKey().toString() : "") + " >= " + level,
+                "%detail%", players.toString());
         return true;
     }
 
@@ -120,7 +138,7 @@ public class SearchEnchantCommand implements TabExecutor {
                     continue;
                 }
                 ItemMeta meta = item.getItemMeta();
-                if (!meta.hasEnchants()) {
+                if (meta == null || !meta.hasEnchants()) {
                     continue;
                 }
                 for (int enchLevel : meta.getEnchants().values()) {
@@ -134,13 +152,13 @@ public class SearchEnchantCommand implements TabExecutor {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!command.testPermissionSilent(sender) || args.length < 1 || args.length > 2) {
             return Collections.emptyList();
         }
 
         if (args.length == 1) {
-            return TabCompleter.completeObject(args[0], Enchantment::getName, Enchantment.values());
+            return TabCompleter.completeObject(args[0], enchantment -> enchantment.getKey().toString(), Enchantment.values());
         } else {
             return TabCompleter.completeInteger(args[1]);
         }

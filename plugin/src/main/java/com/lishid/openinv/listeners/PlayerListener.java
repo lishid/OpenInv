@@ -55,7 +55,7 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getPlayer().isSneaking()
-                || event.useInteractedBlock() == Result.DENY
+                || event.useInteractedBlock() == Result.DENY || event.getClickedBlock() == null
                 || !plugin.getAnySilentContainer().isAnySilentContainer(event.getClickedBlock())) {
             return;
         }
@@ -71,13 +71,15 @@ public class PlayerListener implements Listener {
         boolean silent = Permissions.SILENT.hasPermission(player) && plugin.getPlayerSilentChestStatus(player);
 
         // If anycontainer or silentcontainer is active
-        if ((any || silent) && plugin.getAnySilentContainer().activateContainer(player, silent, event.getClickedBlock())) {
-            if (silent && plugin.notifySilentChest() && needsAny && plugin.notifyAnyChest()) {
-                player.sendMessage("You are opening a blocked container silently.");
-            } else if (silent && plugin.notifySilentChest()) {
-                player.sendMessage("You are opening a container silently.");
-            } else if (needsAny && plugin.notifyAnyChest()) {
-                player.sendMessage("You are opening a blocked container.");
+        if (any || silent) {
+            if (plugin.getAnySilentContainer().activateContainer(player, silent, event.getClickedBlock())) {
+                if (silent && plugin.notifySilentChest() && needsAny && plugin.notifyAnyChest()) {
+                    plugin.sendSystemMessage(player, "messages.info.containerBlockedSilent");
+                } else if (needsAny && plugin.notifyAnyChest()) {
+                    plugin.sendSystemMessage(player, "messages.info.containerBlocked");
+                } else if (silent && plugin.notifySilentChest()) {
+                    plugin.sendSystemMessage(player, "messages.info.containerSilent");
+                }
             }
             event.setCancelled(true);
         }

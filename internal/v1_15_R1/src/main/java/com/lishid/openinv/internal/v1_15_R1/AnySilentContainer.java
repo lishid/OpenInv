@@ -16,6 +16,7 @@
 
 package com.lishid.openinv.internal.v1_15_R1;
 
+import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IAnySilentContainer;
 import java.lang.reflect.Field;
 import net.minecraft.server.v1_15_R1.Block;
@@ -300,7 +301,7 @@ public class AnySilentContainer implements IAnySilentContainer {
         if (tile instanceof TileEntityLootable) {
             TileEntityLootable lootable = (TileEntityLootable) tile;
             if (lootable.lootTable != null) {
-                player.a(new ChatMessage("Loot not generated! Please disable /silentcontainer.").a(EnumChatFormat.RED), true);
+                OpenInv.getPlugin(OpenInv.class).sendSystemMessage(bukkitPlayer, "messages.error.lootNotGenerated");
                 return false;
             }
         }

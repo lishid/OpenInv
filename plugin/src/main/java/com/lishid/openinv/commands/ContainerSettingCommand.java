@@ -22,12 +22,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
 public class ContainerSettingCommand implements TabExecutor {
 
@@ -38,15 +38,14 @@ public class ContainerSettingCommand implements TabExecutor {
     }
 
     @Override
-    public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
+            plugin.sendMessage(sender, "messages.error.consoleUnsupported");
             return true;
         }
 
         Player player = (Player) sender;
         boolean any = command.getName().startsWith("any");
-        String commandName = any ? "AnyContainer" : "SilentContainer";
         Function<Player, Boolean> getSetting = any ? plugin::getPlayerAnyChestStatus : plugin::getPlayerSilentChestStatus;
         BiConsumer<OfflinePlayer, Boolean> setSetting = any ? plugin::setPlayerAnyChestStatus : plugin::setPlayerSilentChestStatus;
 
@@ -66,13 +65,18 @@ public class ContainerSettingCommand implements TabExecutor {
             setSetting.accept(player, !getSetting.apply(player));
         }
 
-        sender.sendMessage(commandName + " is now " + (getSetting.apply(player) ? "ON" : "OFF") + ".");
+        String onOff = plugin.getLocalizedMessage(player, getSetting.apply(player) ? "messages.info.on" : "messages.info.off");
+        if (onOff == null) {
+            onOff = String.valueOf(getSetting.apply(player));
+        }
+
+        plugin.sendMessage(sender, "messages.info.settingState","%setting%", any ? "AnyContainer" : "SilentContainer", "%state%", onOff);
 
         return true;
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!command.testPermissionSilent(sender) || args.length != 1) {
             return Collections.emptyList();
         }

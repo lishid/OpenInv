@@ -35,6 +35,7 @@ import com.lishid.openinv.listeners.PluginListener;
 import com.lishid.openinv.util.Cache;
 import com.lishid.openinv.util.ConfigUpdater;
 import com.lishid.openinv.util.InternalAccessor;
+import com.lishid.openinv.util.LanguageManager;
 import com.lishid.openinv.util.Permissions;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -45,6 +46,7 @@ import java.util.concurrent.Future;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.HumanEntity;
@@ -107,6 +109,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             });
 
     private InternalAccessor accessor;
+    private LanguageManager languageManager;
 
     /**
      * Evicts all viewers lacking cross-world permissions from a Player's inventory.
@@ -128,8 +131,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
                 HumanEntity human = iterator.next();
                 // If player has permission or is in the same world, allow continued access
                 // Just in case, also allow null worlds.
-                if (Permissions.CROSSWORLD.hasPermission(human) || human.getWorld() == null
-                        || human.getWorld().equals(player.getWorld())) {
+                if (Permissions.CROSSWORLD.hasPermission(human) || human.getWorld().equals(player.getWorld())) {
                     continue;
                 }
                 human.closeInventory();
@@ -140,8 +142,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             Iterator<HumanEntity> iterator = this.enderChests.get(key).getBukkitInventory().getViewers().iterator();
             while (iterator.hasNext()) {
                 HumanEntity human = iterator.next();
-                if (Permissions.CROSSWORLD.hasPermission(human) || human.getWorld() == null
-                        || human.getWorld().equals(player.getWorld())) {
+                if (Permissions.CROSSWORLD.hasPermission(human) || human.getWorld().equals(player.getWorld())) {
                     continue;
                 }
                 human.closeInventory();
@@ -284,6 +285,43 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         return this.accessor.getPlayerDataManager().openInventory(player, inventory);
     }
 
+    public void sendMessage(@NotNull CommandSender sender, @NotNull String key) {
+        String message = this.languageManager.getValue(key, getLocale(sender));
+
+        if (message != null && !message.isEmpty()) {
+            sender.sendMessage(message);
+        }
+    }
+
+    public void sendMessage(@NotNull CommandSender sender, @NotNull String key, String... replacements) {
+        String message = this.languageManager.getValue(key, getLocale(sender), replacements);
+
+        if (message != null && !message.isEmpty()) {
+            sender.sendMessage(message);
+        }
+    }
+
+    public void sendSystemMessage(@NotNull Player player, @NotNull String key) {
+        String message = this.languageManager.getValue(key, getLocale(player));
+
+        if (message != null) {
+            this.accessor.getPlayerDataManager().sendSystemMessage(player, message);
+        }
+    }
+
+    public @Nullable String getLocalizedMessage(@NotNull CommandSender sender, @NotNull String key) {
+        return this.languageManager.getValue(key, getLocale(sender));
+    }
+
+    @Nullable
+    private String getLocale(@NotNull CommandSender sender) {
+        if (sender instanceof Player) {
+            return this.accessor.getPlayerDataManager().getLocale((Player) sender);
+        } else {
+            return this.getConfig().getString("settings.locale", "en_us");
+        }
+    }
+
     @Override
     public boolean notifyAnyChest() {
         return this.getConfig().getBoolean("notify.any-chest", true);
@@ -317,6 +355,8 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
         this.accessor = new InternalAccessor(this);
 
+        this.languageManager = new LanguageManager(this, "en_us");
+
         // Version check
         if (this.accessor.isSupported()) {
             // Update existing configuration. May require internal access.
@@ -332,16 +372,16 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
             // Register commands to their executors
             OpenInvCommand openInv = new OpenInvCommand(this);
-            this.getCommand("openinv").setExecutor(openInv);
-            this.getCommand("openender").setExecutor(openInv);
+            this.setCommandExecutor("openinv", openInv);
+            this.setCommandExecutor("openender", openInv);
+            this.setCommandExecutor("searchcontainer", new SearchContainerCommand(this));
             SearchInvCommand searchInv = new SearchInvCommand(this);
-            this.getCommand("searchcontainer").setExecutor(new SearchContainerCommand());
-            this.getCommand("searchinv").setExecutor(searchInv);
-            this.getCommand("searchender").setExecutor(searchInv);
-            this.getCommand("searchenchant").setExecutor(new SearchEnchantCommand(this));
+            this.setCommandExecutor("searchinv", searchInv);
+            this.setCommandExecutor("searchender", searchInv);
+            this.setCommandExecutor("searchenchant", new SearchEnchantCommand(this));
             ContainerSettingCommand settingCommand = new ContainerSettingCommand(this);
-            this.getCommand("silentcontainer").setExecutor(settingCommand);
-            this.getCommand("anycontainer").setExecutor(settingCommand);
+            this.setCommandExecutor("silentcontainer", settingCommand);
+            this.setCommandExecutor("anycontainer", settingCommand);
 
         } else {
             this.getLogger().info("Your version of CraftBukkit (" + this.accessor.getVersion() + ") is not supported.");
@@ -351,12 +391,18 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
     }
 
+    private void setCommandExecutor(String commandName, CommandExecutor executor) {
+        PluginCommand command = this.getCommand(commandName);
+        if (command != null) {
+            command.setExecutor(executor);
+        }
+    }
+
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!this.accessor.isSupported()) {
             sender.sendMessage("Your version of CraftBukkit (" + this.accessor.getVersion() + ") is not supported.");
             sender.sendMessage("If this version is a recent release, check for an update.");
-            sender.sendMessage("If this is an older version, ensure that you've downloaded the legacy support version.");
             return true;
         }
         return false;

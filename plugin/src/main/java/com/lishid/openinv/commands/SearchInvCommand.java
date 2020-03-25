@@ -20,13 +20,13 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.util.TabCompleter;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.jetbrains.annotations.NotNull;
 
 public class SearchInvCommand implements TabExecutor {
 
@@ -37,32 +37,33 @@ public class SearchInvCommand implements TabExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
         Material material = null;
         int count = 1;
 
         if (args.length >= 1) {
-            material = Material.getMaterial(args[0]);
+            material = Material.getMaterial(args[0].toUpperCase());
         }
 
         if (args.length >= 2) {
             try {
                 count = Integer.parseInt(args[1]);
             } catch (NumberFormatException ex) {
-                sender.sendMessage(ChatColor.RED + "'" + args[1] + "' is not a number!");
+                plugin.sendMessage(sender, "messages.error.invalidNumber", "%target%", args[1]);
                 return false;
             }
         }
 
         if (material == null) {
-            sender.sendMessage(ChatColor.RED + "Unknown item: \"" + args[0] + "\"");
+            plugin.sendMessage(sender, "messages.error.invalidMaterial", "%target%", args[0]);
             return false;
         }
 
         StringBuilder players = new StringBuilder();
+        boolean searchInv = command.getName().equals("searchinv");
         for (Player player : plugin.getServer().getOnlinePlayers()) {
-            Inventory inventory = command.getName().equals("searchinv") ? player.getInventory() : player.getEnderChest();
+            Inventory inventory = searchInv ? player.getInventory() : player.getEnderChest();
             if (inventory.contains(material, count)) {
                 players.append(player.getName()).append(", ");
             }
@@ -72,15 +73,18 @@ public class SearchInvCommand implements TabExecutor {
         if (players.length() > 0) {
             players.delete(players.length() - 2, players.length());
         } else {
-            sender.sendMessage("No players found with " + material.toString());
+            plugin.sendMessage(sender, "messages.info.player.noMatches",
+                    "%target%", material.name());
+            return true;
         }
 
-        sender.sendMessage("Players with the item " + material.toString() + ": " + players.toString());
+        plugin.sendMessage(sender, "messages.info.player.matches",
+                "%target%", material.name(), "%detail%", players.toString());
         return true;
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length < 1 || args.length > 2 || !command.testPermissionSilent(sender)) {
             return Collections.emptyList();
         }

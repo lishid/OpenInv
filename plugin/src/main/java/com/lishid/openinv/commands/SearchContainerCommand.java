@@ -16,10 +16,10 @@
 
 package com.lishid.openinv.commands;
 
+import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.util.TabCompleter;
 import java.util.Collections;
 import java.util.List;
-import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -29,16 +29,23 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Command for searching containers in a radius of chunks.
  */
 public class SearchContainerCommand implements TabExecutor {
 
+    private final OpenInv plugin;
+
+    public SearchContainerCommand(OpenInv plugin) {
+        this.plugin = plugin;
+    }
+
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
+            plugin.sendMessage(sender, "messages.error.consoleUnsupported");
             return true;
         }
 
@@ -47,10 +54,10 @@ public class SearchContainerCommand implements TabExecutor {
             return false;
         }
 
-        Material material = Material.getMaterial(args[0]);
+        Material material = Material.getMaterial(args[0].toUpperCase());
 
         if (material == null) {
-            sender.sendMessage(ChatColor.RED + "Unknown item: \"" + args[0] + "\"");
+            plugin.sendMessage(sender, "messages.error.invalidMaterial", "%target%", args[0]);
             return false;
         }
 
@@ -95,15 +102,18 @@ public class SearchContainerCommand implements TabExecutor {
         if (locations.length() > 0) {
             locations.delete(locations.length() - 2, locations.length());
         } else {
-            sender.sendMessage("No containers found with " + material.toString());
+            plugin.sendMessage(sender, "messages.info.container.noMatches",
+                    "%target%", material.name());
+            return true;
         }
 
-        sender.sendMessage("Containers holding item " + material.toString() + ": " + locations.toString());
+        plugin.sendMessage(sender, "messages.info.container.matches",
+                "%target%", material.name(), "%detail%", locations.toString());
         return true;
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (args.length < 1 || args.length > 2 || !command.testPermissionSilent(sender)) {
             return Collections.emptyList();
         }

@@ -16,16 +16,19 @@
 
 package com.lishid.openinv.internal.v1_15_R1;
 
+import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialInventory;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.server.v1_15_R1.ChatComponentText;
+import net.minecraft.server.v1_15_R1.ChatMessageType;
 import net.minecraft.server.v1_15_R1.Container;
 import net.minecraft.server.v1_15_R1.Containers;
 import net.minecraft.server.v1_15_R1.DimensionManager;
 import net.minecraft.server.v1_15_R1.EntityHuman;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
 import net.minecraft.server.v1_15_R1.MinecraftServer;
+import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
 import net.minecraft.server.v1_15_R1.PacketPlayOutOpenWindow;
 import net.minecraft.server.v1_15_R1.PlayerInteractManager;
 import net.minecraft.server.v1_15_R1.PlayerInventory;
@@ -42,9 +45,11 @@ import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerDataManager implements IPlayerDataManager {
 
+    @NotNull
     public static EntityPlayer getHandle(final Player player) {
         if (player instanceof CraftPlayer) {
             return ((CraftPlayer) player).getHandle();
@@ -65,6 +70,7 @@ public class PlayerDataManager implements IPlayerDataManager {
         return nmsPlayer;
     }
 
+    @Nullable
     @Override
     public Player loadPlayer(@NotNull final OfflinePlayer offline) {
         // Ensure player has data
@@ -88,26 +94,37 @@ public class PlayerDataManager implements IPlayerDataManager {
         return target;
     }
 
-    @Override
+    @Nullable
+	@Override
     public InventoryView openInventory(@NotNull Player player, @NotNull ISpecialInventory inventory) {
 
         EntityPlayer nmsPlayer = getHandle(player);
 
-        if (nmsPlayer == null || nmsPlayer.playerConnection == null) {
+        if (nmsPlayer.playerConnection == null) {
             return null;
         }
 
         String title;
         if (inventory instanceof SpecialEnderChest) {
             HumanEntity owner = (HumanEntity) ((SpecialEnderChest) inventory).getBukkitOwner();
-            title = (owner.getName() != null ? owner.getName() : owner.getUniqueId().toString()) + "'s Ender Chest";
+            title = OpenInv.getPlugin(OpenInv.class).getLocalizedMessage(player, "container.enderchest");
+            if (title == null) {
+                title = "%player%'s Ender Chest";
+            }
+            //noinspection ConstantConditions - owner name can be null if loaded by UUID
+            title = title.replace("%player%", owner.getName() != null ? owner.getName() : owner.getUniqueId().toString());
         } else if (inventory instanceof SpecialPlayerInventory) {
             EntityHuman owner = ((PlayerInventory) inventory).player;
-            title = (owner.getName() != null ? owner.getName() : owner.getUniqueID().toString()) + "'s Inventory";
+            title = OpenInv.getPlugin(OpenInv.class).getLocalizedMessage(player, "container.player");
+            if (title == null) {
+                title = "%player%'s Inventory";
+            }
+            title = title.replace("%player%", owner.getName() != null ? owner.getName() : owner.getUniqueID().toString());
         } else {
             return player.openInventory(inventory.getBukkitInventory());
         }
 
+        String finalTitle = title;
         Container container = new CraftContainer(new InventoryView() {
             @Override
             public @NotNull Inventory getTopInventory() {
@@ -127,7 +144,7 @@ public class PlayerDataManager implements IPlayerDataManager {
             }
             @Override
             public @NotNull String getTitle() {
-                return title;
+                return finalTitle;
             }
         }, nmsPlayer, nmsPlayer.nextContainerCounter()) {
             @Override
@@ -165,6 +182,26 @@ public class PlayerDataManager implements IPlayerDataManager {
 
         return container.getBukkitView();
 
+    }
+
+    @Override
+    public void sendSystemMessage(@NotNull Player player, @NotNull String message) {
+        int newline = message.indexOf('\n');
+        if (newline != -1) {
+            // No newlines in action bar chat.
+            message = message.substring(0, newline);
+        }
+
+        if (message.isEmpty()) {
+            return;
+        }
+
+        EntityPlayer nmsPlayer = getHandle(player);
+
+        // For action bar chat, color codes are still supported but JSON text color is not allowed. Do not convert text.
+        if (nmsPlayer.playerConnection != null) {
+            nmsPlayer.playerConnection.sendPacket(new PacketPlayOutChat(new ChatComponentText(message), ChatMessageType.GAME_INFO));
+        }
     }
 
 }

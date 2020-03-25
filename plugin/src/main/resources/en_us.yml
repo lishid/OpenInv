@@ -1,0 +1,28 @@
+messages:
+  error:
+    consoleUnsupported: 'You cannot use this command from console.'
+    lootNotGenerated: '&cLoot not generated! Please disable &b/silentcontainer&c.'
+    invalidMaterial: '&cInvalid material: "%target%"'
+    invalidNumber: '&cInvalid number: "%target%"'
+    invalidPlayer: '&cPlayer not found!'
+    permissionOpenSelf: '&cYou''re not allowed to open your own inventory.'
+    permissionEnderAll: '&cYou''re not allowed to access other players'' ender chests.'
+    permissionExempt: '&c%target%''s inventory is protected.'
+    permissionCrossWorld: '&c%target% is not in your world.'
+    commandException: '&cAn error occurred. Please check console for details.'
+  info:
+    containerBlocked: 'You are opening a blocked container.'
+    containerBlockedSilent: 'You are opening a blocked container silently.'
+    containerSilent: 'You are opening a container silently.'
+    settingState: '%setting%: %state%'
+    player:
+      noMatches: 'No players found with %target%.'
+      matches: 'Players holding %target%: %detail%'
+    container:
+      noMatches: 'No containers found with %target%.'
+      matches: 'Containers holding %target%: %detail%'
+    on: 'on'
+    off: 'off'
+container:
+  player: '%player%''s Inventory'
+  enderchest: '%Player''s Ender Chest'

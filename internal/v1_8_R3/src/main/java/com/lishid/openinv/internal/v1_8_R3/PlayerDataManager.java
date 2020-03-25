@@ -19,8 +19,10 @@ package com.lishid.openinv.internal.v1_8_R3;
 import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialInventory;
 import com.mojang.authlib.GameProfile;
+import net.minecraft.server.v1_8_R3.ChatComponentText;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
+import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_8_R3.PlayerInteractManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -30,9 +32,32 @@ import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class PlayerDataManager implements IPlayerDataManager {
 
+    @NotNull
+    public static EntityPlayer getHandle(Player player) {
+        if (player instanceof CraftPlayer) {
+            return ((CraftPlayer) player).getHandle();
+        }
+
+        Server server = player.getServer();
+        EntityPlayer nmsPlayer = null;
+
+        if (server instanceof CraftServer) {
+            nmsPlayer = ((CraftServer) server).getHandle().getPlayer(player.getName());
+        }
+
+        if (nmsPlayer == null) {
+            // Could use reflection to examine fields, but it's honestly not worth the bother.
+            throw new RuntimeException("Unable to fetch EntityPlayer from provided Player implementation");
+        }
+
+        return nmsPlayer;
+    }
+
+    @Nullable
     @Override
     public Player loadPlayer(@NotNull OfflinePlayer offline) {
         // Ensure the player has data
@@ -56,29 +81,36 @@ public class PlayerDataManager implements IPlayerDataManager {
         return target;
     }
 
-    public static EntityPlayer getHandle(Player player) {
-        if (player instanceof CraftPlayer) {
-            return ((CraftPlayer) player).getHandle();
-        }
-
-        Server server = player.getServer();
-        EntityPlayer nmsPlayer = null;
-
-        if (server instanceof CraftServer) {
-            nmsPlayer = ((CraftServer) server).getHandle().getPlayer(player.getName());
-        }
-
-        if (nmsPlayer == null) {
-            // Could use reflection to examine fields, but it's honestly not worth the bother.
-            throw new RuntimeException("Unable to fetch EntityPlayer from provided Player implementation");
-        }
-
-        return nmsPlayer;
+    @Nullable
+	@Override
+    public InventoryView openInventory(@NotNull Player player, @NotNull ISpecialInventory inventory) {
+        return player.openInventory(inventory.getBukkitInventory());
     }
 
     @Override
-    public InventoryView openInventory(@NotNull Player player, @NotNull ISpecialInventory inventory) {
-        return player.openInventory(inventory.getBukkitInventory());
+    public void sendSystemMessage(@NotNull Player player, @NotNull String message) {
+        int newline = message.indexOf('\n');
+        if (newline != -1) {
+            // No newlines in action bar chat.
+            message = message.substring(0, newline);
+        }
+
+        if (message.isEmpty()) {
+            return;
+        }
+
+        EntityPlayer nmsPlayer = getHandle(player);
+
+        // For action bar chat, color codes are still supported but JSON text color is not allowed. Do not convert text.
+        if (nmsPlayer.playerConnection != null) {
+            nmsPlayer.playerConnection.sendPacket(new PacketPlayOutChat(new ChatComponentText(message), (byte) 2));
+        }
+    }
+
+    @NotNull
+    @Override
+    public String getLocale(Player player) {
+        return getHandle(player).locale;
     }
 
 }

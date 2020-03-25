@@ -31,7 +31,6 @@
 
   <modules>
     <module>api</module>
-    <module>common</module>
     <module>plugin</module>
     <module>internal</module>
     <module>assembly</module>

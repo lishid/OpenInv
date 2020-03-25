@@ -32,7 +32,8 @@ public interface IPlayerDataManager {
      * @param offline the OfflinePlayer
      * @return the Player loaded
      */
-    @Nullable Player loadPlayer(@NotNull OfflinePlayer offline);
+    @Nullable
+    Player loadPlayer(@NotNull OfflinePlayer offline);
 
     /**
      * Opens an ISpecialInventory for a Player.
@@ -42,6 +43,14 @@ public interface IPlayerDataManager {
      *`
      * @return the InventoryView opened
      */
+    @Nullable
     InventoryView openInventory(@NotNull Player player, @NotNull ISpecialInventory inventory);
+
+    void sendSystemMessage(@NotNull Player player, @NotNull String message);
+
+    @NotNull
+    default String getLocale(Player player) {
+        return player.getLocale();
+    }
 
 }

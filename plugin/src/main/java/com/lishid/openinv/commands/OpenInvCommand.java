@@ -23,13 +23,13 @@ import com.lishid.openinv.util.TabCompleter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 public class OpenInvCommand implements TabExecutor {
 
@@ -42,9 +42,9 @@ public class OpenInvCommand implements TabExecutor {
     }
 
     @Override
-    public boolean onCommand(final CommandSender sender, final Command command, final String label, final String[] args) {
+    public boolean onCommand(@NotNull final CommandSender sender, @NotNull final Command command, @NotNull final String label, @NotNull final String[] args) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(ChatColor.RED + "You can't use this from the console.");
+            plugin.sendMessage(sender, "messages.error.consoleUnsupported");
             return true;
         }
 
@@ -79,7 +79,7 @@ public class OpenInvCommand implements TabExecutor {
                 final OfflinePlayer offlinePlayer = OpenInvCommand.this.plugin.matchPlayer(name);
 
                 if (offlinePlayer == null || !offlinePlayer.hasPlayedBefore() && !offlinePlayer.isOnline()) {
-                    player.sendMessage(ChatColor.RED + "Player not found!");
+                    plugin.sendMessage(player, "messages.error.invalidPlayer");
                     return;
                 }
 
@@ -100,49 +100,48 @@ public class OpenInvCommand implements TabExecutor {
     }
 
     private void openInventory(final Player player, final OfflinePlayer target, boolean openinv) {
-
-
         Player onlineTarget;
         boolean online = target.isOnline();
 
         if (!online) {
             // Try loading the player's data
             onlineTarget = this.plugin.loadPlayer(target);
-
-            if (onlineTarget == null) {
-                player.sendMessage(ChatColor.RED + "Player not found!");
-                return;
-            }
         } else {
             onlineTarget = target.getPlayer();
+        }
+
+        if (onlineTarget == null) {
+            plugin.sendMessage(player, "messages.error.invalidPlayer");
+            return;
         }
 
         // Permissions checks
         if (onlineTarget.equals(player)) {
             // Inventory: Additional permission required to open own inventory
             if (openinv && !Permissions.OPENSELF.hasPermission(player)) {
-                player.sendMessage(ChatColor.RED + "You're not allowed to open your own inventory!");
+                plugin.sendMessage(player, "messages.error.permissionOpenSelf");
                 return;
             }
         } else {
             // Enderchest: Additional permission required to open others' ender chests
             if (!openinv && !Permissions.ENDERCHEST_ALL.hasPermission(player)) {
-                player.sendMessage(ChatColor.RED + "You do not have permission to access other players' ender chests.");
+                plugin.sendMessage(player, "messages.error.permissionEnderAll");
                 return;
             }
 
             // Protected check
             if (!Permissions.OVERRIDE.hasPermission(player)
                     && Permissions.EXEMPT.hasPermission(onlineTarget)) {
-                player.sendMessage(ChatColor.RED + onlineTarget.getDisplayName() + "'s inventory is protected!");
+                plugin.sendMessage(player, "messages.error.permissionExempt",
+                        "%target%", onlineTarget.getDisplayName());
                 return;
             }
 
             // Crossworld check
             if (!Permissions.CROSSWORLD.hasPermission(player)
                     && !onlineTarget.getWorld().equals(player.getWorld())) {
-                player.sendMessage(
-                        ChatColor.RED + onlineTarget.getDisplayName() + " is not in your world!");
+                plugin.sendMessage(player, "messages.error.permissionCrossWorld",
+                        "%target%", onlineTarget.getDisplayName());
                 return;
             }
         }
@@ -155,7 +154,7 @@ public class OpenInvCommand implements TabExecutor {
         try {
             inv = openinv ? this.plugin.getSpecialInventory(onlineTarget, online) : this.plugin.getSpecialEnderChest(onlineTarget, online);
         } catch (Exception e) {
-            player.sendMessage(ChatColor.RED + "An error occurred creating " + onlineTarget.getDisplayName() + "'s inventory!");
+            plugin.sendMessage(player, "messages.error.commandException");
             e.printStackTrace();
             return;
         }
@@ -165,7 +164,7 @@ public class OpenInvCommand implements TabExecutor {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!command.testPermissionSilent(sender) || args.length != 1) {
             return Collections.emptyList();
         }
