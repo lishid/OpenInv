@@ -21,7 +21,7 @@
   <artifactId>openinvparent</artifactId>
   <name>OpenInvParent</name>
   <url>http://dev.bukkit.org/bukkit-plugins/openinv/</url>
-  <version>4.0.9-SNAPSHOT</version>
+  <version>4.1.0</version>
 
   <packaging>pom</packaging>
 
