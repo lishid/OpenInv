@@ -313,6 +313,10 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         return this.languageManager.getValue(key, getLocale(sender));
     }
 
+    public @Nullable String getLocalizedMessage(@NotNull CommandSender sender, @NotNull String key, String... replacements) {
+        return this.languageManager.getValue(key, getLocale(sender), replacements);
+    }
+
     @Nullable
     private String getLocale(@NotNull CommandSender sender) {
         if (sender instanceof Player) {

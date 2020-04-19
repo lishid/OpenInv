@@ -192,17 +192,16 @@ public class PlayerDataManager implements IPlayerDataManager {
         String title;
         if (inventory instanceof SpecialEnderChest) {
             HumanEntity owner = (HumanEntity) ((SpecialEnderChest) inventory).getBukkitOwner();
-            title = OpenInv.getPlugin(OpenInv.class).getLocalizedMessage(player, "container.enderchest");
+            title = OpenInv.getPlugin(OpenInv.class).getLocalizedMessage(player, "container.enderchest", "%player%", owner.getName());
             if (title == null) {
-                title = "%player%'s Ender Chest";
+                title = owner.getName() + "'s Ender Chest";
             }
         } else if (inventory instanceof SpecialPlayerInventory) {
             EntityHuman owner = ((PlayerInventory) inventory).player;
-            title = OpenInv.getPlugin(OpenInv.class).getLocalizedMessage(player, "container.player");
+            title = OpenInv.getPlugin(OpenInv.class).getLocalizedMessage(player, "container.player", "%player%", owner.getName());
             if (title == null) {
-                title = "%player%'s Inventory";
+                title = owner.getName() + "'s Inventory";
             }
-            title = title.replace("%player%", owner.getName() != null ? owner.getName() : owner.getUniqueID().toString());
         } else {
             return player.openInventory(inventory.getBukkitInventory());
         }
