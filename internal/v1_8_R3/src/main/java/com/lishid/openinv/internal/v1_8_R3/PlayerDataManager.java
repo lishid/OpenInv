@@ -19,11 +19,19 @@ package com.lishid.openinv.internal.v1_8_R3;
 import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialInventory;
 import com.mojang.authlib.GameProfile;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.lang.reflect.Field;
 import net.minecraft.server.v1_8_R3.ChatComponentText;
+import net.minecraft.server.v1_8_R3.Entity;
 import net.minecraft.server.v1_8_R3.EntityPlayer;
 import net.minecraft.server.v1_8_R3.MinecraftServer;
+import net.minecraft.server.v1_8_R3.NBTCompressedStreamTools;
+import net.minecraft.server.v1_8_R3.NBTTagCompound;
 import net.minecraft.server.v1_8_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_8_R3.PlayerInteractManager;
+import net.minecraft.server.v1_8_R3.WorldNBTStorage;
+import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
@@ -35,6 +43,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class PlayerDataManager implements IPlayerDataManager {
+
+    private Field bukkitEntity;
+
+    public PlayerDataManager() {
+        try {
+            bukkitEntity = Entity.class.getDeclaredField("bukkitEntity");
+        } catch (NoSuchFieldException e) {
+            System.out.println("Unable to obtain field to inject custom save process - players' mounts may be deleted when loaded.");
+            e.printStackTrace();
+            bukkitEntity = null;
+        }
+    }
 
     @NotNull
     public static EntityPlayer getHandle(Player player) {
@@ -66,10 +86,17 @@ public class PlayerDataManager implements IPlayerDataManager {
         }
 
         // Create a profile and entity to load the player data
-        GameProfile profile = new GameProfile(offline.getUniqueId(), offline.getName());
+        GameProfile profile = new GameProfile(offline.getUniqueId(),
+                offline.getName() != null ? offline.getName() : offline.getUniqueId().toString());
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
         EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(0), profile,
                 new PlayerInteractManager(server.getWorldServer(0)));
+
+        try {
+            injectPlayer(entity);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
 
         // Get the bukkit entity
         Player target = entity.getBukkitEntity();
@@ -79,6 +106,64 @@ public class PlayerDataManager implements IPlayerDataManager {
         }
         // Return the entity
         return target;
+    }
+
+    void injectPlayer(EntityPlayer player) throws IllegalAccessException {
+        if (bukkitEntity == null) {
+            return;
+        }
+
+        bukkitEntity.setAccessible(true);
+
+        bukkitEntity.set(player, new CraftPlayer(player.server.server, player) {
+            @Override
+            public void saveData() {
+                super.saveData();
+                // See net.minecraft.server.WorldNBTStorage#save(EntityHuman)
+                try {
+                    WorldNBTStorage worldNBTStorage = (WorldNBTStorage) player.server.getPlayerList().playerFileData;
+
+                    NBTTagCompound playerData = new NBTTagCompound();
+                    player.e(playerData);
+
+                    if (!isOnline()) {
+                        // Special case: save old vehicle data
+                        NBTTagCompound oldData = worldNBTStorage.load(player);
+
+                        if (oldData != null && oldData.hasKeyOfType("Riding", 10)) {
+                            // See net.minecraft.server.PlayerList#a(NetworkManager, EntityPlayer) and net.minecraft.server.EntityPlayer#b(NBTTagCompound)
+                            playerData.set("Riding", oldData.getCompound("Riding"));
+                        }
+                    }
+
+                    File file = new File(worldNBTStorage.getPlayerDir(), player.getUniqueID().toString() + ".dat.tmp");
+                    File file1 = new File(worldNBTStorage.getPlayerDir(), player.getUniqueID().toString() + ".dat");
+
+                    NBTCompressedStreamTools.a(playerData, new FileOutputStream(file));
+
+                    if (file1.exists()) {
+                        file1.delete();
+                    }
+
+                    file.renameTo(file1);
+                } catch (Exception e) {
+                    LogManager.getLogger().warn("Failed to save player data for {}", player.getName());
+                }
+            }
+        });
+    }
+
+    @NotNull
+    @Override
+    public Player inject(@NotNull Player player) {
+        try {
+            EntityPlayer nmsPlayer = getHandle(player);
+            injectPlayer(nmsPlayer);
+            return nmsPlayer.getBukkitEntity();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return player;
+        }
     }
 
     @Nullable

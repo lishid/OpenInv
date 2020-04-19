@@ -465,6 +465,9 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             return;
         }
 
+        // Replace stored player with our own version
+        this.playerCache.put(key, this.accessor.getPlayerDataManager().inject(player));
+
         if (this.inventories.containsKey(key)) {
             this.inventories.get(key).setPlayerOffline();
         }

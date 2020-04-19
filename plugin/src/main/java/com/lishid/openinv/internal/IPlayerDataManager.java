@@ -36,6 +36,14 @@ public interface IPlayerDataManager {
     Player loadPlayer(@NotNull OfflinePlayer offline);
 
     /**
+     * Creates a new Player from an existing one that will function slightly better offline.
+     *
+     * @return the Player
+     */
+    @NotNull
+    Player inject(@NotNull Player player);
+
+    /**
      * Opens an ISpecialInventory for a Player.
      *
      * @param player the Player opening the ISpecialInventory
