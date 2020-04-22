@@ -40,11 +40,17 @@ public class SearchInvCommand implements TabExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
         Material material = null;
-        int count = 1;
 
         if (args.length >= 1) {
             material = Material.getMaterial(args[0].toUpperCase());
         }
+
+        if (material == null) {
+            plugin.sendMessage(sender, "messages.error.invalidMaterial", "%target%", args.length > 0 ? args[0] : "null");
+            return false;
+        }
+
+        int count = 1;
 
         if (args.length >= 2) {
             try {
@@ -53,11 +59,6 @@ public class SearchInvCommand implements TabExecutor {
                 plugin.sendMessage(sender, "messages.error.invalidNumber", "%target%", args[1]);
                 return false;
             }
-        }
-
-        if (material == null) {
-            plugin.sendMessage(sender, "messages.error.invalidMaterial", "%target%", args[0]);
-            return false;
         }
 
         StringBuilder players = new StringBuilder();
