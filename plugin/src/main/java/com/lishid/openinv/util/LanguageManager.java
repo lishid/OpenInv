@@ -99,6 +99,11 @@ public class LanguageManager {
 
 			if (!newKeys.isEmpty()) {
 				plugin.getLogger().info("[LanguageManager] Added new language keys: " + String.join(", ", newKeys));
+				try {
+					localeConfig.save(file);
+				} catch (IOException e) {
+					plugin.getLogger().log(Level.WARNING, "[LanguageManager] Unable to save resource " + locale + ".yml", e);
+				}
 			}
 		}
 
