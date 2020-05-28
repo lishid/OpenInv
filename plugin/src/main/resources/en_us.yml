@@ -9,6 +9,8 @@ messages:
     permissionEnderAll: '&cYou''re not allowed to access other players'' ender chests.'
     permissionExempt: '&c%target%''s inventory is protected.'
     permissionCrossWorld: '&c%target% is not in your world.'
+    permissionPlayerOnline: '&cYou''re not allowed to open the inventory of online players.'
+    permissionPlayerOffline: '&cYou''re not allowed to open the inventory of offline players.'
     commandException: '&cAn error occurred. Please check console for details.'
   info:
     containerBlocked: 'You are opening a blocked container.'

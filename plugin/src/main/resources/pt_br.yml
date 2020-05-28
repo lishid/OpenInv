@@ -9,6 +9,8 @@ messages:
     permissionEnderAll: '&cVoce nao tem permissao para abrir baus de ender de outros jogadores.'
     permissionExempt: '&cO inventario de %target% e protegido.'
     permissionCrossWorld: '&c%target% nao esta no seu mundo.'
+    permissionPlayerOnline: '&cVoce nao tem permissao para abrir o inventario de jogadores online.'
+    permissionPlayerOffline: '&cVoce nao tem permissao para abrir o inventario de jogadores offline.'
     commandException: '&cUm erro ocorreu. Por favor cheque o console para detalhes.'
   info:
     containerBlocked: 'Voce esta abrindo um recipiente bloqueado.'

@@ -25,6 +25,8 @@ permissions:
       OpenInv.anychest: true
       OpenInv.searchenchant: true
       OpenInv.searchcontainer: true
+      OpenInv.openonline: true
+      OpenInv.openoffline: true
 
 commands:
   openinv:

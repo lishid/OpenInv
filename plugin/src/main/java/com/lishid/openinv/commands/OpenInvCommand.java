@@ -104,10 +104,20 @@ public class OpenInvCommand implements TabExecutor {
         boolean online = target.isOnline();
 
         if (!online) {
-            // Try loading the player's data
-            onlineTarget = this.plugin.loadPlayer(target);
+            if (Permissions.OPENOFFLINE.hasPermission(player)) {
+                // Try loading the player's data
+                onlineTarget = this.plugin.loadPlayer(target);
+            } else {
+                plugin.sendMessage(player, "messages.error.permissionPlayerOffline");
+                return;
+            }
         } else {
-            onlineTarget = target.getPlayer();
+            if (Permissions.OPENONLINE.hasPermission(player)) {
+                onlineTarget = target.getPlayer();
+            } else {
+                plugin.sendMessage(player, "messages.error.permissionPlayerOnline");
+                return;
+            }
         }
 
         if (onlineTarget == null) {

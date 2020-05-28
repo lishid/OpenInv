@@ -33,7 +33,9 @@ public enum Permissions {
     SEARCH("search"),
     EDITINV("editinv"),
     EDITENDER("editender"),
-    OPENSELF("openself");
+    OPENSELF("openself"),
+    OPENONLINE("openonline"),
+    OPENOFFLINE("openoffline");
 
     private final String permission;
 
