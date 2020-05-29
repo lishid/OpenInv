@@ -81,6 +81,14 @@ OpenInv is a [Bukkit plugin](https://dev.bukkit.org/bukkit-plugins/openinv/) whi
     <td>Required to make changes to open inventories.</td>
   </tr>
   <tr>
+      <td>OpenInv.openonline</td>
+      <td>Allows users to open online players' inventories. For compatibility reasons this is granted by the nodes OpenInv.openinv and OpenInv.openender.</td>
+  </tr>
+  <tr>
+      <td>OpenInv.openoffline</td>
+      <td>Allows users to open offline players' inventories. For compatibility reasons this is granted by the nodes OpenInv.openinv and OpenInv.openender.</td>
+  </tr>
+  <tr>
     <td>OpenInv.openender</td>
     <td>Required to use /openender.</td>
   </tr>
