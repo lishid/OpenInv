@@ -27,6 +27,16 @@ permissions:
       OpenInv.searchcontainer: true
       OpenInv.openonline: true
       OpenInv.openoffline: true
+  OpenInv.openinv:
+    default: op
+    children:
+      OpenInv.openonline: true
+      OpenInv.openoffline: true
+  OpenInv.openender:
+    default: op
+    children:
+      OpenInv.openonline: true
+      OpenInv.openoffline: true
 
 commands:
   openinv:
