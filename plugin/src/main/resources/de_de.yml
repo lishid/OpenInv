@@ -1,6 +1,6 @@
 messages:
   error:
-    consoleUnsupported: 'Due kannst diesen Befehl nicht von der Konsole ausführen.'
+    consoleUnsupported: 'Du kannst diesen Befehl nicht von der Konsole ausführen.'
     lootNotGenerated: '&cBeute noch nicht erstellt! Bitte schalte &b/silentcontainer&c aus.'
     invalidMaterial: '&cUngültiges Material: "%target%"'
     invalidNumber: '&cUngültige Nummer: "%target%"'
