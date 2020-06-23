@@ -1,0 +1,31 @@
+messages:
+  error:
+    consoleUnsupported: 'No puedes usar este comando desde la consola.'
+    lootNotGenerated: '&c¡Botín no generado! Desactiva &b/silentcontainer&c.'
+    invalidMaterial: '&cMaterial no válido: "%target%"'
+    invalidNumber: '&cNúmero no válido: "%target%"'
+    invalidPlayer: '&cJugador no encontrado'
+    permissionOpenSelf: '&cNo tienes permisos para abrir tu inventario de esa forma.'
+    permissionEnderAll: '&cNo tienes permiso para abrir cofres de ender de otros jugadores.'
+    permissionExempt: '&c El inventario de %target% está protegido.'
+    permissionCrossWorld: '&c%target% no está en tu dimensión.'
+    permissionPlayerOnline: '&cNo estás autorizado para abrir inventarios de jugadores conectados.'
+    permissionPlayerOffline: '&cNo estás autorizado para abrir inventarios de jugadores desconectados.'
+    commandException: '&cSe ha producido un error, lee la consola para mas información.'
+  info:
+    containerBlocked: 'Estás abriendo un contenedor protegido.'
+    containerBlockedSilent: 'Estás abriendo sigilosamente un contenedor protegido.'
+    containerSilent: 'Estás abriendo un contenedor sigilosamente.'
+    settingState: '%setting%: %state%'
+    player:
+      noMatches: 'No se encontraron jugadores con %target%.'
+      matches: 'Jugadores con %target%: %detail%'
+    container:
+      noMatches: 'No se encontraron contenedores con %target%.'
+      matches: 'Contenedores con %target%: %detail%'
+    on: 'activado'
+    off: 'desactivado'
+container:
+  player: 'Inventario de %player%'
+  enderchest: 'Cofre de Ender de %player%'
+  
