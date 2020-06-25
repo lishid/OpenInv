@@ -14,25 +14,26 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_14_R1;
+package com.lishid.openinv.internal.v1_16_R1;
 
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import java.util.List;
-import net.minecraft.server.v1_14_R1.AutoRecipeStackManager;
-import net.minecraft.server.v1_14_R1.ContainerUtil;
-import net.minecraft.server.v1_14_R1.EntityHuman;
-import net.minecraft.server.v1_14_R1.EntityPlayer;
-import net.minecraft.server.v1_14_R1.IInventoryListener;
-import net.minecraft.server.v1_14_R1.InventoryEnderChest;
-import net.minecraft.server.v1_14_R1.ItemStack;
-import net.minecraft.server.v1_14_R1.NonNullList;
+import net.minecraft.server.v1_16_R1.AutoRecipeStackManager;
+import net.minecraft.server.v1_16_R1.ContainerUtil;
+import net.minecraft.server.v1_16_R1.EntityHuman;
+import net.minecraft.server.v1_16_R1.EntityPlayer;
+import net.minecraft.server.v1_16_R1.IInventoryListener;
+import net.minecraft.server.v1_16_R1.InventoryEnderChest;
+import net.minecraft.server.v1_16_R1.ItemStack;
+import net.minecraft.server.v1_16_R1.NonNullList;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SpecialEnderChest extends InventoryEnderChest implements ISpecialEnderChest {
 
@@ -115,7 +116,7 @@ public class SpecialEnderChest extends InventoryEnderChest implements ISpecialEn
     }
 
     @Override
-    public Location getLocation() {
+    public @Nullable Location getLocation() {
         return null;
     }
 
@@ -131,7 +132,7 @@ public class SpecialEnderChest extends InventoryEnderChest implements ISpecialEn
 
     @Override
     public ItemStack getItem(int i) {
-        return i >= 0 && i < this.items.size() ? this.items.get(i) : ItemStack.a;
+        return i >= 0 && i < this.items.size() ? this.items.get(i) : ItemStack.b;
     }
 
     @Override
@@ -153,7 +154,7 @@ public class SpecialEnderChest extends InventoryEnderChest implements ISpecialEn
             if (itemstack2.isEmpty()) {
                 this.setItem(i, itemstack1);
                 this.update();
-                return ItemStack.a;
+                return ItemStack.b;
             }
 
             if (ItemStack.c(itemstack2, itemstack1)) {
@@ -164,7 +165,7 @@ public class SpecialEnderChest extends InventoryEnderChest implements ISpecialEn
                     itemstack1.subtract(k);
                     if (itemstack1.isEmpty()) {
                         this.update();
-                        return ItemStack.a;
+                        return ItemStack.b;
                     }
                 }
             }
@@ -181,9 +182,9 @@ public class SpecialEnderChest extends InventoryEnderChest implements ISpecialEn
     public ItemStack splitWithoutUpdate(int i) {
         ItemStack itemstack = this.items.get(i);
         if (itemstack.isEmpty()) {
-            return ItemStack.a;
+            return ItemStack.b;
         } else {
-            this.items.set(i, ItemStack.a);
+            this.items.set(i, ItemStack.b);
             return itemstack;
         }
     }
@@ -204,7 +205,7 @@ public class SpecialEnderChest extends InventoryEnderChest implements ISpecialEn
     }
 
     @Override
-    public boolean isNotEmpty() {
+    public boolean isEmpty() {
 
         for (ItemStack itemstack : this.items) {
             if (!itemstack.isEmpty()) {

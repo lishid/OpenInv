@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_14_R1;
+package com.lishid.openinv.internal.v1_16_R1;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IPlayerDataManager;
@@ -23,30 +23,32 @@ import com.mojang.authlib.GameProfile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Field;
-import net.minecraft.server.v1_14_R1.ChatComponentText;
-import net.minecraft.server.v1_14_R1.ChatMessageType;
-import net.minecraft.server.v1_14_R1.Container;
-import net.minecraft.server.v1_14_R1.Containers;
-import net.minecraft.server.v1_14_R1.DimensionManager;
-import net.minecraft.server.v1_14_R1.Entity;
-import net.minecraft.server.v1_14_R1.EntityHuman;
-import net.minecraft.server.v1_14_R1.EntityPlayer;
-import net.minecraft.server.v1_14_R1.MinecraftServer;
-import net.minecraft.server.v1_14_R1.NBTCompressedStreamTools;
-import net.minecraft.server.v1_14_R1.NBTTagCompound;
-import net.minecraft.server.v1_14_R1.PacketPlayOutChat;
-import net.minecraft.server.v1_14_R1.PacketPlayOutOpenWindow;
-import net.minecraft.server.v1_14_R1.PlayerInteractManager;
-import net.minecraft.server.v1_14_R1.PlayerInventory;
-import net.minecraft.server.v1_14_R1.WorldNBTStorage;
+import net.minecraft.server.v1_16_R1.ChatComponentText;
+import net.minecraft.server.v1_16_R1.ChatMessageType;
+import net.minecraft.server.v1_16_R1.Container;
+import net.minecraft.server.v1_16_R1.Containers;
+import net.minecraft.server.v1_16_R1.Entity;
+import net.minecraft.server.v1_16_R1.EntityHuman;
+import net.minecraft.server.v1_16_R1.EntityPlayer;
+import net.minecraft.server.v1_16_R1.MinecraftServer;
+import net.minecraft.server.v1_16_R1.NBTCompressedStreamTools;
+import net.minecraft.server.v1_16_R1.NBTTagCompound;
+import net.minecraft.server.v1_16_R1.PacketPlayOutChat;
+import net.minecraft.server.v1_16_R1.PacketPlayOutOpenWindow;
+import net.minecraft.server.v1_16_R1.PlayerInteractManager;
+import net.minecraft.server.v1_16_R1.PlayerInventory;
+import net.minecraft.server.v1_16_R1.SystemUtils;
+import net.minecraft.server.v1_16_R1.World;
+import net.minecraft.server.v1_16_R1.WorldNBTStorage;
+import net.minecraft.server.v1_16_R1.WorldServer;
 import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
-import org.bukkit.craftbukkit.v1_14_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_14_R1.event.CraftEventFactory;
-import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftContainer;
+import org.bukkit.craftbukkit.v1_16_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R1.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftContainer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -57,7 +59,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PlayerDataManager implements IPlayerDataManager {
 
-    private Field bukkitEntity;
+    private @Nullable Field bukkitEntity;
 
     public PlayerDataManager() {
         try {
@@ -90,6 +92,7 @@ public class PlayerDataManager implements IPlayerDataManager {
         return nmsPlayer;
     }
 
+    @Nullable
     @Override
     public Player loadPlayer(@NotNull final OfflinePlayer offline) {
         // Ensure player has data
@@ -98,11 +101,17 @@ public class PlayerDataManager implements IPlayerDataManager {
         }
 
         // Create a profile and entity to load the player data
+        // See net.minecraft.server.PlayerList#attemptLogin
         GameProfile profile = new GameProfile(offline.getUniqueId(),
                 offline.getName() != null ? offline.getName() : offline.getUniqueId().toString());
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        EntityPlayer entity = new EntityPlayer(server, server.getWorldServer(DimensionManager.OVERWORLD), profile,
-                new PlayerInteractManager(server.getWorldServer(DimensionManager.OVERWORLD)));
+        WorldServer worldServer = server.getWorldServer(World.OVERWORLD);
+
+        if (worldServer == null) {
+            return null;
+        }
+
+        EntityPlayer entity = new EntityPlayer(server, worldServer, profile, new PlayerInteractManager(worldServer));
 
         try {
             injectPlayer(entity);
@@ -133,7 +142,7 @@ public class PlayerDataManager implements IPlayerDataManager {
                 super.saveData();
                 // See net.minecraft.server.WorldNBTStorage#save(EntityPlayer)
                 try {
-                    WorldNBTStorage worldNBTStorage = (WorldNBTStorage) player.server.getPlayerList().playerFileData;
+                    WorldNBTStorage worldNBTStorage = player.server.getPlayerList().playerFileData;
 
                     NBTTagCompound playerData = player.save(new NBTTagCompound());
 
@@ -280,7 +289,7 @@ public class PlayerDataManager implements IPlayerDataManager {
 
         // For action bar chat, color codes are still supported but JSON text color is not allowed. Do not convert text.
         if (nmsPlayer.playerConnection != null) {
-            nmsPlayer.playerConnection.sendPacket(new PacketPlayOutChat(new ChatComponentText(message), ChatMessageType.GAME_INFO));
+            nmsPlayer.playerConnection.sendPacket(new PacketPlayOutChat(new ChatComponentText(message), ChatMessageType.GAME_INFO, SystemUtils.b));
         }
     }
 

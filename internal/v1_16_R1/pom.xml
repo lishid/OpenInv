@@ -25,14 +25,14 @@
     <version>4.1.2-SNAPSHOT</version>
   </parent>
 
-  <artifactId>openinvadapter1_14_R1</artifactId>
-  <name>OpenInvAdapter1_14_R1</name>
+  <artifactId>openinvadapter1_16_R1</artifactId>
+  <name>OpenInvAdapter1_16_R1</name>
 
   <dependencies>
     <dependency>
       <groupId>org.spigotmc</groupId>
       <artifactId>spigot</artifactId>
-      <version>1.14.3-R0.1-SNAPSHOT</version>
+      <version>1.16.1-R0.1-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

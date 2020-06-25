@@ -14,40 +14,40 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_14_R1;
+package com.lishid.openinv.internal.v1_16_R1;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IAnySilentContainer;
 import java.lang.reflect.Field;
-import net.minecraft.server.v1_14_R1.Block;
-import net.minecraft.server.v1_14_R1.BlockBarrel;
-import net.minecraft.server.v1_14_R1.BlockChest;
-import net.minecraft.server.v1_14_R1.BlockChestTrapped;
-import net.minecraft.server.v1_14_R1.BlockEnderChest;
-import net.minecraft.server.v1_14_R1.BlockPosition;
-import net.minecraft.server.v1_14_R1.BlockPropertyChestType;
-import net.minecraft.server.v1_14_R1.BlockShulkerBox;
-import net.minecraft.server.v1_14_R1.ChatMessage;
-import net.minecraft.server.v1_14_R1.Container;
-import net.minecraft.server.v1_14_R1.ContainerChest;
-import net.minecraft.server.v1_14_R1.Containers;
-import net.minecraft.server.v1_14_R1.EntityHuman;
-import net.minecraft.server.v1_14_R1.EntityPlayer;
-import net.minecraft.server.v1_14_R1.EnumChatFormat;
-import net.minecraft.server.v1_14_R1.EnumGamemode;
-import net.minecraft.server.v1_14_R1.IBlockData;
-import net.minecraft.server.v1_14_R1.IChatBaseComponent;
-import net.minecraft.server.v1_14_R1.ITileInventory;
-import net.minecraft.server.v1_14_R1.InventoryEnderChest;
-import net.minecraft.server.v1_14_R1.InventoryLargeChest;
-import net.minecraft.server.v1_14_R1.PlayerInteractManager;
-import net.minecraft.server.v1_14_R1.PlayerInventory;
-import net.minecraft.server.v1_14_R1.TileEntity;
-import net.minecraft.server.v1_14_R1.TileEntityChest;
-import net.minecraft.server.v1_14_R1.TileEntityEnderChest;
-import net.minecraft.server.v1_14_R1.TileEntityLootable;
-import net.minecraft.server.v1_14_R1.TileInventory;
-import net.minecraft.server.v1_14_R1.World;
+import net.minecraft.server.v1_16_R1.Block;
+import net.minecraft.server.v1_16_R1.BlockBarrel;
+import net.minecraft.server.v1_16_R1.BlockChest;
+import net.minecraft.server.v1_16_R1.BlockChestTrapped;
+import net.minecraft.server.v1_16_R1.BlockEnderChest;
+import net.minecraft.server.v1_16_R1.BlockPosition;
+import net.minecraft.server.v1_16_R1.BlockPropertyChestType;
+import net.minecraft.server.v1_16_R1.BlockShulkerBox;
+import net.minecraft.server.v1_16_R1.ChatMessage;
+import net.minecraft.server.v1_16_R1.Container;
+import net.minecraft.server.v1_16_R1.ContainerChest;
+import net.minecraft.server.v1_16_R1.Containers;
+import net.minecraft.server.v1_16_R1.EntityHuman;
+import net.minecraft.server.v1_16_R1.EntityPlayer;
+import net.minecraft.server.v1_16_R1.EnumChatFormat;
+import net.minecraft.server.v1_16_R1.EnumGamemode;
+import net.minecraft.server.v1_16_R1.IBlockData;
+import net.minecraft.server.v1_16_R1.IChatBaseComponent;
+import net.minecraft.server.v1_16_R1.ITileInventory;
+import net.minecraft.server.v1_16_R1.InventoryEnderChest;
+import net.minecraft.server.v1_16_R1.InventoryLargeChest;
+import net.minecraft.server.v1_16_R1.PlayerInteractManager;
+import net.minecraft.server.v1_16_R1.PlayerInventory;
+import net.minecraft.server.v1_16_R1.TileEntity;
+import net.minecraft.server.v1_16_R1.TileEntityChest;
+import net.minecraft.server.v1_16_R1.TileEntityEnderChest;
+import net.minecraft.server.v1_16_R1.TileEntityLootable;
+import net.minecraft.server.v1_16_R1.TileInventory;
+import net.minecraft.server.v1_16_R1.World;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.block.Barrel;
@@ -216,7 +216,7 @@ public class AnySilentContainer implements IAnySilentContainer {
                         break;
                 }
                 return new ContainerChest(containers, containerCounter, playerInventory, enderChest, rows);
-            }, BlockEnderChest.d));
+            }, BlockEnderChest.e));
             bukkitPlayer.incrementStatistic(Statistic.ENDERCHEST_OPENED);
             return true;
         }
@@ -231,16 +231,16 @@ public class AnySilentContainer implements IAnySilentContainer {
 
         if (block instanceof BlockChest) {
 
-            BlockPropertyChestType chestType = blockData.get(BlockChest.b);
+            BlockPropertyChestType chestType = blockData.get(BlockChest.c);
 
             if (chestType != BlockPropertyChestType.SINGLE) {
 
-                BlockPosition adjacentBlockPosition = blockPosition.shift(BlockChest.j(blockData));
+                BlockPosition adjacentBlockPosition = blockPosition.shift(BlockChest.h(blockData));
                 IBlockData adjacentBlockData = world.getType(adjacentBlockPosition);
 
                 if (adjacentBlockData.getBlock() == block) {
 
-                    BlockPropertyChestType adjacentChestType = adjacentBlockData.get(BlockChest.b);
+                    BlockPropertyChestType adjacentChestType = adjacentBlockData.get(BlockChest.c);
 
                     if (adjacentChestType != BlockPropertyChestType.SINGLE && chestType != adjacentChestType
                             && adjacentBlockData.get(BlockChest.FACING) == blockData.get(BlockChest.FACING)) {

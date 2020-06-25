@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_14_R1;
+package com.lishid.openinv.internal.v1_16_R1;
 
 import com.google.common.collect.ImmutableList;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
@@ -22,29 +22,31 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import net.minecraft.server.v1_14_R1.AutoRecipeStackManager;
-import net.minecraft.server.v1_14_R1.ChatMessage;
-import net.minecraft.server.v1_14_R1.ContainerUtil;
-import net.minecraft.server.v1_14_R1.CrashReport;
-import net.minecraft.server.v1_14_R1.CrashReportSystemDetails;
-import net.minecraft.server.v1_14_R1.EntityHuman;
-import net.minecraft.server.v1_14_R1.EntityPlayer;
-import net.minecraft.server.v1_14_R1.EnumItemSlot;
-import net.minecraft.server.v1_14_R1.IBlockData;
-import net.minecraft.server.v1_14_R1.IChatBaseComponent;
-import net.minecraft.server.v1_14_R1.Item;
-import net.minecraft.server.v1_14_R1.ItemArmor;
-import net.minecraft.server.v1_14_R1.ItemStack;
-import net.minecraft.server.v1_14_R1.NBTTagCompound;
-import net.minecraft.server.v1_14_R1.NBTTagList;
-import net.minecraft.server.v1_14_R1.NonNullList;
-import net.minecraft.server.v1_14_R1.PacketPlayOutSetSlot;
-import net.minecraft.server.v1_14_R1.PlayerInventory;
-import net.minecraft.server.v1_14_R1.ReportedException;
-import net.minecraft.server.v1_14_R1.World;
+import net.minecraft.server.v1_16_R1.AutoRecipeStackManager;
+import net.minecraft.server.v1_16_R1.ChatMessage;
+import net.minecraft.server.v1_16_R1.ContainerUtil;
+import net.minecraft.server.v1_16_R1.CrashReport;
+import net.minecraft.server.v1_16_R1.CrashReportSystemDetails;
+import net.minecraft.server.v1_16_R1.DamageSource;
+import net.minecraft.server.v1_16_R1.EntityHuman;
+import net.minecraft.server.v1_16_R1.EntityPlayer;
+import net.minecraft.server.v1_16_R1.EnumItemSlot;
+import net.minecraft.server.v1_16_R1.IBlockData;
+import net.minecraft.server.v1_16_R1.IChatBaseComponent;
+import net.minecraft.server.v1_16_R1.IInventory;
+import net.minecraft.server.v1_16_R1.Item;
+import net.minecraft.server.v1_16_R1.ItemArmor;
+import net.minecraft.server.v1_16_R1.ItemStack;
+import net.minecraft.server.v1_16_R1.NBTTagCompound;
+import net.minecraft.server.v1_16_R1.NBTTagList;
+import net.minecraft.server.v1_16_R1.NonNullList;
+import net.minecraft.server.v1_16_R1.PacketPlayOutSetSlot;
+import net.minecraft.server.v1_16_R1.PlayerInventory;
+import net.minecraft.server.v1_16_R1.ReportedException;
+import net.minecraft.server.v1_16_R1.World;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
@@ -117,7 +119,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         }
 
         if (i >= list.size()) {
-            return ItemStack.a;
+            return ItemStack.b;
         }
 
         return list.get(i);
@@ -133,7 +135,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             i -= next.size();
         }
 
-        return list == null ? ItemStack.a : list.get(i);
+        return list == null ? ItemStack.b : list.get(i);
     }
 
     @Override
@@ -229,10 +231,10 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         }
 
         if (i >= list.size()) {
-            return ItemStack.a;
+            return ItemStack.b;
         }
 
-        return list.get(i).isEmpty() ? ItemStack.a : ContainerUtil.a(list, i, j);
+        return list.get(i).isEmpty() ? ItemStack.b : ContainerUtil.a(list, i, j);
     }
 
     @Override
@@ -254,17 +256,17 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         }
 
         if (i >= list.size()) {
-            return ItemStack.a;
+            return ItemStack.b;
         }
 
         if (!list.get(i).isEmpty()) {
             ItemStack itemstack = list.get(i);
 
-            list.set(i, ItemStack.a);
+            list.set(i, ItemStack.b);
             return itemstack;
         }
 
-        return ItemStack.a;
+        return ItemStack.b;
     }
 
     @Override
@@ -304,10 +306,10 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
 
     @Override
     public ItemStack getItemInHand() {
-        return d(this.itemInHandIndex) ? this.items.get(this.itemInHandIndex) : ItemStack.a;
+        return d(this.itemInHandIndex) ? this.items.get(this.itemInHandIndex) : ItemStack.b;
     }
 
-    private boolean a(ItemStack itemstack, ItemStack itemstack1) {
+    private boolean isSimilarAndNotFull(ItemStack itemstack, ItemStack itemstack1) {
         return !itemstack.isEmpty() && this.b(itemstack, itemstack1) && itemstack.isStackable() && itemstack.getCount() < itemstack.getMaxStackSize() && itemstack.getCount() < this.getMaxStackSize();
     }
 
@@ -325,13 +327,18 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
                 return itemstack.getCount();
             }
 
-            if (!this.a(itemstack, itemstack1)) {
-                remains -= (itemstack1.getMaxStackSize() < this.getMaxStackSize() ? itemstack1.getMaxStackSize() : this.getMaxStackSize()) - itemstack1.getCount();
+            if (!this.isSimilarAndNotFull(itemstack, itemstack1)) {
+                remains -= Math.min(itemstack1.getMaxStackSize(), this.getMaxStackSize()) - itemstack1.getCount();
             }
 
             if (remains <= 0) {
                 return itemstack.getCount();
             }
+        }
+
+        ItemStack offhandItemStack = this.getItem(this.items.size() + this.armor.size());
+        if (this.isSimilarAndNotFull(offhandItemStack, itemstack)) {
+            remains -= Math.min(offhandItemStack.getMaxStackSize(), this.getMaxStackSize()) - offhandItemStack.getCount();
         }
 
         return itemstack.getCount() - remains;
@@ -390,41 +397,14 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
-    public int a(Predicate<ItemStack> predicate, int i) {
-        int j = 0;
-
-        int k;
-        for (k = 0; k < this.getSize(); ++k) {
-            ItemStack itemstack = this.getItem(k);
-            if (!itemstack.isEmpty() && predicate.test(itemstack)) {
-                int l = i <= 0 ? itemstack.getCount() : Math.min(i - j, itemstack.getCount());
-                j += l;
-                if (i != 0) {
-                    itemstack.subtract(l);
-                    if (itemstack.isEmpty()) {
-                        this.setItem(k, ItemStack.a);
-                    }
-
-                    if (i > 0 && j >= i) {
-                        return j;
-                    }
-                }
-            }
-        }
-
-        if (!this.getCarried().isEmpty() && predicate.test(this.getCarried())) {
-            k = i <= 0 ? this.getCarried().getCount() : Math.min(i - j, this.getCarried().getCount());
-            j += k;
-            if (i != 0) {
-                this.getCarried().subtract(k);
-                if (this.getCarried().isEmpty()) {
-                    this.setCarried(ItemStack.a);
-                }
-
-                if (i > 0 && j >= i) {
-                    return j;
-                }
-            }
+    public int a(Predicate<ItemStack> predicate, int i, IInventory iinventory) {
+        byte b0 = 0;
+        boolean flag = i == 0;
+        int j = b0 + ContainerUtil.a(this, predicate, i - b0, flag);
+        j += ContainerUtil.a(iinventory, predicate, i - j, flag);
+        j += ContainerUtil.a(this.getCarried(), predicate, i - j, flag);
+        if (this.getCarried().isEmpty()) {
+            this.setCarried(ItemStack.b);
         }
 
         return j;
@@ -445,8 +425,9 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         ItemStack itemstack1 = this.getItem(i);
         if (itemstack1.isEmpty()) {
             itemstack1 = new ItemStack(item, 0);
-            if (itemstack.hasTag()) {
-                itemstack1.setTag(itemstack.getTag().clone());
+            NBTTagCompound tag = itemstack.getTag();
+            if (tag != null) {
+                itemstack1.setTag(tag.clone());
             }
 
             this.setItem(i, itemstack1);
@@ -461,25 +442,23 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             k = this.getMaxStackSize() - itemstack1.getCount();
         }
 
-        if (k == 0) {
-            return j;
-        } else {
+        if (k != 0) {
             j -= k;
             itemstack1.add(k);
             itemstack1.d(5);
-            return j;
         }
+        return j;
     }
 
     @Override
     public int firstPartial(ItemStack itemstack) {
-        if (this.a(this.getItem(this.itemInHandIndex), itemstack)) {
+        if (this.isSimilarAndNotFull(this.getItem(this.itemInHandIndex), itemstack)) {
             return this.itemInHandIndex;
-        } else if (this.a(this.getItem(40), itemstack)) {
+        } else if (this.isSimilarAndNotFull(this.getItem(40), itemstack)) {
             return 40;
         } else {
             for (int i = 0; i < this.items.size(); ++i) {
-                if (this.a(this.items.get(i), itemstack)) {
+                if (this.isSimilarAndNotFull(this.items.get(i), itemstack)) {
                     return i;
                 }
             }
@@ -586,7 +565,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         for (List<ItemStack> list : this.f) {
             for (int i = 0; i < list.size(); ++i) {
                 if (list.get(i) == itemstack) {
-                    list.set(i, ItemStack.a);
+                    list.set(i, ItemStack.b);
                     break;
                 }
             }
@@ -656,12 +635,12 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
-    public boolean isNotEmpty() {
-        Iterator iterator = this.items.iterator();
+    public boolean isEmpty() {
+        Iterator<ItemStack> iterator = this.items.iterator();
 
         ItemStack itemstack;
         while (iterator.hasNext()) {
-            itemstack = (ItemStack)iterator.next();
+            itemstack = iterator.next();
             if (!itemstack.isEmpty()) {
                 return false;
             }
@@ -670,7 +649,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         iterator = this.armor.iterator();
 
         while (iterator.hasNext()) {
-            itemstack = (ItemStack)iterator.next();
+            itemstack = iterator.next();
             if (!itemstack.isEmpty()) {
                 return false;
             }
@@ -679,7 +658,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         iterator = this.extraSlots.iterator();
 
         while (iterator.hasNext()) {
-            itemstack = (ItemStack)iterator.next();
+            itemstack = iterator.next();
             if (!itemstack.isEmpty()) {
                 return false;
             }
@@ -695,12 +674,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
-    public boolean b(IBlockData iblockdata) {
-        return this.getItem(this.itemInHandIndex).b(iblockdata);
-    }
-
-    @Override
-    public void a(float f) {
+    public void a(DamageSource damagesource, float f) {
         if (f > 0.0F) {
             f /= 4.0F;
             if (f < 1.0F) {
@@ -710,8 +684,8 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             for (int i = 0; i < this.armor.size(); ++i) {
                 ItemStack itemstack = this.armor.get(0);
                 int index = i;
-                if (itemstack.getItem() instanceof ItemArmor) {
-                    itemstack.damage((int) f, this.player, (entityhuman) -> entityhuman.c(EnumItemSlot.a(EnumItemSlot.Function.ARMOR, index)));
+                if ((!damagesource.isFire() || !itemstack.getItem().u()) && itemstack.getItem() instanceof ItemArmor) {
+                    itemstack.damage((int) f, this.player, (entityHuman) -> entityHuman.broadcastItemBreak(EnumItemSlot.a(EnumItemSlot.Function.ARMOR, index)));
                 }
             }
         }
@@ -723,7 +697,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             for (int i = 0; i < itemStacks.size(); ++i) {
                 ItemStack itemstack = itemStacks.get(i);
                 if (!itemstack.isEmpty()) {
-                    itemStacks.set(i, ItemStack.a);
+                    itemStacks.set(i, ItemStack.b);
                     this.player.a(itemstack, true, false);
                 }
             }
