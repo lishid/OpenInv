@@ -33,7 +33,6 @@ import net.minecraft.server.v1_16_R1.ContainerChest;
 import net.minecraft.server.v1_16_R1.Containers;
 import net.minecraft.server.v1_16_R1.EntityHuman;
 import net.minecraft.server.v1_16_R1.EntityPlayer;
-import net.minecraft.server.v1_16_R1.EnumChatFormat;
 import net.minecraft.server.v1_16_R1.EnumGamemode;
 import net.minecraft.server.v1_16_R1.IBlockData;
 import net.minecraft.server.v1_16_R1.IChatBaseComponent;
@@ -251,8 +250,8 @@ public class AnySilentContainer implements IAnySilentContainer {
                             TileEntityChest rightChest = chestType == BlockPropertyChestType.RIGHT ? ((TileEntityChest) tileInventory) : (TileEntityChest) adjacentTile;
                             TileEntityChest leftChest = chestType == BlockPropertyChestType.RIGHT ? (TileEntityChest) adjacentTile : ((TileEntityChest) tileInventory);
 
-                            if (rightChest.lootTable != null || leftChest.lootTable != null) {
-                                player.a(new ChatMessage("Loot not generated! Please disable /silentcontainer.").a(EnumChatFormat.RED), true);
+                            if (silentchest && (rightChest.lootTable != null || leftChest.lootTable != null)) {
+                                OpenInv.getPlugin(OpenInv.class).sendSystemMessage(bukkitPlayer, "messages.error.lootNotGenerated");
                                 return false;
                             }
 
