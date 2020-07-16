@@ -55,8 +55,8 @@ public class PlayerListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
 
-        // Do not cancel the event if it is the InvUnloadCheckAccessEvent
-        if(!event.getClass().getName().equals("de.jeff_media.InvUnload.API.InvUnloadCheckAccessEvent")) {
+        // Do not cancel 3rd party plugins' custom events
+        if (!PlayerInteractEvent.class.equals(event.getClass())) {
             return;
         }
 
