@@ -54,6 +54,12 @@ public class PlayerListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
+
+        // Do not cancel the event if it is the InvUnloadCheckAccessEvent
+        if(!event.getClass().getName().equals("de.jeff_media.InvUnload.API.InvUnloadCheckAccessEvent")) {
+            return;
+        }
+
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getPlayer().isSneaking()
                 || event.useInteractedBlock() == Result.DENY || event.getClickedBlock() == null
                 || !plugin.getAnySilentContainer().isAnySilentContainer(event.getClickedBlock())) {
