@@ -405,8 +405,8 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!this.accessor.isSupported()) {
-            sender.sendMessage("Your version of CraftBukkit (" + this.accessor.getVersion() + ") is not supported.");
-            sender.sendMessage("If this version is a recent release, check for an update.");
+            sender.sendMessage("Your server version (" + this.accessor.getVersion() + ") is not supported.");
+            sender.sendMessage("Please check https://github.com/lishid/OpenInv/releases for an update.");
             return true;
         }
         return false;
