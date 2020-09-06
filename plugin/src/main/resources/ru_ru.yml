@@ -1,0 +1,30 @@
+messages:
+  error:
+    consoleUnsupported: 'Вы не можете использовать команду из консоли.'
+    lootNotGenerated: '&cНаграбленое не сгенерировано! Пожалуйста, отключите &b/silentcontainer&c.'
+    invalidMaterial: '&cНедействительный материал: "%target%"'
+    invalidNumber: '&cНедействительный число: "%target%"'
+    invalidPlayer: '&cИгрок не найден!'
+    permissionOpenSelf: '&cВам нельзя открывать свой собственный инвентарь.'
+    permissionEnderAll: '&cВам запрещён доступ к эндер сундукам других игроков'
+    permissionExempt: 'Инвентарь &c%target% защищён.'
+    permissionCrossWorld: '&c%target% нет в Вашем мире.'
+    permissionPlayerOnline: '&cВам запрещено открывать инвентарь онлайн игроков.'
+    permissionPlayerOffline: '&cВам запрещено открывать инвентарь оффлайн игроков.'
+    commandException: '&cПроизошла ошибка. Пожалуйста, проверьте консоль и сообщество вк модовестник, для деталей.'
+  info:
+    containerBlocked: 'Вы открываете заблокированный контейнер.'
+    containerBlockedSilent: 'Вы бесшумно открываете заблокированный контейнер.'
+    containerSilent: 'Вы бесшумно открываете контейнер.'
+    settingState: '%setting%: %state%'
+    player:
+      noMatches: 'Игроки не найдены с помощью %target%.'
+      matches: 'Игроки находятся %target%: %detail%'
+    container:
+      noMatches: 'Контейнеры не найдены с помощью %target%.'
+      matches: 'Контейнеры находятся %target%: %detail%'
+    on: 'вкл'
+    off: 'выкл'
+container:
+  player: 'Инвентарь %player%'
+  enderchest: 'Эндер сундук %player%''
