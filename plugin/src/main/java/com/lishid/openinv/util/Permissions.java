@@ -25,9 +25,9 @@ public enum Permissions {
     EXEMPT("exempt"),
     CROSSWORLD("crossworld"),
     SILENT("silent"),
-    SILENT_DEFAULT("silent.default"),
+    SILENT_DEFAULT("silent.default", true),
     ANYCHEST("anychest"),
-    ANY_DEFAULT("any.default"),
+    ANY_DEFAULT("any.default", true),
     ENDERCHEST("openender"),
     ENDERCHEST_ALL("openenderall"),
     SEARCH("search"),
@@ -39,15 +39,21 @@ public enum Permissions {
     SPECTATE("spectate");
 
     private final String permission;
+    private final boolean uninheritable;
 
     Permissions(String permission) {
+        this(permission, false);
+    }
+
+    Permissions(String permission, boolean uninheritable) {
         this.permission = "OpenInv." + permission;
+        this.uninheritable = uninheritable;
     }
 
     public boolean hasPermission(Permissible permissible) {
 
         boolean hasPermission = permissible.hasPermission(permission);
-        if (hasPermission || permissible.isPermissionSet(permission)) {
+        if (uninheritable || hasPermission || permissible.isPermissionSet(permission)) {
             return hasPermission;
         }
 
