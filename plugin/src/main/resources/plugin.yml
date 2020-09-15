@@ -5,7 +5,7 @@ author: lishid
 authors: [Jikoo, ShadowRanger]
 description: >
              This plugin allows you to open a player's inventory as a chest and interact with it in real time.
-api-version: "1.14"
+api-version: "1.15"
 
 permissions:
   OpenInv.any.default:
@@ -27,6 +27,7 @@ permissions:
       OpenInv.searchcontainer: true
       OpenInv.openonline: true
       OpenInv.openoffline: true
+      OpenInv.spectate: true
   OpenInv.openinv:
     default: op
     children:

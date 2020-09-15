@@ -136,6 +136,10 @@ OpenInv is a [Bukkit plugin](https://dev.bukkit.org/bukkit-plugins/openinv/) whi
     <td>OpenInv.silent.default</td>
     <td>Cause SilentContainer to be enabled by default.</td>
   </tr>
+  <tr>
+    <td>OpenInv.spectate</td>
+    <td>Allows users in spectate gamemode to edit inventories.</td>
+  </tr>
 </table>
 
 ## For Developers

@@ -35,7 +35,8 @@ public enum Permissions {
     EDITENDER("editender"),
     OPENSELF("openself"),
     OPENONLINE("openonline"),
-    OPENOFFLINE("openoffline");
+    OPENOFFLINE("openoffline"),
+    SPECTATE("spectate");
 
     private final String permission;
 

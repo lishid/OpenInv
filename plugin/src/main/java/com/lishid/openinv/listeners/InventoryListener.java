@@ -19,6 +19,7 @@ package com.lishid.openinv.listeners;
 import com.lishid.openinv.IOpenInv;
 import com.lishid.openinv.util.InventoryAccess;
 import com.lishid.openinv.util.Permissions;
+import org.bukkit.GameMode;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -56,22 +57,37 @@ public class InventoryListener implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryClick(InventoryClickEvent event) {
         onInventoryInteract(event);
     }
 
-    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryDrag(InventoryDragEvent event) {
         onInventoryInteract(event);
     }
 
     private void onInventoryInteract(InventoryInteractEvent event) {
         HumanEntity entity = event.getWhoClicked();
+
+        if (Permissions.SPECTATE.hasPermission(entity) && entity.getGameMode() == GameMode.SPECTATOR) {
+            event.setCancelled(false);
+        }
+
+        if (event.isCancelled()) {
+            return;
+        }
+
         Inventory inventory = event.getInventory();
-        if (InventoryAccess.isPlayerInventory(inventory) && !Permissions.EDITINV.hasPermission(entity)
-                || InventoryAccess.isEnderChest(inventory) && !Permissions.EDITENDER.hasPermission(entity)) {
-            event.setCancelled(true);
+
+        if (InventoryAccess.isPlayerInventory(inventory)) {
+            if (!Permissions.EDITINV.hasPermission(entity)) {
+                event.setCancelled(true);
+            }
+        } else if (InventoryAccess.isEnderChest(inventory)) {
+            if (!Permissions.EDITENDER.hasPermission(entity)) {
+                event.setCancelled(true);
+            }
         }
     }
 
