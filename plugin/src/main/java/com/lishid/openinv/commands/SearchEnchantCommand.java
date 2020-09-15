@@ -31,6 +31,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Command adding the ability to search online players' inventories for enchantments of a specific
@@ -124,8 +125,9 @@ public class SearchEnchantCommand implements TabExecutor {
         return true;
     }
 
-    private boolean containsEnchantment(Inventory inventory, Enchantment enchant, int minLevel) {
+    private boolean containsEnchantment(Inventory inventory, @Nullable Enchantment enchant, int minLevel) {
         for (ItemStack item : inventory.getContents()) {
+            //noinspection ConstantConditions // Spigot improperly annotated, should be ItemStack @NotNull []
             if (item == null || item.getType() == Material.AIR) {
                 continue;
             }

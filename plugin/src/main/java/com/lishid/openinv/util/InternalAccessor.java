@@ -40,7 +40,6 @@ public class InternalAccessor {
         this.version = packageName.substring(packageName.lastIndexOf('.') + 1);
 
         try {
-            // TODO: implement support for CraftMagicNumbers#getMappingsVersion
             Class.forName("com.lishid.openinv.internal." + this.version + ".SpecialPlayerInventory");
             Class.forName("com.lishid.openinv.internal." + this.version + ".SpecialEnderChest");
             this.playerDataManager = this.createObject(IPlayerDataManager.class, "PlayerDataManager");

@@ -21,7 +21,7 @@ import com.lishid.openinv.util.TabCompleter;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -46,7 +46,7 @@ public class ContainerSettingCommand implements TabExecutor {
 
         Player player = (Player) sender;
         boolean any = command.getName().startsWith("any");
-        Function<Player, Boolean> getSetting = any ? plugin::getPlayerAnyChestStatus : plugin::getPlayerSilentChestStatus;
+        Predicate<Player> getSetting = any ? plugin::getPlayerAnyChestStatus : plugin::getPlayerSilentChestStatus;
         BiConsumer<OfflinePlayer, Boolean> setSetting = any ? plugin::setPlayerAnyChestStatus : plugin::setPlayerSilentChestStatus;
 
         if (args.length > 0) {
@@ -62,12 +62,12 @@ public class ContainerSettingCommand implements TabExecutor {
             }
 
         } else {
-            setSetting.accept(player, !getSetting.apply(player));
+            setSetting.accept(player, !getSetting.test(player));
         }
 
-        String onOff = plugin.getLocalizedMessage(player, getSetting.apply(player) ? "messages.info.on" : "messages.info.off");
+        String onOff = plugin.getLocalizedMessage(player, getSetting.test(player) ? "messages.info.on" : "messages.info.off");
         if (onOff == null) {
-            onOff = String.valueOf(getSetting.apply(player));
+            onOff = String.valueOf(getSetting.test(player));
         }
 
         plugin.sendMessage(sender, "messages.info.settingState","%setting%", any ? "AnyContainer" : "SilentContainer", "%state%", onOff);

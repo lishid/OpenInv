@@ -18,6 +18,7 @@ package com.lishid.openinv.util;
 
 import com.lishid.openinv.internal.IInventoryAccess;
 import com.lishid.openinv.internal.ISpecialEnderChest;
+import com.lishid.openinv.internal.ISpecialInventory;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -33,9 +34,8 @@ public class InventoryAccess implements IInventoryAccess {
 
     static {
         String packageName = Bukkit.getServer().getClass().getPackage().getName();
-        String version = packageName.substring(packageName.lastIndexOf('.') + 1);
         try {
-            craftInventory = Class.forName("org.bukkit.craftbukkit." + version + ".inventory.CraftInventory");
+            craftInventory = Class.forName(packageName + ".inventory.CraftInventory");
         } catch (ClassNotFoundException ignored) {}
         try {
             getInventory = craftInventory.getDeclaredMethod("getInventory");
@@ -47,62 +47,42 @@ public class InventoryAccess implements IInventoryAccess {
     }
 
     public static boolean isPlayerInventory(@NotNull Inventory inventory) {
-        if (craftInventory.isAssignableFrom(inventory.getClass())) {
-            try {
-                return getInventory.invoke(inventory) instanceof ISpecialPlayerInventory;
-            } catch (ReflectiveOperationException ignored) {}
-        }
-        return grabFieldOfTypeFromObject(ISpecialPlayerInventory.class, inventory) != null;
+        return getPlayerInventory(inventory) != null;
     }
 
-    public static ISpecialPlayerInventory getPlayerInventory(@NotNull Inventory inventory) {
-        Object inv = null;
-        if (craftInventory.isAssignableFrom(inventory.getClass())) {
-            try {
-                inv = getInventory.invoke(inventory);
-            } catch (ReflectiveOperationException ignored) {}
-        }
-
-        if (inv == null) {
-            inv = grabFieldOfTypeFromObject(ISpecialPlayerInventory.class, inventory);
-        }
-
-        if (inv instanceof ISpecialPlayerInventory) {
-            return (ISpecialPlayerInventory) inv;
-        }
-
-        return null;
+    public static @Nullable ISpecialPlayerInventory getPlayerInventory(@NotNull Inventory inventory) {
+        return getSpecialInventory(ISpecialPlayerInventory.class, inventory);
     }
 
     public static boolean isEnderChest(@NotNull Inventory inventory) {
-        if (craftInventory.isAssignableFrom(inventory.getClass())) {
-            try {
-                return getInventory.invoke(inventory) instanceof ISpecialEnderChest;
-            } catch (ReflectiveOperationException ignored) {}
-        }
-        return grabFieldOfTypeFromObject(ISpecialEnderChest.class, inventory) != null;
+        return getEnderChest(inventory) != null;
     }
 
-    public static ISpecialEnderChest getEnderChest(@NotNull Inventory inventory) {
-        Object inv = null;
-        if (craftInventory.isAssignableFrom(inventory.getClass())) {
+    public static @Nullable ISpecialEnderChest getEnderChest(@NotNull Inventory inventory) {
+        return getSpecialInventory(ISpecialEnderChest.class, inventory);
+    }
+
+    private static <T extends ISpecialInventory> @Nullable T getSpecialInventory(@NotNull Class<T> expected, @NotNull Inventory inventory) {
+        Object inv;
+        if (craftInventory != null && getInventory != null && craftInventory.isAssignableFrom(inventory.getClass())) {
             try {
                 inv = getInventory.invoke(inventory);
+                if (expected.isInstance(inv)) {
+                    return expected.cast(inv);
+                }
             } catch (ReflectiveOperationException ignored) {}
         }
 
-        if (inv == null) {
-            inv = grabFieldOfTypeFromObject(ISpecialEnderChest.class, inventory);
-        }
+        inv = grabFieldOfTypeFromObject(ISpecialPlayerInventory.class, inventory);
 
-        if (inv instanceof ISpecialEnderChest) {
-            return (ISpecialEnderChest) inv;
+        if (expected.isInstance(inv)) {
+            return expected.cast(inv);
         }
 
         return null;
     }
 
-    private static <T> T grabFieldOfTypeFromObject(final Class<T> type, final Object object) {
+    private static <T> @Nullable T grabFieldOfTypeFromObject(final Class<T> type, final Object object) {
         // Use reflection to find the IInventory
         Class<?> clazz = object.getClass();
         T result = null;
@@ -142,4 +122,5 @@ public class InventoryAccess implements IInventoryAccess {
     public boolean isSpecialPlayerInventory(@NotNull Inventory inventory) {
         return isPlayerInventory(inventory);
     }
+
 }

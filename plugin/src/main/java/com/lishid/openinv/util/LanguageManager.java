@@ -41,7 +41,7 @@ public class LanguageManager {
 
 	private final OpenInv plugin;
 	private final String defaultLocale;
-	private Map<String, YamlConfiguration> locales;
+	private final Map<String, YamlConfiguration> locales;
 
 	public LanguageManager(@NotNull OpenInv plugin, @NotNull String defaultLocale) {
 		this.plugin = plugin;

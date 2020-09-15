@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.Set;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class ConfigUpdater {
 
@@ -36,7 +35,8 @@ public class ConfigUpdater {
 
     public void checkForUpdates() {
         final int version = plugin.getConfig().getInt("config-version", 1);
-        if (version >= plugin.getConfig().getDefaults().getInt("config-version")) {
+        ConfigurationSection defaults = plugin.getConfig().getDefaults();
+        if (defaults == null || version >= defaults.getInt("config-version")) {
             return;
         }
 
@@ -50,87 +50,72 @@ public class ConfigUpdater {
             plugin.getLogger().warning("Could not back up config.yml before updating!");
         }
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                if (version < 2) {
-                    updateConfig1To2();
-                }
-                if (version < 3) {
-                    updateConfig2To3();
-                }
-                if (version < 4) {
-                    updateConfig3To4();
-                }
-
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        plugin.saveConfig();
-                        plugin.getLogger().info("Configuration update complete!");
-                    }
-                }.runTaskLater(plugin, 1L); // Run on 1 tick delay; on older versions Bukkit's scheduler is not guaranteed FIFO
+        plugin.getServer().getScheduler().runTaskAsynchronously(plugin, () -> {
+            if (version < 2) {
+                updateConfig1To2();
             }
-        }.runTaskAsynchronously(plugin);
+            if (version < 3) {
+                updateConfig2To3();
+            }
+            if (version < 4) {
+                updateConfig3To4();
+            }
+
+            plugin.getServer().getScheduler().runTask(plugin, () -> {
+                plugin.saveConfig();
+                plugin.getLogger().info("Configuration update complete!");
+            });
+        });
     }
 
     private void updateConfig3To4() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                plugin.getConfig().set("notify", null);
-                plugin.getConfig().set("settings.locale", "en_US");
-                plugin.getConfig().set("config-version", 4);
-            }
-        }.runTask(plugin);
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            plugin.getConfig().set("notify", null);
+            plugin.getConfig().set("settings.locale", "en_US");
+            plugin.getConfig().set("config-version", 4);
+        });
     }
 
     private void updateConfig2To3() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                plugin.getConfig().set("config-version", 3);
-                plugin.getConfig().set("items.open-inv", null);
-                plugin.getConfig().set("ItemOpenInv", null);
-                plugin.getConfig().set("toggles.items.open-inv", null);
-                plugin.getConfig().set("settings.disable-saving",
-                        plugin.getConfig().getBoolean("DisableSaving", false));
-                plugin.getConfig().set("DisableSaving", null);
-            }
-        }.runTask(plugin);
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            plugin.getConfig().set("config-version", 3);
+            plugin.getConfig().set("items.open-inv", null);
+            plugin.getConfig().set("ItemOpenInv", null);
+            plugin.getConfig().set("toggles.items.open-inv", null);
+            plugin.getConfig().set("settings.disable-saving",
+                    plugin.getConfig().getBoolean("DisableSaving", false));
+            plugin.getConfig().set("DisableSaving", null);
+        });
     }
 
     private void updateConfig1To2() {
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                // Get the old config settings
-                boolean notifySilentChest = plugin.getConfig().getBoolean("NotifySilentChest", true);
-                boolean notifyAnyChest = plugin.getConfig().getBoolean("NotifyAnyChest", true);
-                plugin.getConfig().set("ItemOpenInvItemID", null);
-                plugin.getConfig().set("NotifySilentChest", null);
-                plugin.getConfig().set("NotifyAnyChest", null);
-                plugin.getConfig().set("config-version", 2);
-                plugin.getConfig().set("notify.any-chest", notifyAnyChest);
-                plugin.getConfig().set("notify.silent-chest", notifySilentChest);
-            }
-        }.runTask(plugin);
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            // Get the old config settings
+            boolean notifySilentChest = plugin.getConfig().getBoolean("NotifySilentChest", true);
+            boolean notifyAnyChest = plugin.getConfig().getBoolean("NotifyAnyChest", true);
+            plugin.getConfig().set("ItemOpenInvItemID", null);
+            plugin.getConfig().set("NotifySilentChest", null);
+            plugin.getConfig().set("NotifyAnyChest", null);
+            plugin.getConfig().set("config-version", 2);
+            plugin.getConfig().set("notify.any-chest", notifyAnyChest);
+            plugin.getConfig().set("notify.silent-chest", notifySilentChest);
+        });
 
         updateToggles("AnyChest", "toggles.any-chest");
         updateToggles("SilentChest", "toggles.silent-chest");
     }
 
     private void updateToggles(final String sectionName, final String newSectionName) {
+        ConfigurationSection section = plugin.getConfig().getConfigurationSection(sectionName);
         // Ensure section exists
-        if (!plugin.getConfig().isConfigurationSection(sectionName)) {
+        if (section == null) {
             return;
         }
 
-        ConfigurationSection section = plugin.getConfig().getConfigurationSection(sectionName);
         Set<String> keys = section.getKeys(false);
 
         // Ensure section has content
-        if (keys == null || keys.isEmpty()) {
+        if (keys.isEmpty()) {
             return;
         }
 
@@ -143,25 +128,20 @@ public class ConfigUpdater {
             }
         }
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                // Wipe old ConfigurationSection
-                plugin.getConfig().set(sectionName, null);
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            // Wipe old ConfigurationSection
+            plugin.getConfig().set(sectionName, null);
 
-                // Prepare new ConfigurationSection
-                ConfigurationSection newSection;
-                if (plugin.getConfig().isConfigurationSection(newSectionName)) {
-                    newSection = plugin.getConfig().getConfigurationSection(newSectionName);
-                } else {
-                    newSection = plugin.getConfig().createSection(newSectionName);
-                }
-                // Set new values
-                for (Map.Entry<String, Boolean> entry : toggles.entrySet()) {
-                    newSection.set(entry.getKey(), entry.getValue());
-                }
+            // Prepare new ConfigurationSection
+            ConfigurationSection newSection = plugin.getConfig().getConfigurationSection(newSectionName);
+            if (newSection == null) {
+                newSection = plugin.getConfig().createSection(newSectionName);
             }
-        }.runTask(plugin);
+            // Set new values
+            for (Map.Entry<String, Boolean> entry : toggles.entrySet()) {
+                newSection.set(entry.getKey(), entry.getValue());
+            }
+        });
     }
 
 }

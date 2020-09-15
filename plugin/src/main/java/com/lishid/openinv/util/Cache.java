@@ -24,7 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * A minimal thread-safe time-based cache implementation backed by a HashMap and TreeMultimap.
@@ -36,16 +37,17 @@ public class Cache<K, V> {
     private final Map<K, V> internal;
     private final Multimap<Long, K> expiry;
     private final long retention;
-    private final Function<V, Boolean> inUseCheck, postRemoval;
+    private final Predicate<V> inUseCheck;
+    private final Consumer<V> postRemoval;
 
     /**
      * Constructs a Cache with the specified retention duration, in use function, and post-removal function.
      *
      * @param retention duration after which keys are automatically invalidated if not in use
-     * @param inUseCheck Function used to check if a key is considered in use
-     * @param postRemoval Function used to perform any operations required when a key is invalidated
+     * @param inUseCheck Predicate used to check if a key is considered in use
+     * @param postRemoval Consumer used to perform any operations required when a key is invalidated
      */
-    public Cache(final long retention, final Function<V, Boolean> inUseCheck, final Function<V, Boolean> postRemoval) {
+    public Cache(final long retention, final Predicate<V> inUseCheck, final Consumer<V> postRemoval) {
         this.internal = new HashMap<>();
 
         this.expiry = TreeMultimap.create(Long::compareTo, (k1, k2) -> Objects.equals(k1, k2) ? 0 : 1);
@@ -136,7 +138,7 @@ public class Cache<K, V> {
     public void invalidateAll() {
         synchronized (this.internal) {
             for (V value : this.internal.values()) {
-                this.postRemoval.apply(value);
+                this.postRemoval.accept(value);
             }
             this.expiry.clear();
             this.internal.clear();
@@ -161,7 +163,7 @@ public class Cache<K, V> {
 
                 iterator.remove();
 
-                if (this.inUseCheck.apply(this.internal.get(entry.getValue()))) {
+                if (this.inUseCheck.test(this.internal.get(entry.getValue()))) {
                     inUse.add(entry.getValue());
                     continue;
                 }
@@ -172,7 +174,7 @@ public class Cache<K, V> {
                     continue;
                 }
 
-                this.postRemoval.apply(value);
+                this.postRemoval.accept(value);
             }
 
             long nextExpiry = now + this.retention;

@@ -16,19 +16,57 @@
 
 package com.lishid.openinv.listeners;
 
+import com.lishid.openinv.IOpenInv;
 import com.lishid.openinv.util.InventoryAccess;
 import com.lishid.openinv.util.Permissions;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.Inventory;
 
-public class InventoryClickListener implements Listener {
+/**
+ * Listener for inventory-related events to prevent modification of inventories where not allowed.
+ *
+ * @author Jikoo
+ */
+public class InventoryListener implements Listener {
+
+    private final IOpenInv plugin;
+
+    public InventoryListener(final IOpenInv plugin) {
+        this.plugin = plugin;
+    }
+
+    @EventHandler
+    public void onInventoryClose(final InventoryCloseEvent event) {
+        if (!(event.getPlayer() instanceof Player)) {
+            return;
+        }
+
+        Player player = (Player) event.getPlayer();
+
+        if (this.plugin.getPlayerSilentChestStatus(player)) {
+            this.plugin.getAnySilentContainer().deactivateContainer(player);
+        }
+    }
 
     @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
     public void onInventoryClick(InventoryClickEvent event) {
+        onInventoryInteract(event);
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onInventoryDrag(InventoryDragEvent event) {
+        onInventoryInteract(event);
+    }
+
+    private void onInventoryInteract(InventoryInteractEvent event) {
         HumanEntity entity = event.getWhoClicked();
         Inventory inventory = event.getInventory();
         if (InventoryAccess.isPlayerInventory(inventory) && !Permissions.EDITINV.hasPermission(entity)

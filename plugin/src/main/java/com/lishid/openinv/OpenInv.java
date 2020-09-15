@@ -27,9 +27,7 @@ import com.lishid.openinv.internal.IAnySilentContainer;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialInventory;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
-import com.lishid.openinv.listeners.InventoryClickListener;
-import com.lishid.openinv.listeners.InventoryCloseListener;
-import com.lishid.openinv.listeners.InventoryDragListener;
+import com.lishid.openinv.listeners.InventoryListener;
 import com.lishid.openinv.listeners.PlayerListener;
 import com.lishid.openinv.listeners.PluginListener;
 import com.lishid.openinv.util.Cache;
@@ -105,7 +103,6 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
                 if (!OpenInv.this.disableSaving() && !value.isOnline()) {
                     value.saveData();
                 }
-                return true;
             });
 
     private InternalAccessor accessor;
@@ -127,6 +124,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
         if (this.inventories.containsKey(key)) {
             Iterator<HumanEntity> iterator = this.inventories.get(key).getBukkitInventory().getViewers().iterator();
+            //noinspection WhileLoopReplaceableByForEach
             while (iterator.hasNext()) {
                 HumanEntity human = iterator.next();
                 // If player has permission or is in the same world, allow continued access
@@ -140,6 +138,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
         if (this.enderChests.containsKey(key)) {
             Iterator<HumanEntity> iterator = this.enderChests.get(key).getBukkitInventory().getViewers().iterator();
+            //noinspection WhileLoopReplaceableByForEach
             while (iterator.hasNext()) {
                 HumanEntity human = iterator.next();
                 if (Permissions.CROSSWORLD.hasPermission(human) || human.getWorld().equals(player.getWorld())) {
@@ -222,22 +221,18 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         return this.accessor != null && this.accessor.isSupported();
     }
 
-    @Nullable
     @Override
-    public Player loadPlayer(@NotNull final OfflinePlayer offline) {
+    public @Nullable Player loadPlayer(@NotNull final OfflinePlayer offline) {
 
         String key = this.getPlayerID(offline);
         if (this.playerCache.containsKey(key)) {
             return this.playerCache.get(key);
         }
 
-        // TODO: wrap Player to ensure all methods can safely be called offline
-        Player loaded;
-
-        if (offline.isOnline()) {
-            loaded = offline.getPlayer();
-            this.playerCache.put(key, loaded);
-            return loaded;
+        Player player = offline.getPlayer();
+        if (player != null) {
+            this.playerCache.put(key, player);
+            return player;
         }
 
         if (!this.isSupportedVersion()) {
@@ -251,33 +246,18 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         Future<Player> future = Bukkit.getScheduler().callSyncMethod(this,
                 () -> OpenInv.this.accessor.getPlayerDataManager().loadPlayer(offline));
 
-        int ticks = 0;
-        while (!future.isDone() && !future.isCancelled() && ticks < 10) {
-            ++ticks;
-            try {
-                Thread.sleep(50L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        if (!future.isDone() || future.isCancelled()) {
-            return null;
-        }
-
         try {
-            loaded = future.get();
+            player = future.get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             return null;
         }
 
-        if (loaded != null) {
-            this.playerCache.put(key, loaded);
+        if (player != null) {
+            this.playerCache.put(key, player);
         }
 
-        return loaded;
+        return player;
     }
 
     @Override
@@ -317,8 +297,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         return this.languageManager.getValue(key, getLocale(sender), replacements);
     }
 
-    @Nullable
-    private String getLocale(@NotNull CommandSender sender) {
+    private @Nullable String getLocale(@NotNull CommandSender sender) {
         if (sender instanceof Player) {
             return this.accessor.getPlayerDataManager().getLocale((Player) sender);
         } else {
@@ -369,10 +348,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             // Register listeners
             pm.registerEvents(new PlayerListener(this), this);
             pm.registerEvents(new PluginListener(this), this);
-            pm.registerEvents(new InventoryClickListener(), this);
-            pm.registerEvents(new InventoryCloseListener(this), this);
-            // Bukkit will handle missing events for us, attempt to register InventoryDragEvent without a version check
-            pm.registerEvents(new InventoryDragListener(), this);
+            pm.registerEvents(new InventoryListener(this), this);
 
             // Register commands to their executors
             OpenInvCommand openInv = new OpenInvCommand(this);
