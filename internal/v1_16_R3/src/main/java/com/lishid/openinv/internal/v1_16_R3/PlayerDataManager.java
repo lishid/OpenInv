@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_16_R1;
+package com.lishid.openinv.internal.v1_16_R3;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IPlayerDataManager;
@@ -23,32 +23,32 @@ import com.mojang.authlib.GameProfile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Field;
-import net.minecraft.server.v1_16_R1.ChatComponentText;
-import net.minecraft.server.v1_16_R1.ChatMessageType;
-import net.minecraft.server.v1_16_R1.Container;
-import net.minecraft.server.v1_16_R1.Containers;
-import net.minecraft.server.v1_16_R1.Entity;
-import net.minecraft.server.v1_16_R1.EntityHuman;
-import net.minecraft.server.v1_16_R1.EntityPlayer;
-import net.minecraft.server.v1_16_R1.MinecraftServer;
-import net.minecraft.server.v1_16_R1.NBTCompressedStreamTools;
-import net.minecraft.server.v1_16_R1.NBTTagCompound;
-import net.minecraft.server.v1_16_R1.PacketPlayOutChat;
-import net.minecraft.server.v1_16_R1.PacketPlayOutOpenWindow;
-import net.minecraft.server.v1_16_R1.PlayerInteractManager;
-import net.minecraft.server.v1_16_R1.PlayerInventory;
-import net.minecraft.server.v1_16_R1.SystemUtils;
-import net.minecraft.server.v1_16_R1.World;
-import net.minecraft.server.v1_16_R1.WorldNBTStorage;
-import net.minecraft.server.v1_16_R1.WorldServer;
+import net.minecraft.server.v1_16_R3.ChatComponentText;
+import net.minecraft.server.v1_16_R3.ChatMessageType;
+import net.minecraft.server.v1_16_R3.Container;
+import net.minecraft.server.v1_16_R3.Containers;
+import net.minecraft.server.v1_16_R3.Entity;
+import net.minecraft.server.v1_16_R3.EntityHuman;
+import net.minecraft.server.v1_16_R3.EntityPlayer;
+import net.minecraft.server.v1_16_R3.MinecraftServer;
+import net.minecraft.server.v1_16_R3.NBTCompressedStreamTools;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.PacketPlayOutChat;
+import net.minecraft.server.v1_16_R3.PacketPlayOutOpenWindow;
+import net.minecraft.server.v1_16_R3.PlayerInteractManager;
+import net.minecraft.server.v1_16_R3.PlayerInventory;
+import net.minecraft.server.v1_16_R3.SystemUtils;
+import net.minecraft.server.v1_16_R3.World;
+import net.minecraft.server.v1_16_R3.WorldNBTStorage;
+import net.minecraft.server.v1_16_R3.WorldServer;
 import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
-import org.bukkit.craftbukkit.v1_16_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_16_R1.event.CraftEventFactory;
-import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftContainer;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R3.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftContainer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -161,11 +161,10 @@ public class PlayerDataManager implements IPlayerDataManager {
 
                     NBTCompressedStreamTools.a(playerData, new FileOutputStream(file));
 
-                    if (file1.exists()) {
-                        file1.delete();
+                    if (file1.exists() && !file1.delete() || !file.renameTo(file1)) {
+                        LogManager.getLogger().warn("Failed to save player data for {}", player.getDisplayName().getString());
                     }
 
-                    file.renameTo(file1);
                 } catch (Exception e) {
                     LogManager.getLogger().warn("Failed to save player data for {}", player.getDisplayName().getString());
                 }
@@ -187,7 +186,7 @@ public class PlayerDataManager implements IPlayerDataManager {
     }
 
     @Nullable
-	@Override
+    @Override
     public InventoryView openInventory(@NotNull Player player, @NotNull ISpecialInventory inventory) {
 
         EntityPlayer nmsPlayer = getHandle(player);

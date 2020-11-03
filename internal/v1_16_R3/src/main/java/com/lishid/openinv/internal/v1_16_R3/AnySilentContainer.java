@@ -14,39 +14,38 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_16_R1;
+package com.lishid.openinv.internal.v1_16_R3;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IAnySilentContainer;
 import java.lang.reflect.Field;
-import net.minecraft.server.v1_16_R1.Block;
-import net.minecraft.server.v1_16_R1.BlockBarrel;
-import net.minecraft.server.v1_16_R1.BlockChest;
-import net.minecraft.server.v1_16_R1.BlockChestTrapped;
-import net.minecraft.server.v1_16_R1.BlockEnderChest;
-import net.minecraft.server.v1_16_R1.BlockPosition;
-import net.minecraft.server.v1_16_R1.BlockPropertyChestType;
-import net.minecraft.server.v1_16_R1.BlockShulkerBox;
-import net.minecraft.server.v1_16_R1.ChatMessage;
-import net.minecraft.server.v1_16_R1.Container;
-import net.minecraft.server.v1_16_R1.ContainerChest;
-import net.minecraft.server.v1_16_R1.Containers;
-import net.minecraft.server.v1_16_R1.EntityHuman;
-import net.minecraft.server.v1_16_R1.EntityPlayer;
-import net.minecraft.server.v1_16_R1.EnumGamemode;
-import net.minecraft.server.v1_16_R1.IBlockData;
-import net.minecraft.server.v1_16_R1.IChatBaseComponent;
-import net.minecraft.server.v1_16_R1.ITileInventory;
-import net.minecraft.server.v1_16_R1.InventoryEnderChest;
-import net.minecraft.server.v1_16_R1.InventoryLargeChest;
-import net.minecraft.server.v1_16_R1.PlayerInteractManager;
-import net.minecraft.server.v1_16_R1.PlayerInventory;
-import net.minecraft.server.v1_16_R1.TileEntity;
-import net.minecraft.server.v1_16_R1.TileEntityChest;
-import net.minecraft.server.v1_16_R1.TileEntityEnderChest;
-import net.minecraft.server.v1_16_R1.TileEntityLootable;
-import net.minecraft.server.v1_16_R1.TileInventory;
-import net.minecraft.server.v1_16_R1.World;
+import net.minecraft.server.v1_16_R3.Block;
+import net.minecraft.server.v1_16_R3.BlockBarrel;
+import net.minecraft.server.v1_16_R3.BlockChest;
+import net.minecraft.server.v1_16_R3.BlockChestTrapped;
+import net.minecraft.server.v1_16_R3.BlockPosition;
+import net.minecraft.server.v1_16_R3.BlockPropertyChestType;
+import net.minecraft.server.v1_16_R3.BlockShulkerBox;
+import net.minecraft.server.v1_16_R3.ChatMessage;
+import net.minecraft.server.v1_16_R3.Container;
+import net.minecraft.server.v1_16_R3.ContainerChest;
+import net.minecraft.server.v1_16_R3.Containers;
+import net.minecraft.server.v1_16_R3.EntityHuman;
+import net.minecraft.server.v1_16_R3.EntityPlayer;
+import net.minecraft.server.v1_16_R3.EnumGamemode;
+import net.minecraft.server.v1_16_R3.IBlockData;
+import net.minecraft.server.v1_16_R3.IChatBaseComponent;
+import net.minecraft.server.v1_16_R3.ITileInventory;
+import net.minecraft.server.v1_16_R3.InventoryEnderChest;
+import net.minecraft.server.v1_16_R3.InventoryLargeChest;
+import net.minecraft.server.v1_16_R3.PlayerInteractManager;
+import net.minecraft.server.v1_16_R3.PlayerInventory;
+import net.minecraft.server.v1_16_R3.TileEntity;
+import net.minecraft.server.v1_16_R3.TileEntityChest;
+import net.minecraft.server.v1_16_R3.TileEntityEnderChest;
+import net.minecraft.server.v1_16_R3.TileEntityLootable;
+import net.minecraft.server.v1_16_R3.TileInventory;
+import net.minecraft.server.v1_16_R3.World;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.block.Barrel;
@@ -149,7 +148,7 @@ public class AnySilentContainer implements IAnySilentContainer {
         if (!(relativeData instanceof Chest)) {
             return false;
         }
-        
+
         Chest relativeChest = (Chest) relativeData;
         if (relativeChest.getFacing() != chest.getFacing()
                 || relativeChest.getType() != (chest.getType() == Chest.Type.RIGHT ? Chest.Type.LEFT : Chest.Type.RIGHT)) {
@@ -215,7 +214,7 @@ public class AnySilentContainer implements IAnySilentContainer {
                         break;
                 }
                 return new ContainerChest(containers, containerCounter, playerInventory, enderChest, rows);
-            }, BlockEnderChest.e));
+            }, new ChatMessage("container.enderchest")));
             bukkitPlayer.incrementStatistic(Statistic.ENDERCHEST_OPENED);
             return true;
         }
@@ -324,9 +323,9 @@ public class AnySilentContainer implements IAnySilentContainer {
             case ENDER_CHEST:
             case SHULKER_BOX:
             case BARREL:
-            break;
-        default:
-            return;
+                break;
+            default:
+                return;
         }
 
         EntityPlayer player = PlayerDataManager.getHandle(bukkitPlayer);

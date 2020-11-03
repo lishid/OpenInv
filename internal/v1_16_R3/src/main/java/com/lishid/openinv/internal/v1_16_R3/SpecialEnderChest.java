@@ -14,21 +14,21 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_16_R1;
+package com.lishid.openinv.internal.v1_16_R3;
 
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import java.util.List;
-import net.minecraft.server.v1_16_R1.AutoRecipeStackManager;
-import net.minecraft.server.v1_16_R1.ContainerUtil;
-import net.minecraft.server.v1_16_R1.EntityHuman;
-import net.minecraft.server.v1_16_R1.EntityPlayer;
-import net.minecraft.server.v1_16_R1.IInventoryListener;
-import net.minecraft.server.v1_16_R1.InventoryEnderChest;
-import net.minecraft.server.v1_16_R1.ItemStack;
-import net.minecraft.server.v1_16_R1.NonNullList;
+import net.minecraft.server.v1_16_R3.AutoRecipeStackManager;
+import net.minecraft.server.v1_16_R3.ContainerUtil;
+import net.minecraft.server.v1_16_R3.EntityHuman;
+import net.minecraft.server.v1_16_R3.EntityPlayer;
+import net.minecraft.server.v1_16_R3.IInventoryListener;
+import net.minecraft.server.v1_16_R3.InventoryEnderChest;
+import net.minecraft.server.v1_16_R3.ItemStack;
+import net.minecraft.server.v1_16_R3.NonNullList;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;

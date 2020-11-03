@@ -54,26 +54,6 @@
       </activation>
     </profile>
 
-    <profile>
-      <id>latest</id>
-      <activation>
-        <property>
-          <name>latest</name>
-          <value>true</value>
-        </property>
-      </activation>
-    </profile>
-
-    <profile>
-      <id>recent</id>
-      <activation>
-        <property>
-          <name>recent</name>
-          <value>true</value>
-        </property>
-      </activation>
-    </profile>
-
   </profiles>
 
   <repositories>
