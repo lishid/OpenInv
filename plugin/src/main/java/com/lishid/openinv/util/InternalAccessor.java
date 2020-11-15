@@ -44,7 +44,7 @@ public class InternalAccessor {
             Class.forName("com.lishid.openinv.internal." + this.version + ".SpecialEnderChest");
             this.playerDataManager = this.createObject(IPlayerDataManager.class, "PlayerDataManager");
             this.anySilentContainer = this.createObject(IAnySilentContainer.class, "AnySilentContainer");
-            this.supported = InventoryAccess.isUseable();
+            this.supported = InventoryAccess.isUsable();
         } catch (Exception ignored) {}
     }
 
