@@ -352,17 +352,11 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             pm.registerEvents(new InventoryListener(this), this);
 
             // Register commands to their executors
-            OpenInvCommand openInv = new OpenInvCommand(this);
-            this.setCommandExecutor("openinv", openInv);
-            this.setCommandExecutor("openender", openInv);
-            this.setCommandExecutor("searchcontainer", new SearchContainerCommand(this));
-            SearchInvCommand searchInv = new SearchInvCommand(this);
-            this.setCommandExecutor("searchinv", searchInv);
-            this.setCommandExecutor("searchender", searchInv);
-            this.setCommandExecutor("searchenchant", new SearchEnchantCommand(this));
-            ContainerSettingCommand settingCommand = new ContainerSettingCommand(this);
-            this.setCommandExecutor("silentcontainer", settingCommand);
-            this.setCommandExecutor("anycontainer", settingCommand);
+            this.setCommandExecutor(new OpenInvCommand(this), "openinv", "openender");
+            this.setCommandExecutor(new SearchContainerCommand(this), "searchcontainer");
+            this.setCommandExecutor(new SearchInvCommand(this), "searchinv", "searchender");
+            this.setCommandExecutor(new SearchEnchantCommand(this), "searchenchant");
+            this.setCommandExecutor(new ContainerSettingCommand(this), "silentcontainer", "anycontainer");
 
         } else {
             this.sendVersionError(this.getLogger()::warning);
@@ -375,10 +369,12 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         messageMethod.accept("Please obtain an appropriate version here: " + accessor.getReleasesLink());
     }
 
-    private void setCommandExecutor(String commandName, CommandExecutor executor) {
-        PluginCommand command = this.getCommand(commandName);
-        if (command != null) {
-            command.setExecutor(executor);
+    private void setCommandExecutor(CommandExecutor executor, String... commands) {
+        for (String commandName : commands) {
+            PluginCommand command = this.getCommand(commandName);
+            if (command != null) {
+                command.setExecutor(executor);
+            }
         }
     }
 
