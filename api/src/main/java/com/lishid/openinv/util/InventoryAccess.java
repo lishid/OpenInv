@@ -73,7 +73,7 @@ public class InventoryAccess implements IInventoryAccess {
             } catch (ReflectiveOperationException ignored) {}
         }
 
-        inv = grabFieldOfTypeFromObject(ISpecialPlayerInventory.class, inventory);
+        inv = grabFieldOfTypeFromObject(expected, inventory);
 
         if (expected.isInstance(inv)) {
             return expected.cast(inv);
