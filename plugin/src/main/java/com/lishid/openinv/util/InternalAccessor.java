@@ -48,6 +48,45 @@ public class InternalAccessor {
         } catch (Exception ignored) {}
     }
 
+    public String getReleasesLink() {
+        switch (version) {
+            case "1_4_5":
+            case "1_4_6":
+            case "v1_4_R1":
+            case "v1_5_R2":
+            case "v1_5_R3":
+            case "v1_6_R1":
+            case "v1_6_R2":
+            case "v1_6_R3":
+            case "v1_7_R1":
+            case "v1_7_R2":
+            case "v1_7_R3":
+            case "v1_7_R4":
+            case "v1_8_R1":
+            case "v1_8_R2":
+            case "v1_9_R1":
+            case "v1_9_R2":
+            case "v1_10_R1":
+            case "v1_11_R1":
+            case "v1_12_R1":
+                return "https://github.com/lishid/OpenInv/releases/tag/4.0.0 (OpenInv-legacy)";
+            case "v1_13_R1":
+                return "https://github.com/lishid/OpenInv/releases/tag/4.0.0";
+            case "v1_13_R2":
+                return "https://github.com/lishid/OpenInv/releases/tag/4.0.7";
+            case "v1_14_R1":
+                return "https://github.com/lishid/OpenInv/releases/tag/4.1.1";
+            case "v1_16_R1":
+                return "https://github.com/lishid/OpenInv/releases/tag/4.1.4";
+            case "v1_8_R3":
+            case "v1_15_R1":
+            case "v1_16_R2":
+            case "v1_16_R3":
+            default:
+                return "https://github.com/lishid/OpenInv/releases";
+        }
+    }
+
     private <T> T createObject(final Class<? extends T> assignableClass, final String className,
             final Object... params) throws ClassCastException, ClassNotFoundException,
             InstantiationException, IllegalAccessException, IllegalArgumentException,

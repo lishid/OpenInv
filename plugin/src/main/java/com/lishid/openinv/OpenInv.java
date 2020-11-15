@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -364,11 +365,14 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             this.setCommandExecutor("anycontainer", settingCommand);
 
         } else {
-            this.getLogger().info("Your version of CraftBukkit (" + this.accessor.getVersion() + ") is not supported.");
-            this.getLogger().info("If this version is a recent release, check for an update.");
-            this.getLogger().info("If this is an older version, ensure that you've downloaded the legacy support version.");
+            this.sendVersionError(this.getLogger()::warning);
         }
 
+    }
+
+    private void sendVersionError(Consumer<String> messageMethod) {
+        messageMethod.accept("Your server version (" + this.accessor.getVersion() + ") is not supported.");
+        messageMethod.accept("Please obtain an appropriate version here: " + accessor.getReleasesLink());
     }
 
     private void setCommandExecutor(String commandName, CommandExecutor executor) {
@@ -381,8 +385,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (!this.accessor.isSupported()) {
-            sender.sendMessage("Your server version (" + this.accessor.getVersion() + ") is not supported.");
-            sender.sendMessage("Please check https://github.com/lishid/OpenInv/releases for an update.");
+            this.sendVersionError(sender::sendMessage);
             return true;
         }
         return false;
