@@ -1,11 +1,10 @@
 **/.settings
-**/.gitignore
 **/.project
 **/.classpath
-**/.idea
+**/.idea/
 **.iml
-**/target
-**/bin
-**/out
-**dependency-reduced-pom.xml
-**pom.xml.versionsBackup
+**/target/
+**/bin/
+**/out/
+**/dependency-reduced-pom.xml
+**/pom.xml.versionsBackup
