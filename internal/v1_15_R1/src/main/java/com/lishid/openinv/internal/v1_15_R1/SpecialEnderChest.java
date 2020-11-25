@@ -33,6 +33,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class SpecialEnderChest extends InventoryEnderChest implements ISpecialEnderChest {
 
@@ -115,7 +116,7 @@ public class SpecialEnderChest extends InventoryEnderChest implements ISpecialEn
     }
 
     @Override
-    public Location getLocation() {
+    public @Nullable Location getLocation() {
         return null;
     }
 
@@ -204,7 +205,7 @@ public class SpecialEnderChest extends InventoryEnderChest implements ISpecialEn
     }
 
     @Override
-    public boolean isNotEmpty() {
+    public boolean isEmpty() {
 
         for (ItemStack itemstack : this.items) {
             if (!itemstack.isEmpty()) {
