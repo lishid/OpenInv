@@ -326,7 +326,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             }
 
             if (!this.a(itemstack, itemstack1)) {
-                remains -= (itemstack1.getMaxStackSize() < this.getMaxStackSize() ? itemstack1.getMaxStackSize() : this.getMaxStackSize()) - itemstack1.getCount();
+                remains -= Math.min(itemstack1.getMaxStackSize(), this.getMaxStackSize()) - itemstack1.getCount();
             }
 
             if (remains <= 0) {
@@ -461,14 +461,12 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
             k = this.getMaxStackSize() - itemstack1.getCount();
         }
 
-        if (k == 0) {
-            return j;
-        } else {
+        if (k != 0) {
             j -= k;
             itemstack1.add(k);
             itemstack1.d(5);
-            return j;
         }
+        return j;
     }
 
     @Override
@@ -656,12 +654,12 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
-    public boolean isNotEmpty() {
-        Iterator iterator = this.items.iterator();
+    public boolean isEmpty() {
+        Iterator<ItemStack> iterator = this.items.iterator();
 
         ItemStack itemstack;
         while (iterator.hasNext()) {
-            itemstack = (ItemStack)iterator.next();
+            itemstack = iterator.next();
             if (!itemstack.isEmpty()) {
                 return false;
             }
@@ -670,7 +668,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         iterator = this.armor.iterator();
 
         while (iterator.hasNext()) {
-            itemstack = (ItemStack)iterator.next();
+            itemstack = iterator.next();
             if (!itemstack.isEmpty()) {
                 return false;
             }
@@ -679,7 +677,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
         iterator = this.extraSlots.iterator();
 
         while (iterator.hasNext()) {
-            itemstack = (ItemStack)iterator.next();
+            itemstack = iterator.next();
             if (!itemstack.isEmpty()) {
                 return false;
             }
@@ -711,7 +709,7 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
                 ItemStack itemstack = this.armor.get(0);
                 int index = i;
                 if (itemstack.getItem() instanceof ItemArmor) {
-                    itemstack.damage((int) f, this.player, (entityhuman) -> entityhuman.c(EnumItemSlot.a(EnumItemSlot.Function.ARMOR, index)));
+                    itemstack.damage((int) f, this.player, (entityhuman) -> entityhuman.broadcastItemBreak(EnumItemSlot.a(EnumItemSlot.Function.ARMOR, index)));
                 }
             }
         }
