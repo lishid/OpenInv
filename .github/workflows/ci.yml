@@ -48,15 +48,15 @@ jobs:
       - name: Upload Distributable Jar
         id: upload-final
         uses: actions/upload-artifact@v2
-          with:
-            name: dist
-            path: ./target/OpenInv.jar
+        with:
+          name: dist
+          path: ./target/OpenInv.jar
       - name: Upload API Jar
         id: upload-api
         uses: actions/upload-artifact@v2
-          with:
-            name: api
-            path: ./api/target/openinvapi*.jar
+        with:
+          name: api
+          path: ./api/target/openinvapi*.jar
 
   release:
     name: Create Github Release
