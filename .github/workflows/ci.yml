@@ -88,6 +88,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_path: ./target/OpenInv.jar
+          asset_path: ./OpenInv.jar
           asset_name: OpenInv.jar
           asset_content_type: application/java-archive
