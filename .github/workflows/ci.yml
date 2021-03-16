@@ -9,8 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: true
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
@@ -28,15 +26,10 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
 
-      # If the cache was not present, run BuildTools to install the relevant versions to Maven.
-      # This will take approximately forever.
+      # Install Spigot dependencies.
+      # This script uses Maven to check all required installations and ensure that they are present.
       - name: Install Spigot Dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          mkdir ~/buildtools
-          cd ~/buildtools
-          wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
-          java -jar BuildTools.jar --rev 1.16.4
+        run: . scripts/install_spigot_dependencies.sh
 
       - name: Build With Maven
         run: mvn -e clean package -am -P all
