@@ -20,8 +20,6 @@ import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialInventory;
 import com.lishid.openinv.internal.OpenInventoryView;
 import com.mojang.authlib.GameProfile;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.lang.reflect.Field;
 import net.minecraft.server.v1_16_R3.ChatComponentText;
 import net.minecraft.server.v1_16_R3.ChatMessageType;
@@ -30,16 +28,12 @@ import net.minecraft.server.v1_16_R3.Containers;
 import net.minecraft.server.v1_16_R3.Entity;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.MinecraftServer;
-import net.minecraft.server.v1_16_R3.NBTCompressedStreamTools;
-import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_16_R3.PacketPlayOutOpenWindow;
 import net.minecraft.server.v1_16_R3.PlayerInteractManager;
 import net.minecraft.server.v1_16_R3.SystemUtils;
 import net.minecraft.server.v1_16_R3.World;
-import net.minecraft.server.v1_16_R3.WorldNBTStorage;
 import net.minecraft.server.v1_16_R3.WorldServer;
-import org.apache.logging.log4j.LogManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
@@ -131,40 +125,7 @@ public class PlayerDataManager implements IPlayerDataManager {
 
         bukkitEntity.setAccessible(true);
 
-        bukkitEntity.set(player, new CraftPlayer(player.server.server, player) {
-            @Override
-            public void saveData() {
-                super.saveData();
-                // See net.minecraft.server.WorldNBTStorage#save(EntityPlayer)
-                try {
-                    WorldNBTStorage worldNBTStorage = player.server.getPlayerList().playerFileData;
-
-                    NBTTagCompound playerData = player.save(new NBTTagCompound());
-
-                    if (!isOnline()) {
-                        // Special case: save old vehicle data
-                        NBTTagCompound oldData = worldNBTStorage.load(player);
-
-                        if (oldData != null && oldData.hasKeyOfType("RootVehicle", 10)) {
-                            // See net.minecraft.server.PlayerList#a(NetworkManager, EntityPlayer) and net.minecraft.server.EntityPlayer#b(NBTTagCompound)
-                            playerData.set("RootVehicle", oldData.getCompound("RootVehicle"));
-                        }
-                    }
-
-                    File file = new File(worldNBTStorage.getPlayerDir(), player.getUniqueIDString() + ".dat.tmp");
-                    File file1 = new File(worldNBTStorage.getPlayerDir(), player.getUniqueIDString() + ".dat");
-
-                    NBTCompressedStreamTools.a(playerData, new FileOutputStream(file));
-
-                    if (file1.exists() && !file1.delete() || !file.renameTo(file1)) {
-                        LogManager.getLogger().warn("Failed to save player data for {}", player.getDisplayName().getString());
-                    }
-
-                } catch (Exception e) {
-                    LogManager.getLogger().warn("Failed to save player data for {}", player.getDisplayName().getString());
-                }
-            }
-        });
+        bukkitEntity.set(player, new OpenPlayer(player.server.server, player));
     }
 
     @NotNull
