@@ -190,29 +190,8 @@ public class AnySilentContainer implements IAnySilentContainer {
             InventoryEnderChest enderChest = player.getEnderChest();
             enderChest.a((TileEntityEnderChest) tile);
             player.openContainer(new TileInventory((containerCounter, playerInventory, ignored) -> {
-                Containers<?> containers;
+                Containers<?> containers = PlayerDataManager.getContainers(enderChest.getSize());
                 int rows = enderChest.getSize() / 9;
-                switch (rows) {
-                    case 1:
-                        containers = Containers.GENERIC_9X1;
-                        break;
-                    case 2:
-                        containers = Containers.GENERIC_9X2;
-                        break;
-                    case 3:
-                    default:
-                        containers = Containers.GENERIC_9X3;
-                        break;
-                    case 4:
-                        containers = Containers.GENERIC_9X4;
-                        break;
-                    case 5:
-                        containers = Containers.GENERIC_9X5;
-                        break;
-                    case 6:
-                        containers = Containers.GENERIC_9X6;
-                        break;
-                }
                 return new ContainerChest(containers, containerCounter, playerInventory, enderChest, rows);
             }, new ChatMessage("container.enderchest")));
             bukkitPlayer.incrementStatistic(Statistic.ENDERCHEST_OPENED);
@@ -262,6 +241,12 @@ public class AnySilentContainer implements IAnySilentContainer {
                                 }
 
                                 public IChatBaseComponent getScoreboardDisplayName() {
+                                    if (leftChest.hasCustomName()) {
+                                        return leftChest.getScoreboardDisplayName();
+                                    }
+                                    if (rightChest.hasCustomName()) {
+                                        return rightChest.getScoreboardDisplayName();
+                                    }
                                     return new ChatMessage("container.chestDouble");
                                 }
                             };

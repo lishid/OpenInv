@@ -190,7 +190,7 @@ public class PlayerDataManager implements IPlayerDataManager {
         }
     }
 
-    private @NotNull Containers<?> getContainers(int inventorySize) {
+    static @NotNull Containers<?> getContainers(int inventorySize) {
         switch (inventorySize) {
             case 9:
                 return Containers.GENERIC_9X1;
