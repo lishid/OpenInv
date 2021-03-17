@@ -16,9 +16,9 @@
 
 package com.lishid.openinv.internal.v1_16_R3;
 
-import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialInventory;
+import com.lishid.openinv.internal.OpenInventoryView;
 import com.mojang.authlib.GameProfile;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,7 +28,6 @@ import net.minecraft.server.v1_16_R3.ChatMessageType;
 import net.minecraft.server.v1_16_R3.Container;
 import net.minecraft.server.v1_16_R3.Containers;
 import net.minecraft.server.v1_16_R3.Entity;
-import net.minecraft.server.v1_16_R3.EntityHuman;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.MinecraftServer;
 import net.minecraft.server.v1_16_R3.NBTCompressedStreamTools;
@@ -36,7 +35,6 @@ import net.minecraft.server.v1_16_R3.NBTTagCompound;
 import net.minecraft.server.v1_16_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_16_R3.PacketPlayOutOpenWindow;
 import net.minecraft.server.v1_16_R3.PlayerInteractManager;
-import net.minecraft.server.v1_16_R3.PlayerInventory;
 import net.minecraft.server.v1_16_R3.SystemUtils;
 import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldNBTStorage;
@@ -49,10 +47,7 @@ import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.event.CraftEventFactory;
 import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftContainer;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -195,68 +190,20 @@ public class PlayerDataManager implements IPlayerDataManager {
             return null;
         }
 
-        String title;
-        if (inventory instanceof SpecialEnderChest) {
-            HumanEntity owner = (HumanEntity) ((SpecialEnderChest) inventory).getBukkitOwner();
-            title = OpenInv.getPlugin(OpenInv.class).getLocalizedMessage(player, "container.enderchest", "%player%", owner.getName());
-            if (title == null) {
-                title = owner.getName() + "'s Ender Chest";
-            }
-        } else if (inventory instanceof SpecialPlayerInventory) {
-            EntityHuman owner = ((PlayerInventory) inventory).player;
-            title = OpenInv.getPlugin(OpenInv.class).getLocalizedMessage(player, "container.player", "%player%", owner.getName());
-            if (title == null) {
-                title = owner.getName() + "'s Inventory";
-            }
-        } else {
+        InventoryView view = getView(player, inventory);
+
+        if (view == null) {
             return player.openInventory(inventory.getBukkitInventory());
         }
 
-        String finalTitle = title;
-        Container container = new CraftContainer(new InventoryView() {
-            @Override
-            public @NotNull Inventory getTopInventory() {
-                return inventory.getBukkitInventory();
-            }
-            @Override
-            public @NotNull Inventory getBottomInventory() {
-                return player.getInventory();
-            }
-            @Override
-            public @NotNull HumanEntity getPlayer() {
-                return player;
-            }
-            @Override
-            public @NotNull InventoryType getType() {
-                return inventory.getBukkitInventory().getType();
-            }
-            @Override
-            public @NotNull String getTitle() {
-                return finalTitle;
-            }
-        }, nmsPlayer, nmsPlayer.nextContainerCounter()) {
+        Container container = new CraftContainer(view, nmsPlayer, nmsPlayer.nextContainerCounter()) {
             @Override
             public Containers<?> getType() {
-                switch (inventory.getBukkitInventory().getSize()) {
-                    case 9:
-                        return Containers.GENERIC_9X1;
-                    case 18:
-                        return Containers.GENERIC_9X2;
-                    case 27:
-                    default:
-                        return Containers.GENERIC_9X3;
-                    case 36:
-                        return Containers.GENERIC_9X4;
-                    case 41: // PLAYER
-                    case 45:
-                        return Containers.GENERIC_9X5;
-                    case 54:
-                        return Containers.GENERIC_9X6;
-                }
+                return getContainers(inventory.getBukkitInventory().getSize());
             }
         };
 
-        container.setTitle(new ChatComponentText(title));
+        container.setTitle(new ChatComponentText(view.getTitle()));
         container = CraftEventFactory.callInventoryOpenEvent(nmsPlayer, container);
 
         if (container == null) {
@@ -270,6 +217,63 @@ public class PlayerDataManager implements IPlayerDataManager {
 
         return container.getBukkitView();
 
+    }
+
+    private @Nullable InventoryView getView(Player player, ISpecialInventory inventory) {
+        if (inventory instanceof SpecialEnderChest) {
+            return new OpenInventoryView(player, inventory, "container.enderchest", "'s Ender Chest");
+        } else if (inventory instanceof SpecialPlayerInventory) {
+            return new OpenInventoryView(player, inventory, "container.player", "'s Inventory");
+        } else {
+            return null;
+        }
+    }
+
+    private @NotNull Containers<?> getContainers(int inventorySize) {
+        switch (inventorySize) {
+            case 9:
+                return Containers.GENERIC_9X1;
+            case 18:
+                return Containers.GENERIC_9X2;
+            case 36:
+                return Containers.GENERIC_9X4;
+            case 41: // PLAYER
+            case 45:
+                return Containers.GENERIC_9X5;
+            case 54:
+                return Containers.GENERIC_9X6;
+            case 27:
+            default:
+                return Containers.GENERIC_9X3;
+        }
+    }
+
+    @Override
+    public int convertToPlayerSlot(InventoryView view, int rawSlot) {
+        int topSize = view.getTopInventory().getSize();
+        if (topSize <= rawSlot) {
+            // Slot is not inside special inventory, use Bukkit logic.
+            return view.convertSlot(rawSlot);
+        }
+
+        // Main inventory, slots 0-26 -> 9-35
+        if (rawSlot < 27) {
+            return rawSlot + 9;
+        }
+        // Hotbar, slots 27-35 -> 0-8
+        if (rawSlot < 36) {
+            return rawSlot - 27;
+        }
+        // Armor, slots 36-39 -> 39-36
+        if (rawSlot < 40) {
+            return 36 + (39 - rawSlot);
+        }
+        // Off hand
+        if (rawSlot == 40) {
+            return 40;
+        }
+        // Drop slots, "out of inventory"
+        return -1;
     }
 
     @Override

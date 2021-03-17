@@ -20,6 +20,9 @@ import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import com.lishid.openinv.util.InventoryAccess;
 import com.lishid.openinv.util.Permissions;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.bukkit.GameMode;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -32,8 +35,10 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Listener for inventory-related events to prevent modification of inventories where not allowed.
@@ -67,11 +72,6 @@ public class InventoryListener implements Listener {
             return;
         }
 
-        // Only specially handle actions in the player's own inventory.
-        if (!event.getWhoClicked().equals(event.getView().getTopInventory().getHolder())) {
-            return;
-        }
-
         // Safe cast - has to be a player to be the holder of a special player inventory.
         Player player = (Player) event.getWhoClicked();
 
@@ -102,14 +102,65 @@ public class InventoryListener implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryDrag(@NotNull final InventoryDragEvent event) {
-        handleInventoryInteract(event);
+        if (handleInventoryInteract(event)) {
+            return;
+        }
+
+        InventoryView view = event.getView();
+        int topSize = view.getTopInventory().getSize();
+
+        // Get bottom inventory active slots as player inventory slots.
+        Set<Integer> slots = event.getRawSlots().stream()
+                .filter(slot -> slot >= topSize)
+                .map(slot -> plugin.convertToPlayerSlot(view, slot)).collect(Collectors.toSet());
+
+        int overlapLosses = 0;
+
+        // Count overlapping slots.
+        for (Map.Entry<Integer, ItemStack> newItem : event.getNewItems().entrySet()) {
+            int rawSlot = newItem.getKey();
+
+            // Skip bottom inventory slots.
+            if (rawSlot >= topSize) {
+                continue;
+            }
+
+            int convertedSlot = plugin.convertToPlayerSlot(view, rawSlot);
+
+            if (slots.contains(convertedSlot)) {
+                overlapLosses += getCountDiff(view.getItem(rawSlot), newItem.getValue());
+            }
+        }
+
+        // Allow no overlap to proceed as usual.
+        if (overlapLosses < 1) {
+            return;
+        }
+
+        ItemStack cursor = event.getCursor();
+        if (cursor != null) {
+            cursor.setAmount(cursor.getAmount() + overlapLosses);
+        } else {
+            cursor = event.getOldCursor().clone();
+            cursor.setAmount(overlapLosses);
+        }
+
+        event.setCursor(cursor);
+    }
+
+    private int getCountDiff(@Nullable ItemStack original, @NotNull ItemStack result) {
+        if (original == null || original.getType() != result.getType()) {
+            return result.getAmount();
+        }
+
+        return result.getAmount() - original.getAmount();
     }
 
     /**
      * Handle common InventoryInteractEvent functions.
      *
      * @param event the InventoryInteractEvent
-     * @return true unless the top inventory is an opened player inventory
+     * @return true unless the top inventory is the holder's own inventory
      */
     private boolean handleInventoryInteract(@NotNull final InventoryInteractEvent event) {
         HumanEntity entity = event.getWhoClicked();
@@ -147,7 +198,8 @@ public class InventoryListener implements Listener {
             return true;
         }
 
-        return false;
+        // Only specially handle actions in the player's own inventory.
+        return !event.getWhoClicked().equals(event.getView().getTopInventory().getHolder());
     }
 
 }

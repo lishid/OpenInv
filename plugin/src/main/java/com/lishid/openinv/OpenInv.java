@@ -150,6 +150,20 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         }
     }
 
+    /**
+     * Convert a raw slot number into a player inventory slot number.
+     *
+     * <p>Note that this method is specifically for converting an ISpecialPlayerInventory slot number into a regular
+     * player inventory slot number.
+     *
+     * @param view the open inventory view
+     * @param rawSlot the raw slot in the view
+     * @return the converted slot number
+     */
+    public int convertToPlayerSlot(InventoryView view, int rawSlot) {
+        return this.accessor.getPlayerDataManager().convertToPlayerSlot(view, rawSlot);
+    }
+
     @Override
     public boolean disableSaving() {
         return this.getConfig().getBoolean("settings.disable-saving", false);
