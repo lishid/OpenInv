@@ -60,6 +60,9 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v2
 
+      - name: Generate changelog
+        run: . scripts/generate_changelog.sh
+
       - name: Create Release
         id: create-release
         uses: actions/create-release@v1
@@ -68,6 +71,7 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
+          body: ${{ env.GENERATED_CHANGELOG }}
           draft: true
           prerelease: false
 
