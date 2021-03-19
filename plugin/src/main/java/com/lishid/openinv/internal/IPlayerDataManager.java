@@ -32,16 +32,14 @@ public interface IPlayerDataManager {
      * @param offline the OfflinePlayer
      * @return the Player loaded
      */
-    @Nullable
-    Player loadPlayer(@NotNull OfflinePlayer offline);
+    @Nullable Player loadPlayer(@NotNull OfflinePlayer offline);
 
     /**
      * Creates a new Player from an existing one that will function slightly better offline.
      *
      * @return the Player
      */
-    @NotNull
-    Player inject(@NotNull Player player);
+    @NotNull Player inject(@NotNull Player player);
 
     /**
      * Opens an ISpecialInventory for a Player.
@@ -51,8 +49,7 @@ public interface IPlayerDataManager {
      *`
      * @return the InventoryView opened
      */
-    @Nullable
-    InventoryView openInventory(@NotNull Player player, @NotNull ISpecialInventory inventory);
+    @Nullable InventoryView openInventory(@NotNull Player player, @NotNull ISpecialInventory inventory);
 
     /**
      * Convert a raw slot number into a player inventory slot number.
@@ -65,12 +62,5 @@ public interface IPlayerDataManager {
      * @return the converted slot number
      */
     int convertToPlayerSlot(InventoryView view, int rawSlot);
-
-    void sendSystemMessage(@NotNull Player player, @NotNull String message);
-
-    @NotNull
-    default String getLocale(Player player) {
-        return player.getLocale();
-    }
 
 }

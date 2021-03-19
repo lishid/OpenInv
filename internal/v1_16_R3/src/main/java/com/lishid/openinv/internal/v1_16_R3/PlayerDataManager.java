@@ -22,16 +22,13 @@ import com.lishid.openinv.internal.OpenInventoryView;
 import com.mojang.authlib.GameProfile;
 import java.lang.reflect.Field;
 import net.minecraft.server.v1_16_R3.ChatComponentText;
-import net.minecraft.server.v1_16_R3.ChatMessageType;
 import net.minecraft.server.v1_16_R3.Container;
 import net.minecraft.server.v1_16_R3.Containers;
 import net.minecraft.server.v1_16_R3.Entity;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import net.minecraft.server.v1_16_R3.MinecraftServer;
-import net.minecraft.server.v1_16_R3.PacketPlayOutChat;
 import net.minecraft.server.v1_16_R3.PacketPlayOutOpenWindow;
 import net.minecraft.server.v1_16_R3.PlayerInteractManager;
-import net.minecraft.server.v1_16_R3.SystemUtils;
 import net.minecraft.server.v1_16_R3.World;
 import net.minecraft.server.v1_16_R3.WorldServer;
 import org.bukkit.Bukkit;
@@ -235,26 +232,6 @@ public class PlayerDataManager implements IPlayerDataManager {
         }
         // Drop slots, "out of inventory"
         return -1;
-    }
-
-    @Override
-    public void sendSystemMessage(@NotNull Player player, @NotNull String message) {
-        int newline = message.indexOf('\n');
-        if (newline != -1) {
-            // No newlines in action bar chat.
-            message = message.substring(0, newline);
-        }
-
-        if (message.isEmpty()) {
-            return;
-        }
-
-        EntityPlayer nmsPlayer = getHandle(player);
-
-        // For action bar chat, color codes are still supported but JSON text color is not allowed. Do not convert text.
-        if (nmsPlayer.playerConnection != null) {
-            nmsPlayer.playerConnection.sendPacket(new PacketPlayOutChat(new ChatComponentText(message), ChatMessageType.GAME_INFO, SystemUtils.b));
-        }
     }
 
 }

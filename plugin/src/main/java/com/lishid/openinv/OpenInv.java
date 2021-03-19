@@ -42,6 +42,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -299,9 +301,21 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     public void sendSystemMessage(@NotNull Player player, @NotNull String key) {
         String message = this.languageManager.getValue(key, getLocale(player));
 
-        if (message != null) {
-            this.accessor.getPlayerDataManager().sendSystemMessage(player, message);
+        if (message == null) {
+            return;
         }
+
+        int newline = message.indexOf('\n');
+        if (newline != -1) {
+            // No newlines in action bar chat.
+            message = message.substring(0, newline);
+        }
+
+        if (message.isEmpty()) {
+            return;
+        }
+
+        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
     }
 
     public @Nullable String getLocalizedMessage(@NotNull CommandSender sender, @NotNull String key) {
@@ -314,7 +328,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
     private @Nullable String getLocale(@NotNull CommandSender sender) {
         if (sender instanceof Player) {
-            return this.accessor.getPlayerDataManager().getLocale((Player) sender);
+            return ((Player) sender).getLocale();
         } else {
             return this.getConfig().getString("settings.locale", "en_us");
         }
