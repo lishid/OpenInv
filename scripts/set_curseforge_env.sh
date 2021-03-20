@@ -18,31 +18,25 @@
 # Note that this script is designed for use in GitHub Actions, and is not
 # particularly robust nor configurable. Run from project parent directory.
 
-buildtools_dir=~/buildtools
-buildtools=$buildtools_dir/BuildTools.jar
+# Parse Spigot dependency information into major Minecraft versions
+function get_curseforge_minecraft_versions() {
+  versions=$(. ./scripts/get_spigot_versions.sh)
 
-get_buildtools () {
-  if [[ -d $buildtools_dir && -f $buildtools ]]; then
-    return
-  fi
+  for version in "${versions[@]}"; do
+    # Parse Minecraft major version
+    version="${version%[.-]"${version#*.*[.-]}"}"
 
-  mkdir $buildtools_dir
-  wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar -O $buildtools
+    # Skip already listed versions
+    if [[ "$minecraft_versions" =~ "$version"($|,) ]]; then
+      continue
+    fi
+
+    # Append comma if variable is set, then append version
+    minecraft_versions="${minecraft_versions:+${minecraft_versions},}Minecraft ${version}"
+  done
+
+  echo "${minecraft_versions}"
 }
 
-versions=$(. ./scripts/get_spigot_versions.sh)
-echo Found Spigot dependencies: "$versions"
-
-for version in "${versions[@]}"; do
-  set -e
-  exit_code=0
-  mvn dependency:get -Dartifact=org.spigotmc:spigot:"$version" -q -o || exit_code=$?
-  if [ $exit_code -ne 0 ]; then
-    echo Installing missing Spigot version "$version"
-    revision=${version//-R.*/}
-    get_buildtools
-    java -jar $buildtools -rev "$revision"
-  else
-    echo Spigot "$version" is already installed
-  fi
-done
+minecraft_versions=$(get_curseforge_minecraft_versions)
+echo "CURSEFORGE_MINECRAFT_VERSIONS=$minecraft_versions"

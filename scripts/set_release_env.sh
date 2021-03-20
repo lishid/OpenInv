@@ -18,31 +18,15 @@
 # Note that this script is designed for use in GitHub Actions, and is not
 # particularly robust nor configurable. Run from project parent directory.
 
-buildtools_dir=~/buildtools
-buildtools=$buildtools_dir/BuildTools.jar
-
-get_buildtools () {
-  if [[ -d $buildtools_dir && -f $buildtools ]]; then
-    return
-  fi
-
-  mkdir $buildtools_dir
-  wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar -O $buildtools
+# Get a pretty string of the project's name and version
+# Disable SC warning about variable expansion for this function - those are Maven variables.
+# shellcheck disable=SC2016
+function get_versioned_name() {
+  mvn -q -Dexec.executable=echo -Dexec.args='${project.name} ${project.version}' --non-recursive exec:exec
 }
 
-versions=$(. ./scripts/get_spigot_versions.sh)
-echo Found Spigot dependencies: "$versions"
+# Set GitHub environmental variables
+echo "VERSIONED_NAME=$(get_versioned_name)" >> "$GITHUB_ENV"
 
-for version in "${versions[@]}"; do
-  set -e
-  exit_code=0
-  mvn dependency:get -Dartifact=org.spigotmc:spigot:"$version" -q -o || exit_code=$?
-  if [ $exit_code -ne 0 ]; then
-    echo Installing missing Spigot version "$version"
-    revision=${version//-R.*/}
-    get_buildtools
-    java -jar $buildtools -rev "$revision"
-  else
-    echo Spigot "$version" is already installed
-  fi
-done
+changelog="$(. ./scripts/generate_changelog.sh)"
+printf "GENERATED_CHANGELOG<<EOF\n%s\nEOF\n" "$changelog" >> "$GITHUB_ENV"

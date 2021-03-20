@@ -19,7 +19,7 @@
 
   <groupId>com.lishid</groupId>
   <artifactId>openinvparent</artifactId>
-  <name>OpenInvParent</name>
+  <name>OpenInv</name>
   <url>http://dev.bukkit.org/bukkit-plugins/openinv/</url>
   <version>4.1.6-SNAPSHOT</version>
 

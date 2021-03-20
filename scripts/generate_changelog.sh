@@ -15,14 +15,15 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# A script for generating a changelog from Git.
-#
 # Note that this script is designed for use in GitHub Actions, and is not
 # particularly robust nor configurable. Run from project parent directory.
 
 # Query GitHub for the username of the given email address.
 # Falls through to the given author name.
-lookup_email_username() {
+function lookup_email_username() {
+  # Ensure fallthrough is set
+  ${2:?Must provide email and username as parameters, i.e. 'lookup_email_username admin@example.com Admin'}
+
   lookup=$(curl -G --data-urlencode "q=$1 in:email" https://api.github.com/search/users -H 'Accept: application/vnd.github.v3+json' | grep '"login":' | sed -e 's/^.*": "//g' -e 's/",.*$//g')
 
   if [[ $lookup ]]; then
@@ -32,10 +33,23 @@ lookup_email_username() {
   fi
 }
 
+# Get a pretty list of supported Minecraft versions
+function get_minecraft_versions() {
+  versions=$(. ./scripts/get_spigot_versions.sh)
+
+  for version in "${versions[@]}"; do
+    # Append comma if variable is set, then append version
+    minecraft_versions="${minecraft_versions:+${minecraft_versions},}${version%%-R*}"
+  done
+
+  echo "${minecraft_versions}"
+}
+
 # Use formatted log to pull authors list
 authors_raw=$(git log --pretty=format:"%ae|%an" "$(git describe --tags --abbrev=0 @^)"..@)
 readarray -t authors <<<"$authors_raw"
 
+# Use associative array to map email to author name
 declare -A author_data
 
 for author in "${authors[@]}"; do
@@ -55,7 +69,7 @@ for author in "${authors[@]}"; do
 done
 
 # Fetch actual formatted changelog
-changelog=$(git log --pretty=format:"%s (%h) - %ae" "$(git describe --tags --abbrev=0 @^)"..@)
+changelog=$(git log --pretty=format:"* %s (%h) - %ae" "$(git describe --tags --abbrev=0 @^)"..@)
 
 for author_email in "${!author_data[@]}"; do
   # Ignore case when matching
@@ -64,4 +78,6 @@ for author_email in "${!author_data[@]}"; do
   changelog=${changelog//$author_email/${author_data[$author_email]}}
 done
 
-echo "GENERATED_CHANGELOG<<EOF${changelog}EOF" >> "$GITHUB_ENV"
+minecraft_versions=$(get_minecraft_versions)
+
+printf "## Supported Minecraft versions\n%s\n\n##Changelog\n%s" "${minecraft_versions}" "${changelog}"
