@@ -39,7 +39,7 @@ for version in "${versions[@]}"; do
   mvn dependency:get -Dartifact=org.spigotmc:spigot:"$version" -q -o || exit_code=$?
   if [ $exit_code -ne 0 ]; then
     echo Installing missing Spigot version "$version"
-    revision=${version//-R.*/}
+    revision=${version%%-R*}
     get_buildtools
     java -jar $buildtools -rev "$revision"
   else
