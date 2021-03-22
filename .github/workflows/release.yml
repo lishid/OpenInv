@@ -23,12 +23,6 @@ jobs:
           version: ${{ github.event.release.id }}
           file: OpenInv.jar
 
-      - name: Convert to HTML
-        id: convert_to_html
-        uses: lifepal/markdown-to-html@v1.2
-        with:
-          text: ${{ github.event.release.body }}
-
       - name: Create CurseForge Release
         uses: itsmeow/curseforge-upload@v3
         with:
@@ -36,7 +30,7 @@ jobs:
           project_id: 31432
           game_endpoint: minecraft
           file_path: ./OpenInv.jar
-          changelog: ${{ steps.convert_to_html.outputs.html }}
+          changelog: ${{ github.event.release.body }}
           display_name: ${{ github.event.release.name }}
           game_versions: ${{ env.CURSEFORGE_MINECRAFT_VERSIONS }}
           release_type: release
