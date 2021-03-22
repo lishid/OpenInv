@@ -39,4 +39,4 @@ jobs:
           changelog: ${{ steps.convert_to_html.outputs.html }}
           display_name: ${{ github.event.release.name }}
           game_versions: ${{ env.CURSEFORGE_MINECRAFT_VERSIONS }}
-          release-type: release
+          release_type: release

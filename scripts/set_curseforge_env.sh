@@ -39,4 +39,4 @@ function get_curseforge_minecraft_versions() {
 }
 
 minecraft_versions=$(get_curseforge_minecraft_versions)
-echo "CURSEFORGE_MINECRAFT_VERSIONS=$minecraft_versions"
+echo "CURSEFORGE_MINECRAFT_VERSIONS=$minecraft_versions" >> "$GITHUB_ENV"
