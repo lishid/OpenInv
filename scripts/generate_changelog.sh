@@ -21,9 +21,6 @@
 # Query GitHub for the username of the given email address.
 # Falls through to the given author name.
 function lookup_email_username() {
-  # Ensure fallthrough is set
-  ${2:?Must provide email and username as parameters, i.e. 'lookup_email_username admin@example.com Admin'}
-
   lookup=$(curl -G --data-urlencode "q=$1 in:email" https://api.github.com/search/users -H 'Accept: application/vnd.github.v3+json' | grep '"login":' | sed -e 's/^.*": "//g' -e 's/",.*$//g')
 
   if [[ $lookup ]]; then
@@ -45,8 +42,10 @@ function get_minecraft_versions() {
   echo "${minecraft_versions}"
 }
 
+previous_tag=$(git describe --tags --abbrev=0 @^)
+
 # Use formatted log to pull authors list
-authors_raw=$(git log --pretty=format:"%ae|%an" "$(git describe --tags --abbrev=0 @^)"..@)
+authors_raw=$(git log --pretty=format:"%ae|%an" "$previous_tag"..@)
 readarray -t authors <<<"$authors_raw"
 
 # Use associative array to map email to author name
@@ -69,7 +68,7 @@ for author in "${authors[@]}"; do
 done
 
 # Fetch actual formatted changelog
-changelog=$(git log --pretty=format:"* %s (%h) - %ae" "$(git describe --tags --abbrev=0 @^)"..@)
+changelog=$(git log --pretty=format:"* %s (%h) - %ae" "$previous_tag"..@)
 
 for author_email in "${!author_data[@]}"; do
   # Ignore case when matching
@@ -80,4 +79,4 @@ done
 
 minecraft_versions=$(get_minecraft_versions)
 
-printf "## Supported Minecraft versions\n%s\n\n##Changelog\n%s" "${minecraft_versions}" "${changelog}"
+printf "## Supported Minecraft versions\n%s\n\n## Changelog\n%s" "${minecraft_versions}" "${changelog}"
