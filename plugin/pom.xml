@@ -33,12 +33,6 @@
       <artifactId>openinvapi</artifactId>
       <version>4.1.7-SNAPSHOT</version>
     </dependency>
-    <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot-api</artifactId>
-      <version>1.15.2-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
   </dependencies>
 
   <build>
