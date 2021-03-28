@@ -17,6 +17,7 @@
 package com.lishid.openinv.internal;
 
 import com.lishid.openinv.OpenInv;
+import java.util.Objects;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -62,7 +63,7 @@ public class OpenInventoryView extends InventoryView {
     @Override
     public @NotNull String getTitle() {
         if (title == null) {
-            HumanEntity owner = getPlayer();
+            HumanEntity owner = (HumanEntity) Objects.requireNonNull(inventory.getBukkitInventory().getHolder());
 
             String localTitle = OpenInv.getPlugin(OpenInv.class)
                     .getLocalizedMessage(
