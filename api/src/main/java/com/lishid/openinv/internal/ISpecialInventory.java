@@ -16,6 +16,7 @@
 
 package com.lishid.openinv.internal;
 
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
@@ -47,5 +48,12 @@ public interface ISpecialInventory {
      * @return true if the ISpecialInventory is in use
      */
     boolean isInUse();
+
+    /**
+     * Gets the Player associated with this ISpecialInventory.
+     *
+     * @return the HumanEntity
+     */
+    @NotNull HumanEntity getPlayer();
 
 }

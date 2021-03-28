@@ -81,6 +81,11 @@ public class SpecialEnderChest extends InventoryEnderChest implements ISpecialEn
     }
 
     @Override
+    public @NotNull Player getPlayer() {
+        return owner.getBukkitEntity();
+    }
+
+    @Override
     public void update() {
         this.owner.getEnderChest().update();
     }

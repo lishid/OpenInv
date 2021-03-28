@@ -199,7 +199,7 @@ public class InventoryListener implements Listener {
         }
 
         // Only specially handle actions in the player's own inventory.
-        return !event.getWhoClicked().equals(event.getView().getTopInventory().getHolder());
+        return !event.getWhoClicked().equals(playerInventory.getPlayer());
     }
 
 }

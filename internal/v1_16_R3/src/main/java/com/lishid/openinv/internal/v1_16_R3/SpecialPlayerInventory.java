@@ -213,6 +213,11 @@ public class SpecialPlayerInventory extends PlayerInventory implements ISpecialP
     }
 
     @Override
+    public @NotNull HumanEntity getPlayer() {
+        return this.player.getBukkitEntity();
+    }
+
+    @Override
     public ItemStack splitStack(int i, final int j) {
         List<ItemStack> list = this.items;
 
