@@ -232,16 +232,24 @@ public interface IOpenInv {
      * when a container is activated with AnyChest.
      *
      * @return true unless configured otherwise
+     * @deprecated OpenInv uses action bar chat for notifications. Whether or not they show is based on language settings.
      */
-    boolean notifyAnyChest();
+    @Deprecated
+    default boolean notifyAnyChest() {
+        return true;
+    }
 
     /**
      * Check the configuration value for whether or not OpenInv displays a notification to the user
      * when a container is activated with SilentChest.
      *
      * @return true unless configured otherwise
+     * @deprecated OpenInv uses action bar chat for notifications. Whether or not they show is based on language settings.
      */
-    boolean notifySilentChest();
+    @Deprecated
+    default boolean notifySilentChest() {
+        return true;
+    }
 
     /**
      * Mark a Player as no longer in use by a Plugin to allow OpenInv to remove it from the cache

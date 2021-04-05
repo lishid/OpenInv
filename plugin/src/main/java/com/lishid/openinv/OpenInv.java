@@ -335,16 +335,6 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     }
 
     @Override
-    public boolean notifyAnyChest() {
-        return this.getConfig().getBoolean("notify.any-chest", true);
-    }
-
-    @Override
-    public boolean notifySilentChest() {
-        return this.getConfig().getBoolean("notify.silent-chest", true);
-    }
-
-    @Override
     public void onDisable() {
 
         if (this.disableSaving()) {
