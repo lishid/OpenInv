@@ -1,3 +1,6 @@
+## Notice
+I am now maintaining OpenInv over at [Jikoo/OpenInv](https://github.com/Jikoo/OpenInv) because I needed higher levels of access to add secrets to the repository for Github Actions. It feels ruder to send an email saying what amounts to "pls op" than to redirect people to my fork, though neither option is polite. Existing issues will remain open here until resolved (you can't transfer issues across organizations/users), but any new issues in this repo will be closed without resolution.
+
 ## About
 OpenInv is a [Bukkit plugin](https://dev.bukkit.org/bukkit-plugins/openinv/) which allows users to open and edit anyone's inventory or ender chest - online or not!
 
