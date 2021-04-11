@@ -71,6 +71,10 @@ public class SearchContainerCommand implements TabExecutor {
                 return false;
             }
         }
+        
+        if (radius > 20) {
+            radius = 20;
+        }
 
         Player senderPlayer = (Player) sender;
         World world = senderPlayer.getWorld();
