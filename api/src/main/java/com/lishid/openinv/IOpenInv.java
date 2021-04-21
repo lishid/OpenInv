@@ -24,6 +24,7 @@ import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import com.lishid.openinv.util.InventoryAccess;
 import com.lishid.openinv.util.StringMetric;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -153,10 +154,7 @@ public interface IOpenInv {
         if (Bukkit.getServer().isPrimaryThread()) {
             this.getLogger().warning("Call to OpenInv#matchPlayer made on the main thread!");
             this.getLogger().warning("This can cause the server to hang, potentially severely.");
-            this.getLogger().warning("Trace:");
-            for (StackTraceElement element : new Throwable().fillInStackTrace().getStackTrace()) {
-                this.getLogger().warning(element.toString());
-            }
+            this.getLogger().log(Level.WARNING, new Throwable("Current stack trace"), () -> "Current stack trace");
         }
 
         OfflinePlayer player;
@@ -170,11 +168,6 @@ public interface IOpenInv {
             }
         } catch (IllegalArgumentException ignored) {
             // Not a UUID
-        }
-
-        // Ensure name is valid if server is in online mode to avoid unnecessary searching
-        if (Bukkit.getServer().getOnlineMode() && !name.matches("[a-zA-Z0-9_]{3,16}")) {
-            return null;
         }
 
         player = Bukkit.getServer().getPlayerExact(name);
