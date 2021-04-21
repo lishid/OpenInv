@@ -20,8 +20,9 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
+    <artifactId>openinvparent</artifactId>
     <groupId>com.lishid</groupId>
-    <artifactId>openinvinternal</artifactId>
+    <relativePath>../../pom.xml</relativePath>
     <version>4.1.7-SNAPSHOT</version>
   </parent>
 
@@ -30,44 +31,32 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.spigotmc</groupId>
       <artifactId>spigot</artifactId>
-      <version>1.16.5-R0.1-SNAPSHOT</version>
+      <groupId>org.spigotmc</groupId>
       <scope>provided</scope>
+      <version>1.16.5-R0.1-SNAPSHOT</version>
     </dependency>
     <dependency>
+      <artifactId>openinvapi</artifactId>
       <groupId>com.lishid</groupId>
+    </dependency>
+    <dependency>
       <artifactId>openinvplugincore</artifactId>
-      <version>4.1.7-SNAPSHOT</version>
+      <groupId>com.lishid</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>annotations</artifactId>
+      <groupId>org.jetbrains</groupId>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.2</version>
-        <configuration>
-          <minimizeJar>true</minimizeJar>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
-
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
       </plugin>
     </plugins>
   </build>

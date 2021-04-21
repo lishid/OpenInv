@@ -27,33 +27,32 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
-  <modules>
-    <module>api</module>
-    <module>plugin</module>
-    <module>internal</module>
-    <module>assembly</module>
-  </modules>
-
   <profiles>
-
-    <!--
-      ~ N.B.: All version-specific code is handled in submodules of the internal module.
-      ~
-      ~ Internal submodules built by each profile are handled in internal/pom.xml
-     -->
-
     <profile>
       <id>all</id>
-      <activation>
-        <property>
-          <name>all</name>
-          <value>true</value>
-        </property>
-      </activation>
+      <modules>
+        <module>api</module>
+        <module>plugin</module>
+        <module>internal/v1_16_R3</module>
+        <module>assembly</module>
+      </modules>
     </profile>
 
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>api</module>
+        <module>plugin</module>
+        <module>assembly</module>
+      </modules>
+    </profile>
   </profiles>
 
   <repositories>
@@ -63,57 +62,84 @@
     </repository>
   </repositories>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.jetbrains</groupId>
-      <artifactId>annotations</artifactId>
-      <version>17.0.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot-api</artifactId>
-      <version>1.16.5-R0.1-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <artifactId>annotations</artifactId>
+        <groupId>org.jetbrains</groupId>
+        <scope>provided</scope>
+        <version>20.1.0</version>
+      </dependency>
+      <dependency>
+        <artifactId>spigot-api</artifactId>
+        <groupId>org.spigotmc</groupId>
+        <scope>provided</scope>
+        <version>1.16.5-R0.1-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <artifactId>openinvapi</artifactId>
+        <groupId>com.lishid</groupId>
+        <scope>compile</scope>
+        <version>4.1.7-SNAPSHOT</version>
+      </dependency>
+      <dependency>
+        <artifactId>openinvplugincore</artifactId>
+        <groupId>com.lishid</groupId>
+        <scope>compile</scope>
+        <version>4.1.7-SNAPSHOT</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.2</version>
-        <configuration>
-          <filters>
-            <filter>
-              <artifact>*:*</artifact>
-              <!-- Keep the file clean, don't include every single pom from all modules -->
-              <excludes>
-                <exclude>META-INF/maven/**</exclude>
-              </excludes>
-            </filter>
-          </filters>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-shade-plugin</artifactId>
+          <configuration>
+            <filters>
+              <filter>
+                <!-- Always shade entirety of required modules. -->
+                <artifact>com.lishid:openinv*</artifact>
+                <includes>
+                  <include>**</include>
+                </includes>
+              </filter>
+              <filter>
+                <artifact>*:*</artifact>
+                <!-- Don't warn about file conflicts that'll be clobbered anyway. -->
+                <excludes>
+                  <exclude>META-INF/MANIFEST.MF</exclude>
+                </excludes>
+              </filter>
+            </filters>
+            <minimizeJar>true</minimizeJar>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>shade</goal>
+              </goals>
+            </execution>
+          </executions>
+          <groupId>org.apache.maven.plugins</groupId>
+          <version>3.2.4</version>
+        </plugin>
 
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-    </plugins>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <groupId>org.apache.maven.plugins</groupId>
+          <version>3.8.1</version>
+        </plugin>
+
+        <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <groupId>org.apache.maven.plugins</groupId>
+          <version>3.3.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
 </project>

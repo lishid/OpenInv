@@ -26,6 +26,7 @@
 
   <artifactId>openinvassembly</artifactId>
   <name>OpenInvAssembly</name>
+  <packaging>pom</packaging>
 
   <build>
     <directory>../target</directory>
@@ -34,7 +35,6 @@
     <plugins>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>3.2.0</version>
         <executions>
           <execution>
             <id>reactor-uberjar</id>

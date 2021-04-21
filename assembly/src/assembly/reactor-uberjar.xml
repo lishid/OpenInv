@@ -14,9 +14,9 @@
   ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.0.0 http://maven.apache.org/xsd/assembly-2.0.0.xsd">
+<assembly xmlns="http://maven.apache.org/ASSEMBLY/2.1.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/ASSEMBLY/2.1.0 http://maven.apache.org/xsd/assembly-2.1.0.xsd">
 
   <id>reactor-uberjar</id>
 
@@ -34,8 +34,18 @@
       <binaries>
         <outputDirectory>/</outputDirectory>
         <unpack>true</unpack>
-        <!-- unpackOptions must be present or build breaks. -->
-        <unpackOptions/>
+        <unpackOptions>
+          <excludes>
+            <!--
+              - Exclude existing meta - assembly will write its own manifest, and the rest is maven
+              - details that end users don't need. Ignoring it saves around 7KB after compression
+              - with a single internal module present.
+             -->
+            <exclude>META-INF/**</exclude>
+          </excludes>
+        </unpackOptions>
+        <!-- Exclude dependencies - shade plugin will handle their inclusion as necessary in individual jars. -->
+        <includeDependencies>false</includeDependencies>
       </binaries>
 
     </moduleSet>

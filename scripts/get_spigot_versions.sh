@@ -32,22 +32,23 @@ if [[ ${spigot_versions[@]} ]]; then
 fi
 
 # Pull Spigot dependency information from Maven.
-modules=$(mvn help:evaluate -Dexpression=project.modules -q -DforceStdout -P all -pl internal | grep -oP '(?<=<string>)(.*)(?=<\/string>)')
+# Since we only care about Spigot versions, only check modules in the folder internal.
+readarray -t modules <<< "$(mvn help:evaluate -Dexpression=project.modules -q -DforceStdout -P all | grep -oP '(?<=<string>)(internal/.*)(?=</string>)')"
 
 declare -n versions="spigot_versions"
 
 for module in "${modules[@]}"; do
   # Get number of dependencies declared in pom of specified internal module.
-  max_index=$(mvn help:evaluate -Dexpression=project.dependencies -q -DforceStdout -P all -pl internal/"$module" | grep -c "<dependency>")
+  max_index=$(mvn help:evaluate -Dexpression=project.dependencies -q -DforceStdout -P all -pl "$module" | grep -c "<dependency>")
 
   for ((i=0; i < max_index; i++)); do
     # Get artifactId of dependency.
-    artifact_id=$(mvn help:evaluate -Dexpression=project.dependencies["$i"].artifactId -q -DforceStdout -P all -pl internal/"$module")
+    artifact_id=$(mvn help:evaluate -Dexpression=project.dependencies["$i"].artifactId -q -DforceStdout -P all -pl "$module")
 
     # Ensure dependency is Spigot.
     if [[ "$artifact_id" == spigot ]]; then
       # Get Spigot version.
-      spigot_version=$(mvn help:evaluate -Dexpression=project.dependencies["$i"].version -q -DforceStdout -P all -pl internal/"$module")
+      spigot_version=$(mvn help:evaluate -Dexpression=project.dependencies["$i"].version -q -DforceStdout -P all -pl "$module")
       versions+=("$spigot_version")
       echo "$spigot_version"
       break
