@@ -32,6 +32,14 @@
       <artifactId>openinvapi</artifactId>
       <groupId>com.lishid</groupId>
     </dependency>
+    <dependency>
+      <artifactId>annotations</artifactId>
+      <groupId>org.jetbrains</groupId>
+    </dependency>
+    <dependency>
+      <artifactId>spigot-api</artifactId>
+      <groupId>org.spigotmc</groupId>
+    </dependency>
   </dependencies>
 
   <build>

@@ -68,7 +68,7 @@
         <artifactId>annotations</artifactId>
         <groupId>org.jetbrains</groupId>
         <scope>provided</scope>
-        <version>20.1.0</version>
+        <version>21.0.1</version>
       </dependency>
       <dependency>
         <artifactId>spigot-api</artifactId>
