@@ -57,8 +57,7 @@ public class PlayerDataManager implements IPlayerDataManager {
         }
     }
 
-    @NotNull
-    public static EntityPlayer getHandle(final Player player) {
+    public static @NotNull EntityPlayer getHandle(final Player player) {
         if (player instanceof CraftPlayer) {
             return ((CraftPlayer) player).getHandle();
         }
@@ -78,9 +77,8 @@ public class PlayerDataManager implements IPlayerDataManager {
         return nmsPlayer;
     }
 
-    @Nullable
     @Override
-    public Player loadPlayer(@NotNull final OfflinePlayer offline) {
+    public @Nullable Player loadPlayer(@NotNull final OfflinePlayer offline) {
         // Ensure player has data
         if (!offline.hasPlayedBefore()) {
             return null;

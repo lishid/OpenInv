@@ -33,14 +33,23 @@ public class OpenPlayer extends CraftPlayer {
     }
 
     @Override
+    public void loadData() {
+        // See CraftPlayer#loadData
+        NBTTagCompound loaded = this.server.getHandle().playerFileData.load(this.getHandle());
+        if (loaded != null) {
+            readExtraData(loaded);
+        }
+    }
+
+    @Override
     public void saveData() {
-        super.saveData();
         EntityPlayer player = this.getHandle();
         // See net.minecraft.server.WorldNBTStorage#save(EntityPlayer)
         try {
             WorldNBTStorage worldNBTStorage = player.server.getPlayerList().playerFileData;
 
             NBTTagCompound playerData = player.save(new NBTTagCompound());
+            setExtraData(playerData);
 
             if (!isOnline()) {
                 // Special case: save old vehicle data
