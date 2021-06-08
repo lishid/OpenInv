@@ -38,5 +38,18 @@ function get_curseforge_minecraft_versions() {
   echo "${minecraft_versions}"
 }
 
+# Modify provided changelog to not break when inserted into yaml file.
+function get_yaml_safe_changelog() {
+  changelog=$1
+  # Since we're using a flow scalar, newlines need to be doubled.
+  echo "${changelog//
+/
+
+}"
+}
+
 minecraft_versions=$(get_curseforge_minecraft_versions)
 echo "CURSEFORGE_MINECRAFT_VERSIONS=$minecraft_versions" >> "$GITHUB_ENV"
+
+changelog=$(get_yaml_safe_changelog "$1")
+printf "CURSEFORGE_CHANGELOG<<EOF\n%s\nEOF\n" "$changelog" >> "$GITHUB_ENV"

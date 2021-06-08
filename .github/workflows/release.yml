@@ -13,15 +13,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set CurseForge Variables
-        run: . scripts/set_curseforge_env.sh
-
       - name: Fetch Github Release Asset
         uses: dsaltares/fetch-gh-release-asset@0.0.5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           version: ${{ github.event.release.id }}
           file: OpenInv.jar
+
+      - name: Set CurseForge Variables
+        run: . scripts/set_curseforge_env.sh "${{ github.event.release.body }}"
 
       - name: Create CurseForge Release
         uses: itsmeow/curseforge-upload@v3
@@ -30,7 +30,8 @@ jobs:
           project_id: 31432
           game_endpoint: minecraft
           file_path: ./OpenInv.jar
-          changelog: ${{ github.event.release.body }}
-          display_name: ${{ github.event.release.name }}
-          game_versions: ${{ env.CURSEFORGE_MINECRAFT_VERSIONS }}
+          display_name: "${{ github.event.release.name }}"
+          game_versions: "${{ env.CURSEFORGE_MINECRAFT_VERSIONS }}"
           release_type: release
+          changelog_type: markdown
+          changelog: "${{ env.CURSEFORGE_CHANGELOG }}"
