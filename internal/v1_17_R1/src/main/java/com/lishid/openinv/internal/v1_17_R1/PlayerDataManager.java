@@ -169,7 +169,7 @@ public class PlayerDataManager implements IPlayerDataManager {
             return null;
         }
 
-        nmsPlayer.b.sendPacket(new PacketPlayOutOpenWindow(nmsPlayer.bV.j, container.getType(),
+        nmsPlayer.b.sendPacket(new PacketPlayOutOpenWindow(container.j, container.getType(),
                 new ChatComponentText(container.getBukkitView().getTitle())));
         nmsPlayer.bV = container;
         nmsPlayer.initMenu(container);
