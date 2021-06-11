@@ -14,7 +14,7 @@ jobs:
       - name: Set Up Java
         uses: actions/setup-java@v1
         with:
-          java-version: 1.8
+          java-version: 16
 
       # Use cache to speed up build
       - name: Cache Maven Repo
