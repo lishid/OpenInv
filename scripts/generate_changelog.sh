@@ -32,7 +32,7 @@ function lookup_email_username() {
 
 # Get a pretty list of supported Minecraft versions
 function get_minecraft_versions() {
-  versions=$(. ./scripts/get_spigot_versions.sh)
+  readarray -t versions <<< "$(. ./scripts/get_spigot_versions.sh)"
 
   for version in "${versions[@]}"; do
     # Append comma if variable is set, then append version

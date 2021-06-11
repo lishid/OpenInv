@@ -20,7 +20,7 @@
 
 # Parse Spigot dependency information into major Minecraft versions
 function get_curseforge_minecraft_versions() {
-  versions=$(. ./scripts/get_spigot_versions.sh)
+  readarray -t versions <<< "$(. ./scripts/get_spigot_versions.sh)"
 
   for version in "${versions[@]}"; do
     # Parse Minecraft major version

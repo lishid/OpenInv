@@ -30,8 +30,8 @@ get_buildtools () {
   wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar -O $buildtools
 }
 
-versions=$(. ./scripts/get_spigot_versions.sh)
-echo Found Spigot dependencies: "$versions"
+readarray -t versions <<< "$(. ./scripts/get_spigot_versions.sh)"
+echo Found Spigot dependencies: "${versions[@]}"
 
 for version in "${versions[@]}"; do
   set -e

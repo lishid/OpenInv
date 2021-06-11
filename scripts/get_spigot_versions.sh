@@ -15,27 +15,20 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+# TODO FIGURE OUT AND REMOVE WHEN LESS STRESS
+hacky_versions=("1.16.5-R0.1-SNAPSHOT" "1.17-R0.1-SNAPSHOT")
+for hacky_version in "${hacky_versions[@]}"; do
+  echo "$hacky_version"
+done
+
+exit 0
+
 # Note that this script is designed for use in GitHub Actions, and is not
 # particularly robust nor configurable. Run from project parent directory.
-
-# Use a nameref as a cache - maven evaluation is pretty slow.
-# Re-calling the script and relying on it to handle caching is way easier than passing around info.
-declare -a spigot_versions
-
-# We don't care about concatenation - either it's not null and we return or it's null and we instantiate.
-# shellcheck disable=SC2199
-if [[ ${spigot_versions[@]} ]]; then
-  for spigot_version in "${spigot_versions[@]}"; do
-    echo "$spigot_version"
-  done
-  return
-fi
 
 # Pull Spigot dependency information from Maven.
 # Since we only care about Spigot versions, only check modules in the folder internal.
 readarray -t modules <<< "$(mvn help:evaluate -Dexpression=project.modules -q -DforceStdout -P all | grep -oP '(?<=<string>)(internal/.*)(?=</string>)')"
-
-declare -n versions="spigot_versions"
 
 for module in "${modules[@]}"; do
   # Get number of dependencies declared in pom of specified internal module.
