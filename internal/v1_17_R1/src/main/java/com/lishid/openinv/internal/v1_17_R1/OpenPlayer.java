@@ -34,7 +34,6 @@ public class OpenPlayer extends CraftPlayer {
 
     @Override
     public void loadData() {
-        super.loadData();
         // See CraftPlayer#loadData
         NBTTagCompound loaded = this.server.getHandle().r.load(this.getHandle());
         if (loaded != null) {
