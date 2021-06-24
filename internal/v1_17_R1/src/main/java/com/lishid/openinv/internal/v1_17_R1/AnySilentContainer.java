@@ -336,10 +336,6 @@ public class AnySilentContainer implements IAnySilentContainer {
         try {
             this.playerInteractManagerGamemode.setAccessible(true);
             this.playerInteractManagerGamemode.set(player.d, gameMode);
-            // TODO: may need additional calls to update abilities to prevent container sound + animation
-            //  gameMode.a(player.getAbilities());
-            //  player.updateAbilities();
-            //  should be the fix if it doesn't work as-is
         } catch (IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
         }
