@@ -1,0 +1,13 @@
+name: Close Issue
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: peter-evans/close-issue@v1.0.3
+        with:
+          comment: "Per the notice in the readme, OpenInv is now being maintained at [Jikoo/OpenInv](https://github.com/Jikoo/OpenInv)."
