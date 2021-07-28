@@ -50,18 +50,8 @@ import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.block.state.properties.BlockPropertyChestType;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
-import org.bukkit.block.Barrel;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.EnderChest;
-import org.bukkit.block.ShulkerBox;
-import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Directional;
-import org.bukkit.block.data.type.Chest;
-import org.bukkit.entity.Cat;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
-import org.bukkit.util.BoundingBox;
 import org.jetbrains.annotations.NotNull;
 
 public class AnySilentContainer implements IAnySilentContainer {
@@ -77,91 +67,6 @@ public class AnySilentContainer implements IAnySilentContainer {
             logger.warning("Unable to directly write player gamemode! SilentChest will fail.");
             logger.log(Level.WARNING, "Error obtaining gamemode field", e);
         }
-    }
-
-    @Override
-    public boolean isAnySilentContainer(@NotNull final org.bukkit.block.Block bukkitBlock) {
-        if (bukkitBlock.getType() == Material.ENDER_CHEST) {
-            return true;
-        }
-        BlockState state = bukkitBlock.getState();
-        return state instanceof org.bukkit.block.Chest
-                || state instanceof org.bukkit.block.ShulkerBox
-                || state instanceof org.bukkit.block.Barrel;
-    }
-
-    @Override
-    public boolean isAnyContainerNeeded(@NotNull final Player p, @NotNull final org.bukkit.block.Block block) {
-        BlockState blockState = block.getState();
-
-        // Barrels do not require AnyContainer.
-        if (blockState instanceof Barrel) {
-            return false;
-        }
-
-        // Enderchests require a non-occluding block on top to open.
-        if (blockState instanceof EnderChest) {
-            return block.getRelative(0, 1, 0).getType().isOccluding();
-        }
-
-        // Shulker boxes require 1/2 a block clear in the direction they open.
-        if (blockState instanceof ShulkerBox) {
-            BoundingBox boundingBox = block.getBoundingBox();
-            if (boundingBox.getVolume() > 1) {
-                // Shulker box is already open.
-                return false;
-            }
-
-            BlockData blockData = block.getBlockData();
-            if (!(blockData instanceof Directional directional)) {
-                // Shouldn't be possible. Just in case, demand AnyChest.
-                return true;
-            }
-
-            BlockFace face = directional.getFacing();
-            boundingBox.shift(face.getDirection());
-            // Return whether or not bounding boxes overlap.
-            return block.getRelative(face, 1).getBoundingBox().overlaps(boundingBox);
-        }
-
-        if (!(blockState instanceof org.bukkit.block.Chest)) {
-            return false;
-        }
-
-        if (isBlockedChest(block)) {
-            return true;
-        }
-
-        BlockData blockData = block.getBlockData();
-        if (!(blockData instanceof Chest chest) || ((Chest) blockData).getType() == Chest.Type.SINGLE) {
-            return false;
-        }
-
-        int ordinal = (chest.getFacing().ordinal() + 4 + (chest.getType() == Chest.Type.RIGHT ? -1 : 1)) % 4;
-        BlockFace relativeFace = BlockFace.values()[ordinal];
-        org.bukkit.block.Block relative = block.getRelative(relativeFace);
-
-        if (relative.getType() != block.getType()) {
-            return false;
-        }
-
-        BlockData relativeData = relative.getBlockData();
-        if (!(relativeData instanceof Chest relativeChest)) {
-            return false;
-        }
-
-        if (relativeChest.getFacing() != chest.getFacing()
-                || relativeChest.getType() != (chest.getType() == Chest.Type.RIGHT ? Chest.Type.LEFT : Chest.Type.RIGHT)) {
-            return false;
-        }
-
-        return isBlockedChest(relative);
-    }
-
-    private boolean isBlockedChest(org.bukkit.block.Block block) {
-        org.bukkit.block.Block relative = block.getRelative(0, 1, 0);
-        return relative.getType().isOccluding()
-                || block.getWorld().getNearbyEntities(BoundingBox.of(relative), entity -> entity instanceof Cat).size() > 0;
     }
 
     @Override
