@@ -19,6 +19,7 @@ package com.lishid.openinv.internal.v1_16_R3;
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IAnySilentContainer;
 import java.lang.reflect.Field;
+import java.util.logging.Level;
 import net.minecraft.server.v1_16_R3.Block;
 import net.minecraft.server.v1_16_R3.BlockBarrel;
 import net.minecraft.server.v1_16_R3.BlockChest;
@@ -46,8 +47,10 @@ import net.minecraft.server.v1_16_R3.TileEntityEnderChest;
 import net.minecraft.server.v1_16_R3.TileEntityLootable;
 import net.minecraft.server.v1_16_R3.TileInventory;
 import net.minecraft.server.v1_16_R3.World;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
@@ -64,6 +67,23 @@ public class AnySilentContainer implements IAnySilentContainer {
             System.err.println("[OpenInv] Unable to directly write player gamemode! SilentChest will fail.");
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public boolean isShulkerIgnoreBoundingBox(org.bukkit.block.Block bukkitBlock) {
+        org.bukkit.World bukkitWorld = bukkitBlock.getWorld();
+        if (!(bukkitWorld instanceof CraftWorld)) {
+            bukkitWorld = Bukkit.getWorld(bukkitWorld.getUID());
+        }
+        if (!(bukkitWorld instanceof CraftWorld)) {
+            Exception exception = new IllegalStateException("AnySilentContainer access attempted on an unknown world!");
+            OpenInv.getPlugin(OpenInv.class).getLogger().log(Level.WARNING, exception.getMessage(), exception);
+            return false;
+        }
+
+        final World world = ((CraftWorld) bukkitWorld).getHandle();
+        final BlockPosition blockPosition = new BlockPosition(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
+        return world.getType(blockPosition).d();
     }
 
     @Override

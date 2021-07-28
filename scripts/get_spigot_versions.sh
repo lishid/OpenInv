@@ -16,7 +16,7 @@
 #
 
 # TODO FIGURE OUT AND REMOVE WHEN LESS STRESS
-hacky_versions=("1.16.5-R0.1-SNAPSHOT" "1.17-R0.1-SNAPSHOT")
+hacky_versions=("1.16.5-R0.1-SNAPSHOT" "1.17.1-R0.1-SNAPSHOT")
 for hacky_version in "${hacky_versions[@]}"; do
   echo "$hacky_version"
 done

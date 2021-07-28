@@ -98,11 +98,17 @@ public interface IAnySilentContainer {
 
             Directional directional = (Directional) blockData;
             BlockFace face = directional.getFacing();
-            boundingBox.shift(face.getDirection());
-            // Return whether or not bounding boxes overlap.
-            return block.getRelative(face, 1).getBoundingBox().overlaps(boundingBox);
-        }
+            Block relative = block.getRelative(face, 1);
 
+            if (isShulkerIgnoreBoundingBox(relative)) {
+                // Certain special cases are ignored. Signs, simple redstone, etc.
+                return false;
+            }
+
+            boundingBox.expand(face.getDirection(), 0.5);
+            // Return whether or not bounding boxes overlap.
+            return relative.getBoundingBox().overlaps(boundingBox);
+        }
 
         if (!(blockState instanceof org.bukkit.block.Chest)) {
             return false;
@@ -140,6 +146,14 @@ public interface IAnySilentContainer {
         return isChestBlocked(relative);
     }
 
+    boolean isShulkerIgnoreBoundingBox(Block block);
+
+    /**
+     * Determine whether or not a chest is blocked.
+     *
+     * @param chest the chest block
+     * @return true if the chest block cannot be opened under ordinary circumstances
+     */
     default boolean isChestBlocked(Block chest) {
         org.bukkit.block.Block relative = chest.getRelative(0, 1, 0);
         return relative.getType().isOccluding()
