@@ -15,8 +15,8 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# TODO FIGURE OUT AND REMOVE WHEN LESS STRESS
-hacky_versions=("1.16.5-R0.1-SNAPSHOT" "1.17.1-R0.1-SNAPSHOT")
+# TODO Fix script for bash version used in Actions images
+hacky_versions=("1.17.1-R0.1-SNAPSHOT")
 for hacky_version in "${hacky_versions[@]}"; do
   echo "$hacky_version"
 done

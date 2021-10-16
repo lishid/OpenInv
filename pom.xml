@@ -37,7 +37,6 @@
       <modules>
         <module>api</module>
         <module>plugin</module>
-        <module>internal/v1_16_R3</module>
         <module>internal/v1_17_R1</module>
         <module>assembly</module>
       </modules>
@@ -138,6 +137,12 @@
           <artifactId>maven-assembly-plugin</artifactId>
           <groupId>org.apache.maven.plugins</groupId>
           <version>3.3.0</version>
+        </plugin>
+
+        <plugin>
+          <groupId>net.md-5</groupId>
+          <artifactId>specialsource-maven-plugin</artifactId>
+          <version>1.2.2</version>
         </plugin>
       </plugins>
     </pluginManagement>

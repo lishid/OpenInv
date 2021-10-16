@@ -24,7 +24,6 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.EnderChest;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.block.data.Directional;
 import org.bukkit.block.data.type.Chest;
 import org.bukkit.entity.Cat;
 import org.bukkit.entity.Player;
@@ -84,30 +83,9 @@ public interface IAnySilentContainer {
 
         // Shulker boxes require 1/2 a block clear in the direction they open.
         if (blockState instanceof ShulkerBox) {
-            BoundingBox boundingBox = block.getBoundingBox();
-            if (boundingBox.getVolume() > 1) {
-                // Shulker box is already open.
-                return false;
-            }
-
-            BlockData blockData = block.getBlockData();
-            if (!(blockData instanceof Directional)) {
-                // Shouldn't be possible. Just in case, demand AnyChest.
+            if (isShulkerBlocked((ShulkerBox) blockState)) {
                 return true;
             }
-
-            Directional directional = (Directional) blockData;
-            BlockFace face = directional.getFacing();
-            Block relative = block.getRelative(face, 1);
-
-            if (isShulkerIgnoreBoundingBox(relative)) {
-                // Certain special cases are ignored. Signs, simple redstone, etc.
-                return false;
-            }
-
-            boundingBox.expand(face.getDirection(), 0.5);
-            // Return whether or not bounding boxes overlap.
-            return relative.getBoundingBox().overlaps(boundingBox);
         }
 
         if (!(blockState instanceof org.bukkit.block.Chest)) {
@@ -146,7 +124,7 @@ public interface IAnySilentContainer {
         return isChestBlocked(relative);
     }
 
-    boolean isShulkerIgnoreBoundingBox(Block block);
+    boolean isShulkerBlocked(ShulkerBox block);
 
     /**
      * Determine whether or not a chest is blocked.

@@ -18,75 +18,102 @@ package com.lishid.openinv.internal.v1_17_R1;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IAnySilentContainer;
+import com.lishid.openinv.util.ReflectionHelper;
 import java.lang.reflect.Field;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.minecraft.core.BlockPosition;
-import net.minecraft.network.chat.ChatMessage;
-import net.minecraft.network.chat.IChatBaseComponent;
-import net.minecraft.server.level.EntityPlayer;
-import net.minecraft.server.level.PlayerInteractManager;
-import net.minecraft.world.ITileInventory;
-import net.minecraft.world.InventoryLargeChest;
-import net.minecraft.world.TileInventory;
-import net.minecraft.world.entity.player.EntityHuman;
-import net.minecraft.world.entity.player.PlayerInventory;
-import net.minecraft.world.inventory.Container;
-import net.minecraft.world.inventory.ContainerChest;
-import net.minecraft.world.inventory.Containers;
-import net.minecraft.world.inventory.InventoryEnderChest;
-import net.minecraft.world.level.EnumGamemode;
-import net.minecraft.world.level.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerPlayerGameMode;
+import net.minecraft.world.CompoundContainer;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.entity.monster.Shulker;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.PlayerEnderChestContainer;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.BlockBarrel;
-import net.minecraft.world.level.block.BlockChest;
-import net.minecraft.world.level.block.BlockChestTrapped;
-import net.minecraft.world.level.block.BlockShulkerBox;
-import net.minecraft.world.level.block.entity.TileEntity;
-import net.minecraft.world.level.block.entity.TileEntityChest;
-import net.minecraft.world.level.block.entity.TileEntityEnderChest;
-import net.minecraft.world.level.block.entity.TileEntityLootable;
-import net.minecraft.world.level.block.state.IBlockData;
-import net.minecraft.world.level.block.state.properties.BlockPropertyChestType;
+import net.minecraft.world.level.block.ChestBlock;
+import net.minecraft.world.level.block.DoubleBlockCombiner;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.world.level.block.TrappedChestBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.EnderChestBlockEntity;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
+import org.bukkit.block.ShulkerBox;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class AnySilentContainer implements IAnySilentContainer {
 
-    private Field playerInteractManagerGamemode;
+    private @Nullable Field serverPlayerGameModeGameType;
 
     public AnySilentContainer() {
         try {
-            this.playerInteractManagerGamemode = PlayerInteractManager.class.getDeclaredField("b");
-            this.playerInteractManagerGamemode.setAccessible(true);
-        } catch (NoSuchFieldException | SecurityException e) {
+            try {
+                // IDE warns about field not existing, but SpecialSource does not remap strings used in reflection.
+                // The warning is not suppressed as a reminder that it must manually be checked on updates.
+                this.serverPlayerGameModeGameType = ServerPlayerGameMode.class.getDeclaredField("b");
+                this.serverPlayerGameModeGameType.setAccessible(true);
+            } catch (NoSuchFieldException e) {
+                Logger logger = OpenInv.getPlugin(OpenInv.class).getLogger();
+                logger.warning("ServerPlayerGameMode#gameModeForPlayer's obfuscated name has changed!");
+                logger.warning("Please report this at https://github.com/Jikoo/OpenInv/issues");
+                logger.warning("Attempting to fall through using reflection. Please verify that SilentContainer does not fail.");
+                // N.B. gameModeForPlayer is (for now) declared before previousGameModeForPlayer so silent shouldn't break.
+                this.serverPlayerGameModeGameType = ReflectionHelper.grabFieldByType(ServerPlayerGameMode.class, GameType.class);
+            }
+        } catch (SecurityException e) {
             Logger logger = OpenInv.getPlugin(OpenInv.class).getLogger();
-            logger.warning("Unable to directly write player gamemode! SilentChest will fail.");
-            logger.log(Level.WARNING, "Error obtaining gamemode field", e);
+            logger.warning("Unable to directly write player game mode! SilentContainer will fail.");
+            logger.log(Level.WARNING, "Error obtaining GameType field", e);
         }
     }
 
     @Override
-    public boolean isShulkerIgnoreBoundingBox(org.bukkit.block.Block bukkitBlock) {
-        org.bukkit.World bukkitWorld = bukkitBlock.getWorld();
+    public boolean isShulkerBlocked(ShulkerBox box) {
+        org.bukkit.World bukkitWorld = box.getWorld();
         if (!(bukkitWorld instanceof CraftWorld)) {
             bukkitWorld = Bukkit.getWorld(bukkitWorld.getUID());
         }
-        if (!(bukkitWorld instanceof CraftWorld)) {
+
+        if (!(bukkitWorld instanceof CraftWorld craftWorld)) {
             Exception exception = new IllegalStateException("AnySilentContainer access attempted on an unknown world!");
             OpenInv.getPlugin(OpenInv.class).getLogger().log(Level.WARNING, exception.getMessage(), exception);
             return false;
         }
 
-        final World world = ((CraftWorld) bukkitWorld).getHandle();
-        final BlockPosition blockPosition = new BlockPosition(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
-        // isLargeVoxelShape
-        return world.getType(blockPosition).d();
+        final ServerLevel world = craftWorld.getHandle();
+        final BlockPos blockPosition = new BlockPos(box.getX(), box.getY(), box.getZ());
+        final BlockEntity tile = world.getBlockEntity(blockPosition);
+
+        if (!(tile instanceof ShulkerBoxBlockEntity shulkerBoxBlockEntity)
+                || shulkerBoxBlockEntity.getAnimationStatus() != ShulkerBoxBlockEntity.AnimationStatus.CLOSED) {
+            return false;
+        }
+
+        BlockState blockState = world.getBlockState(blockPosition);
+
+        // See net.minecraft.world.level.block.ShulkerBoxBlock#canOpen
+        AABB boundingBox = Shulker.getProgressDeltaAabb(blockState.getValue(ShulkerBoxBlock.FACING), 0.0F, 0.5F)
+                .move(blockPosition)
+                .deflate(1.0E-6D);
+        return !world.noCollision(boundingBox);
     }
 
     @Override
@@ -102,128 +129,109 @@ public class AnySilentContainer implements IAnySilentContainer {
             return true;
         }
 
-        EntityPlayer player = PlayerDataManager.getHandle(bukkitPlayer);
+        ServerPlayer player = PlayerDataManager.getHandle(bukkitPlayer);
 
-        final World world = player.getWorld();
-        final BlockPosition blockPosition = new BlockPosition(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
-        final TileEntity tile = world.getTileEntity(blockPosition);
+        final ServerLevel level = player.getLevel();
+        final BlockPos blockPos = new BlockPos(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
+        final BlockEntity blockEntity = level.getBlockEntity(blockPos);
 
-        if (tile == null) {
+        if (blockEntity == null) {
             return false;
         }
 
-        if (tile instanceof TileEntityEnderChest) {
+        if (blockEntity instanceof EnderChestBlockEntity enderChestTile) {
             // Anychest ender chest. See net.minecraft.world.level.block.BlockEnderChest
-            InventoryEnderChest enderChest = player.getEnderChest();
-            enderChest.a((TileEntityEnderChest) tile);
-            player.openContainer(new TileInventory((containerCounter, playerInventory, ignored) -> {
-                Containers<?> containers = PlayerDataManager.getContainers(enderChest.getSize());
-                int rows = enderChest.getSize() / 9;
-                return new ContainerChest(containers, containerCounter, playerInventory, enderChest, rows);
-            }, new ChatMessage("container.enderchest")));
+            PlayerEnderChestContainer enderChest = player.getEnderChestInventory();
+            enderChest.setActiveChest(enderChestTile);
+            player.openMenu(new SimpleMenuProvider((containerCounter, playerInventory, ignored) -> {
+                MenuType<?> containers = PlayerDataManager.getContainers(enderChest.getContainerSize());
+                int rows = enderChest.getContainerSize() / 9;
+                return new ChestMenu(containers, containerCounter, playerInventory, enderChest, rows);
+            }, new TextComponent("container.enderchest")));
             bukkitPlayer.incrementStatistic(Statistic.ENDERCHEST_OPENED);
             return true;
         }
 
-        if (!(tile instanceof ITileInventory tileInventory)) {
+        if (!(blockEntity instanceof MenuProvider menuProvider)) {
             return false;
         }
 
-        IBlockData blockData = world.getType(blockPosition);
-        Block block = blockData.getBlock();
+        BlockState blockState = level.getBlockState(blockPos);
+        Block block = blockState.getBlock();
 
-        if (block instanceof BlockChest) {
+        if (block instanceof ChestBlock chestBlock) {
 
-            BlockPropertyChestType chestType = blockData.get(BlockChest.c);
-
-            if (chestType != BlockPropertyChestType.a) {
-
-                BlockPosition adjacentBlockPosition = blockPosition.shift(BlockChest.h(blockData));
-                IBlockData adjacentBlockData = world.getType(adjacentBlockPosition);
-
-                if (adjacentBlockData.getBlock() == block) {
-
-                    BlockPropertyChestType adjacentChestType = adjacentBlockData.get(BlockChest.c);
-
-                    if (adjacentChestType != BlockPropertyChestType.a && chestType != adjacentChestType
-                            && adjacentBlockData.get(BlockChest.b) == blockData.get(BlockChest.b)) {
-
-                        TileEntity adjacentTile = world.getTileEntity(adjacentBlockPosition);
-
-                        if (adjacentTile instanceof TileEntityChest && tileInventory instanceof  TileEntityChest) {
-                            TileEntityChest rightChest = chestType == BlockPropertyChestType.c ? ((TileEntityChest) tileInventory) : (TileEntityChest) adjacentTile;
-                            TileEntityChest leftChest = chestType == BlockPropertyChestType.c ? (TileEntityChest) adjacentTile : ((TileEntityChest) tileInventory);
-
-                            if (silentchest && (rightChest.g != null || leftChest.g != null)) {
-                                OpenInv.getPlugin(OpenInv.class).sendSystemMessage(bukkitPlayer, "messages.error.lootNotGenerated");
-                                return false;
-                            }
-
-                            tileInventory = new ITileInventory() {
-                                public Container createMenu(int containerCounter, PlayerInventory playerInventory, EntityHuman entityHuman) {
-                                    leftChest.d(playerInventory.l);
-                                    rightChest.d(playerInventory.l);
-                                    return ContainerChest.b(containerCounter, playerInventory, new InventoryLargeChest(rightChest, leftChest));
-                                }
-
-                                public IChatBaseComponent getScoreboardDisplayName() {
-                                    if (leftChest.hasCustomName()) {
-                                        return leftChest.getScoreboardDisplayName();
-                                    }
-                                    if (rightChest.hasCustomName()) {
-                                        return rightChest.getScoreboardDisplayName();
-                                    }
-                                    return new ChatMessage("container.chestDouble");
-                                }
-                            };
+            // boolean flag: check if chest is blocked
+            Optional<MenuProvider> menuOptional = chestBlock.combine(blockState, level, blockPos, false).apply(
+                    // Combiner is a copy of private ChestBlock.MENU_PROVIDER_COMBINER
+                    new DoubleBlockCombiner.Combiner<ChestBlockEntity, Optional<MenuProvider>>() {
+                        @Override
+                        public Optional<MenuProvider> acceptDouble(ChestBlockEntity localChest1, ChestBlockEntity localChest2) {
+                            CompoundContainer doubleChest = new CompoundContainer(localChest1, localChest2);
+                            return Optional.of(new ChestBlock.DoubleInventory(localChest1, localChest2, doubleChest));
                         }
-                    }
-                }
+
+                        @Override
+                        public Optional<MenuProvider> acceptSingle(ChestBlockEntity localChest) {
+                            return Optional.of(localChest);
+                        }
+
+                        @Override
+                        public Optional<MenuProvider> acceptNone() {
+                            return Optional.empty();
+                        }
+                    });
+
+            if (menuOptional.isEmpty()) {
+                OpenInv.getPlugin(OpenInv.class).sendSystemMessage(bukkitPlayer, "messages.error.lootNotGenerated");
+                return false;
             }
 
-            if (block instanceof BlockChestTrapped) {
+            menuProvider = menuOptional.get();
+
+            if (block instanceof TrappedChestBlock) {
                 bukkitPlayer.incrementStatistic(Statistic.TRAPPED_CHEST_TRIGGERED);
             } else {
                 bukkitPlayer.incrementStatistic(Statistic.CHEST_OPENED);
             }
         }
 
-        if (block instanceof BlockShulkerBox) {
+        if (block instanceof ShulkerBoxBlock) {
             bukkitPlayer.incrementStatistic(Statistic.SHULKER_BOX_OPENED);
         }
 
-        if (block instanceof BlockBarrel) {
+        if (block instanceof BarrelBlock) {
             bukkitPlayer.incrementStatistic(Statistic.OPEN_BARREL);
         }
 
         // AnyChest only - SilentChest not active, container unsupported, or unnecessary.
-        if (!silentchest || player.d.getGameMode() == EnumGamemode.d) {
-            player.openContainer(tileInventory);
+        if (!silentchest || player.gameMode.getGameModeForPlayer() == GameType.SPECTATOR) {
+            player.openMenu(menuProvider);
             return true;
         }
 
-        // SilentChest requires access to setting players' gamemode directly.
-        if (this.playerInteractManagerGamemode == null) {
+        // SilentChest requires access to setting players' game mode directly.
+        if (this.serverPlayerGameModeGameType == null) {
             return false;
         }
 
-        if (tile instanceof TileEntityLootable lootable) {
-            if (lootable.g != null) {
+        if (blockEntity instanceof RandomizableContainerBlockEntity lootable) {
+            if (lootable.lootTable != null) {
                 OpenInv.getPlugin(OpenInv.class).sendSystemMessage(bukkitPlayer, "messages.error.lootNotGenerated");
                 return false;
             }
         }
 
-        EnumGamemode gamemode = player.d.getGameMode();
-        this.forceGameMode(player, EnumGamemode.d);
-        player.openContainer(tileInventory);
-        this.forceGameMode(player, gamemode);
+        GameType gameType = player.gameMode.getGameModeForPlayer();
+        this.forceGameType(player, GameType.SPECTATOR);
+        player.openMenu(menuProvider);
+        this.forceGameType(player, gameType);
         return true;
     }
 
     @Override
     public void deactivateContainer(@NotNull final Player bukkitPlayer) {
-        if (this.playerInteractManagerGamemode == null) {
+        if (this.serverPlayerGameModeGameType == null) {
             return;
         }
 
@@ -238,29 +246,29 @@ public class AnySilentContainer implements IAnySilentContainer {
                 return;
         }
 
-        EntityPlayer player = PlayerDataManager.getHandle(bukkitPlayer);
+        ServerPlayer player = PlayerDataManager.getHandle(bukkitPlayer);
 
         // Force game mode change without informing plugins or players.
-        EnumGamemode gamemode = player.d.getGameMode();
-        this.forceGameMode(player, EnumGamemode.d);
+        // Regular game mode set calls GameModeChangeEvent and is cancellable.
+        GameType gameType = player.gameMode.getGameModeForPlayer();
+        this.forceGameType(player, GameType.SPECTATOR);
 
-        // See EntityPlayer#closeInventory - can't call or we'd recursively deactivate.
-        player.bV.b(player);
-        player.bU.a(player.bV);
-        player.bV = player.bU;
+        // Close container - note that this is very different from ServerPlayer#closeContainer!
+        // Triggering event must not be re-called or we'll enter an infinite loop.
+        player.doCloseContainer();
 
         // Revert forced game mode.
-        this.forceGameMode(player, gamemode);
+        this.forceGameType(player, gameType);
     }
 
-    private void forceGameMode(final EntityPlayer player, final EnumGamemode gameMode) {
-        if (this.playerInteractManagerGamemode == null) {
+    private void forceGameType(final ServerPlayer player, final GameType gameMode) {
+        if (this.serverPlayerGameModeGameType == null) {
             // No need to warn repeatedly, error on startup and lack of function should be enough.
             return;
         }
         try {
-            this.playerInteractManagerGamemode.setAccessible(true);
-            this.playerInteractManagerGamemode.set(player.d, gameMode);
+            this.serverPlayerGameModeGameType.setAccessible(true);
+            this.serverPlayerGameModeGameType.set(player.gameMode, gameMode);
         } catch (IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
         }

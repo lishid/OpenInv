@@ -20,7 +20,6 @@ import com.lishid.openinv.internal.IInventoryAccess;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialInventory;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
@@ -81,30 +80,14 @@ public class InventoryAccess implements IInventoryAccess {
             } catch (ReflectiveOperationException ignored) {}
         }
 
-        inv = grabFieldOfTypeFromObject(expected, inventory);
+        // Use reflection to find the IInventory
+        inv = ReflectionHelper.grabObjectByType(inventory, expected);
 
         if (expected.isInstance(inv)) {
             return expected.cast(inv);
         }
 
         return null;
-    }
-
-    private static <T> @Nullable T grabFieldOfTypeFromObject(final Class<T> type, final Object object) {
-        // Use reflection to find the IInventory
-        Class<?> clazz = object.getClass();
-        T result = null;
-        for (Field f : clazz.getDeclaredFields()) {
-            f.setAccessible(true);
-            if (type.isAssignableFrom(f.getDeclaringClass())) {
-                try {
-                    result = type.cast(f.get(object));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-        return result;
     }
 
     @Deprecated

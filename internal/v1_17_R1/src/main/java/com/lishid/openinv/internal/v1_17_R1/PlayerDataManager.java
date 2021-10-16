@@ -22,17 +22,16 @@ import com.lishid.openinv.internal.ISpecialInventory;
 import com.lishid.openinv.internal.OpenInventoryView;
 import com.mojang.authlib.GameProfile;
 import java.lang.reflect.Field;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.minecraft.network.chat.ChatComponentText;
-import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.EntityPlayer;
-import net.minecraft.server.level.WorldServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.inventory.Container;
-import net.minecraft.world.inventory.Containers;
-import net.minecraft.world.level.World;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
@@ -55,21 +54,21 @@ public class PlayerDataManager implements IPlayerDataManager {
         } catch (NoSuchFieldException e) {
             Logger logger = OpenInv.getPlugin(OpenInv.class).getLogger();
             logger.warning("Unable to obtain field to inject custom save process - players' mounts may be deleted when loaded.");
-            logger.log(Level.WARNING, e.getMessage(), e);
+            logger.log(java.util.logging.Level.WARNING, e.getMessage(), e);
             bukkitEntity = null;
         }
     }
 
-    public static @NotNull EntityPlayer getHandle(final Player player) {
+    public static @NotNull ServerPlayer getHandle(final Player player) {
         if (player instanceof CraftPlayer) {
             return ((CraftPlayer) player).getHandle();
         }
 
         Server server = player.getServer();
-        EntityPlayer nmsPlayer = null;
+        ServerPlayer nmsPlayer = null;
 
         if (server instanceof CraftServer) {
-            nmsPlayer = ((CraftServer) server).getHandle().getPlayer(player.getName());
+            nmsPlayer = ((CraftServer) server).getHandle().getPlayer(player.getUniqueId());
         }
 
         if (nmsPlayer == null) {
@@ -92,13 +91,13 @@ public class PlayerDataManager implements IPlayerDataManager {
         GameProfile profile = new GameProfile(offline.getUniqueId(),
                 offline.getName() != null ? offline.getName() : offline.getUniqueId().toString());
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
-        WorldServer worldServer = server.getWorldServer(World.f);
+        ServerLevel worldServer = server.getLevel(Level.OVERWORLD);
 
         if (worldServer == null) {
             return null;
         }
 
-        EntityPlayer entity = new EntityPlayer(server, worldServer, profile);
+        ServerPlayer entity = new ServerPlayer(server, worldServer, profile);
 
         try {
             injectPlayer(entity);
@@ -116,21 +115,21 @@ public class PlayerDataManager implements IPlayerDataManager {
         return target;
     }
 
-    void injectPlayer(EntityPlayer player) throws IllegalAccessException {
+    void injectPlayer(ServerPlayer player) throws IllegalAccessException {
         if (bukkitEntity == null) {
             return;
         }
 
         bukkitEntity.setAccessible(true);
 
-        bukkitEntity.set(player, new OpenPlayer(player.c.server, player));
+        bukkitEntity.set(player, new OpenPlayer(player.server.server, player));
     }
 
     @NotNull
     @Override
     public Player inject(@NotNull Player player) {
         try {
-            EntityPlayer nmsPlayer = getHandle(player);
+            ServerPlayer nmsPlayer = getHandle(player);
             injectPlayer(nmsPlayer);
             return nmsPlayer.getBukkitEntity();
         } catch (IllegalAccessException e) {
@@ -143,9 +142,9 @@ public class PlayerDataManager implements IPlayerDataManager {
     @Override
     public InventoryView openInventory(@NotNull Player player, @NotNull ISpecialInventory inventory) {
 
-        EntityPlayer nmsPlayer = getHandle(player);
+        ServerPlayer nmsPlayer = getHandle(player);
 
-        if (nmsPlayer.b == null) {
+        if (nmsPlayer.connection == null) {
             return null;
         }
 
@@ -155,23 +154,23 @@ public class PlayerDataManager implements IPlayerDataManager {
             return player.openInventory(inventory.getBukkitInventory());
         }
 
-        Container container = new CraftContainer(view, nmsPlayer, nmsPlayer.nextContainerCounter()) {
+        AbstractContainerMenu container = new CraftContainer(view, nmsPlayer, nmsPlayer.nextContainerCounter()) {
             @Override
-            public Containers<?> getType() {
+            public MenuType<?> getType() {
                 return getContainers(inventory.getBukkitInventory().getSize());
             }
         };
 
-        container.setTitle(new ChatComponentText(view.getTitle()));
+        container.setTitle(new TextComponent(view.getTitle()));
         container = CraftEventFactory.callInventoryOpenEvent(nmsPlayer, container);
 
         if (container == null) {
             return null;
         }
 
-        nmsPlayer.b.sendPacket(new PacketPlayOutOpenWindow(container.j, container.getType(),
-                new ChatComponentText(container.getBukkitView().getTitle())));
-        nmsPlayer.bV = container;
+        nmsPlayer.connection.send(new ClientboundOpenScreenPacket(container.containerId, container.getType(),
+                new TextComponent(container.getBukkitView().getTitle())));
+        nmsPlayer.containerMenu = container;
         nmsPlayer.initMenu(container);
 
         return container.getBukkitView();
@@ -188,15 +187,15 @@ public class PlayerDataManager implements IPlayerDataManager {
         }
     }
 
-    static @NotNull Containers<?> getContainers(int inventorySize) {
+    static @NotNull MenuType<?> getContainers(int inventorySize) {
 
         return switch (inventorySize) {
-            case 9 -> Containers.a;
-            case 18 -> Containers.b;
-            case 36 -> Containers.d; // PLAYER
-            case 41, 45 -> Containers.e;
-            case 54 -> Containers.f;
-            default -> Containers.c; // 9x3
+            case 9 -> MenuType.GENERIC_9x1;
+            case 18 -> MenuType.GENERIC_9x2;
+            case 36 -> MenuType.GENERIC_9x4; // PLAYER
+            case 41, 45 -> MenuType.GENERIC_9x5;
+            case 54 -> MenuType.GENERIC_9x6;
+            default -> MenuType.GENERIC_9x3; // Default 27-slot inventory
         };
     }
 

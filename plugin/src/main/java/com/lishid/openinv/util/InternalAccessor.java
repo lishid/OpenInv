@@ -83,6 +83,8 @@ public class InternalAccessor {
             case "v1_16_R2":
                 return "https://github.com/lishid/OpenInv/releases/tag/4.1.5";
             case "v1_16_R3":
+                return "https://github.com/Jikoo/OpenInv/releases/tag/4.1.8";
+            case "v1_17_R1":
             default:
                 return "https://github.com/Jikoo/OpenInv/releases";
         }
