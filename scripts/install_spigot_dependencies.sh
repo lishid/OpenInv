@@ -33,6 +33,11 @@ get_buildtools () {
 readarray -t versions <<< "$(. ./scripts/get_spigot_versions.sh)"
 echo Found Spigot dependencies: "${versions[@]}"
 
+# Install dependencies aside from Spigot prior to running in offline mode.
+# Note that the default SuperPOM declares maven-dependency-plugin 2.8.0.
+# Unfortunately, we run into MDEP-204 and require a version >= 3.1.2.
+mvn org.apache.maven.plugins:maven-dependency-plugin:3.2.0:go-offline -DexcludeArtifactIds=spigot
+
 for version in "${versions[@]}"; do
   set -e
   exit_code=0
