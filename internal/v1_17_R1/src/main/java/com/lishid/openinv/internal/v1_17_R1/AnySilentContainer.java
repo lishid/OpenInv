@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
@@ -147,7 +147,7 @@ public class AnySilentContainer implements IAnySilentContainer {
                 MenuType<?> containers = PlayerDataManager.getContainers(enderChest.getContainerSize());
                 int rows = enderChest.getContainerSize() / 9;
                 return new ChestMenu(containers, containerCounter, playerInventory, enderChest, rows);
-            }, new TextComponent("container.enderchest")));
+            }, new TranslatableComponent("container.enderchest")));
             bukkitPlayer.incrementStatistic(Statistic.ENDERCHEST_OPENED);
             return true;
         }
@@ -161,8 +161,8 @@ public class AnySilentContainer implements IAnySilentContainer {
 
         if (block instanceof ChestBlock chestBlock) {
 
-            // boolean flag: check if chest is blocked
-            Optional<MenuProvider> menuOptional = chestBlock.combine(blockState, level, blockPos, false).apply(
+            // boolean flag: do not check if chest is blocked
+            Optional<MenuProvider> menuOptional = chestBlock.combine(blockState, level, blockPos, true).apply(
                     // Combiner is a copy of private ChestBlock.MENU_PROVIDER_COMBINER
                     new DoubleBlockCombiner.Combiner<ChestBlockEntity, Optional<MenuProvider>>() {
                         @Override
