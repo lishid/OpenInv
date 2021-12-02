@@ -19,6 +19,7 @@ package com.lishid.openinv.internal.v1_18_R1;
 import com.google.common.collect.ImmutableList;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -113,11 +114,33 @@ public class SpecialPlayerInventory extends Inventory implements ISpecialPlayerI
     }
 
     private @NotNull ItemStack getRawItem(int i) {
-        return super.getItem(i);
+        if (i < 0) {
+            return ItemStack.EMPTY;
+        }
+
+        NonNullList<ItemStack> list;
+        for (Iterator<NonNullList<ItemStack>> iterator = this.compartments.iterator(); iterator.hasNext(); i -= list.size()) {
+            list = iterator.next();
+            if (i < list.size()) {
+                return list.get(i);
+            }
+        }
+
+        return ItemStack.EMPTY;
     }
 
     private void setRawItem(int i, @NotNull ItemStack itemStack) {
-        super.setItem(i, itemStack);
+        if (i < 0) {
+            return;
+        }
+
+        NonNullList<ItemStack> list;
+        for (Iterator<NonNullList<ItemStack>> iterator = this.compartments.iterator(); iterator.hasNext(); i -= list.size()) {
+            list = iterator.next();
+            if (i < list.size()) {
+                list.set(i, itemStack);
+            }
+        }
     }
 
     private static record IndexedCompartment(@Nullable NonNullList<ItemStack> compartment, int index) {}
