@@ -26,7 +26,7 @@ jobs:
       - name: Create CurseForge Release
         uses: itsmeow/curseforge-upload@v3
         with:
-          token: ${{ secrets.CURSEFORGE_TOKEN }}
+          token: "${{ secrets.CURSEFORGE_TOKEN }}"
           project_id: 31432
           game_endpoint: minecraft
           file_path: ./OpenInv.jar
