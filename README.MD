@@ -124,22 +124,16 @@ The OpenInv API is available via [JitPack](https://jitpack.io/).
 ```
 
 ### Compilation
-To compile, the relevant Spigot jars must be installed in your local repository using the `install` plugin:
-```shell
-mvn install:install-file -Dpackaging=jar -Dfile=spigot-1.8-R0.1-SNAPSHOT.jar \
-    -DgroupId=org.spigotmc -DartifactId=spigot -Dversion=1.8-R0.1-SNAPSHOT
-```
-Note that BuildTools automatically installs produced files. If you use BuildTools to compile Spigot locally, you don't need to install it manually.  
-If you want to use Paper as a dependency, you can install it by executing PaperClip with the property `paperclip.install` set to true:
-```shell
-wget -O paperclip.jar https://papermc.io/api/v1/paper/1.16.5/latest/download
-java -jar -Dpaperclip.install=true paperclip.jar
-```
+To compile, the relevant Spigot jars must be installed in the local repository.
+As OpenInv is compiled against Mojang's mappings, you must run BuildTools with the `--remapped` argument:  
+`java -jar BuildTools.jar --remapped --rev $serverVersion`  
+`$serverVersion` is the version of the server, i.e. `1.18.1`
 
-To compile for a single version, specify the NMS revision you are targeting: `mvn -pl <NMS module> -am clean install`
+To compile for a single version, specify the module you are targeting:  
+`mvn -pl $moduleName -am clean install`  
+`$moduleName` is the name of the module, i.e. `internal/v1_18_R1`.
 
-To compile for a set of versions, you'll need to use a profile. The only provided profile is `all`. Select a profile using the `-P` argument: `mvn clean package -am -P all`
-
+To compile for a set of versions, use a profile. Select a profile using the `-P` argument:  
+`mvn clean package -am -P all`  
+The only provided profile is `all`. The final file is `target/OpenInv.jar`  
 For more information, check out the [official Maven guide](http://maven.apache.org/guides/introduction/introduction-to-profiles.html).
-
-The final file is `target/OpenInv.jar`
