@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (C) 2011-2021 lishid. All rights reserved.
+  ~ Copyright (C) 2011-2022 lishid. All rights reserved.
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
   <properties>
     <maven.compiler.source>16</maven.compiler.source>
     <maven.compiler.target>16</maven.compiler.target>
+    <spigot.version>1.17.1-R0.1-SNAPSHOT</spigot.version>
   </properties>
 
   <dependencies>
@@ -39,7 +40,7 @@
       <artifactId>spigot</artifactId>
       <groupId>org.spigotmc</groupId>
       <scope>provided</scope>
-      <version>1.17.1-R0.1-SNAPSHOT</version>
+      <version>${spigot.version}</version>
       <classifier>remapped-mojang</classifier>
     </dependency>
     <dependency>
@@ -71,34 +72,6 @@
       <plugin>
         <groupId>net.md-5</groupId>
         <artifactId>specialsource-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>remap</goal>
-            </goals>
-            <id>remap-obf</id>
-            <configuration>
-              <srgIn>org.spigotmc:minecraft-server:1.17.1-R0.1-SNAPSHOT:txt:maps-mojang</srgIn>
-              <reverse>true</reverse>
-              <remappedDependencies>org.spigotmc:spigot:1.17.1-R0.1-SNAPSHOT:jar:remapped-mojang</remappedDependencies>
-              <remappedArtifactAttached>true</remappedArtifactAttached>
-              <remappedClassifierName>remapped-obf</remappedClassifierName>
-            </configuration>
-          </execution>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>remap</goal>
-            </goals>
-            <id>remap-spigot</id>
-            <configuration>
-              <inputFile>${project.build.directory}/${project.artifactId}-${project.version}-remapped-obf.jar</inputFile>
-              <srgIn>org.spigotmc:minecraft-server:1.17.1-R0.1-SNAPSHOT:csrg:maps-spigot</srgIn>
-              <remappedDependencies>org.spigotmc:spigot:1.17.1-R0.1-SNAPSHOT:jar:remapped-obf</remappedDependencies>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

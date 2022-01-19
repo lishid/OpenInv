@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (C) 2011-2021 lishid. All rights reserved.
+# Copyright (C) 2011-2022 lishid. All rights reserved.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -42,22 +42,10 @@ readarray -t modules <<< "$(mvn help:evaluate -Dexpression=project.modules -q -D
 declare -n versions="spigot_versions"
 
 for module in "${modules[@]}"; do
-  # Get number of dependencies declared in pom of specified internal module.
-  max_index=$(mvn help:evaluate -Dexpression=project.dependencies -q -DforceStdout -P all -pl "$module" | grep -c "<dependency>")
-
-  for ((i=0; i < max_index; i++)); do
-    # Get artifactId of dependency.
-    artifact_id=$(mvn help:evaluate -Dexpression=project.dependencies["$i"].artifactId -q -DforceStdout -P all -pl "$module")
-
-    # Ensure dependency is Spigot.
-    if [[ "$artifact_id" == spigot ]]; then
-      # Get Spigot version.
-      spigot_version=$(mvn help:evaluate -Dexpression=project.dependencies["$i"].version -q -DforceStdout -P all -pl "$module")
-      versions+=("$spigot_version")
-      echo "$spigot_version"
-      break
-    fi
-  done
+  # Get Spigot version.
+  spigot_version=$(mvn help:evaluate -Dexpression=spigot.version -q -DforceStdout -P all -pl "$module")
+  versions+=("$spigot_version")
+  echo "$spigot_version"
 done
 
 # Reset JVM parameters
