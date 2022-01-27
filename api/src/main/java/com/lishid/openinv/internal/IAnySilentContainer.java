@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2021 lishid. All rights reserved.
+ * Copyright (C) 2011-2022 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ public interface IAnySilentContainer {
 
     /**
      * Opens the container at the given coordinates for the Player. If you do not want blocked
-     * containers to open, be sure to check {@link #isAnyContainerNeeded(Player, Block)}
+     * containers to open, be sure to check {@link #isAnyContainerNeeded(Block)}
      * first.
      *
      * @param player    the Player opening the container

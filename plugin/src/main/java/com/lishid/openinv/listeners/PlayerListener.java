@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2021 lishid. All rights reserved.
+ * Copyright (C) 2011-2022 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ public class PlayerListener implements Listener {
 
         Player player = event.getPlayer();
         boolean any = Permissions.ANYCHEST.hasPermission(player) && plugin.getPlayerAnyChestStatus(player);
-        boolean needsAny = plugin.getAnySilentContainer().isAnyContainerNeeded(player, event.getClickedBlock());
+        boolean needsAny = plugin.getAnySilentContainer().isAnyContainerNeeded(event.getClickedBlock());
 
         if (!any && needsAny) {
             return;
@@ -79,11 +79,11 @@ public class PlayerListener implements Listener {
         // If anycontainer or silentcontainer is active
         if (any || silent) {
             if (plugin.getAnySilentContainer().activateContainer(player, silent, event.getClickedBlock())) {
-                if (silent && plugin.notifySilentChest() && needsAny && plugin.notifyAnyChest()) {
+                if (silent && needsAny) {
                     plugin.sendSystemMessage(player, "messages.info.containerBlockedSilent");
-                } else if (needsAny && plugin.notifyAnyChest()) {
+                } else if (needsAny) {
                     plugin.sendSystemMessage(player, "messages.info.containerBlocked");
-                } else if (silent && plugin.notifySilentChest()) {
+                } else if (silent) {
                     plugin.sendSystemMessage(player, "messages.info.containerSilent");
                 }
             }
