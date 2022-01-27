@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2021 lishid. All rights reserved.
+ * Copyright (C) 2011-2022 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +19,13 @@ package com.lishid.openinv.util;
 import com.lishid.openinv.internal.IAnySilentContainer;
 import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialEnderChest;
+import com.lishid.openinv.internal.ISpecialInventory;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.NotNull;
 
 public class InternalAccessor {
 
@@ -134,6 +136,23 @@ public class InternalAccessor {
         throw new IllegalArgumentException(message);
     }
 
+    private <T extends ISpecialInventory> T createSpecialInventory(
+            @NotNull Class<? extends T> assignableClass,
+            @NotNull String className,
+            @NotNull Player player,
+            boolean online) throws InstantiationException {
+        if (!this.supported) {
+            throw new IllegalStateException(String.format("Unsupported server version %s!", this.version));
+        }
+        try {
+            return this.createObject(assignableClass, className, player, online);
+        } catch (Exception original) {
+            InstantiationException exception = new InstantiationException(String.format("Unable to create a new %s", className));
+            exception.initCause(original.fillInStackTrace());
+            throw exception;
+        }
+    }
+
     /**
      * Creates an instance of the IAnySilentContainer implementation for the current server version.
      *
@@ -189,14 +208,7 @@ public class InternalAccessor {
      * @throws InstantiationException if the ISpecialEnderChest could not be instantiated
      */
     public ISpecialEnderChest newSpecialEnderChest(final Player player, final boolean online) throws InstantiationException {
-        if (!this.supported) {
-            throw new IllegalStateException(String.format("Unsupported server version %s!", this.version));
-        }
-        try {
-            return this.createObject(ISpecialEnderChest.class, "SpecialEnderChest", player, online);
-        } catch (Exception e) {
-            throw new InstantiationException(String.format("Unable to create a new ISpecialEnderChest: %s", e.getMessage()));
-        }
+        return this.createSpecialInventory(ISpecialEnderChest.class, "SpecialEnderChest", player, online);
     }
 
     /**
@@ -208,14 +220,7 @@ public class InternalAccessor {
      * @throws InstantiationException if the ISpecialPlayerInventory could not be instantiated
      */
     public ISpecialPlayerInventory newSpecialPlayerInventory(final Player player, final boolean online) throws InstantiationException {
-        if (!this.supported) {
-            throw new IllegalStateException(String.format("Unsupported server version %s!", this.version));
-        }
-        try {
-            return this.createObject(ISpecialPlayerInventory.class, "SpecialPlayerInventory", player, online);
-        } catch (Exception e) {
-            throw new InstantiationException(String.format("Unable to create a new ISpecialPlayerInventory: %s", e.getMessage()));
-        }
+        return this.createSpecialInventory(ISpecialPlayerInventory.class, "SpecialPlayerInventory", player, online);
     }
 
 }
