@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2021 lishid. All rights reserved.
+ * Copyright (C) 2011-2022 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -253,9 +253,13 @@ public class AnySilentContainer implements IAnySilentContainer {
         GameType gameType = player.gameMode.getGameModeForPlayer();
         this.forceGameType(player, GameType.SPECTATOR);
 
-        // Close container - note that this is very different from ServerPlayer#closeContainer!
-        // Triggering event must not be re-called or we'll enter an infinite loop.
+        // ServerPlayer#closeContainer cannot be called without entering an
+        // infinite loop because this method is called during inventory close.
+        // From ServerPlayer#closeContainer -> CraftEventFactory#handleInventoryCloseEvent
+        player.containerMenu.transferTo(player.inventoryMenu, player.getBukkitEntity());
+        // From ServerPlayer#closeContainer
         player.doCloseContainer();
+        // Regular inventory close will handle the rest - packet sending, etc.
 
         // Revert forced game mode.
         this.forceGameType(player, gameType);
