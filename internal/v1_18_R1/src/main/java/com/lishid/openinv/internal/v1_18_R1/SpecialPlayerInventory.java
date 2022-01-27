@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2021 lishid. All rights reserved.
+ * Copyright (C) 2011-2022 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -105,7 +105,8 @@ public class SpecialPlayerInventory extends Inventory implements ISpecialPlayerI
 
     @Override
     public boolean isInUse() {
-        return !this.getViewers().isEmpty();
+        List<HumanEntity> viewers = this.getViewers();
+        return viewers.size() > 1 || !viewers.isEmpty() && !viewers.get(0).getUniqueId().equals(this.player.getUUID());
     }
 
     @Override
