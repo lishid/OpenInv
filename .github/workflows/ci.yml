@@ -56,15 +56,15 @@ jobs:
       - if: steps.changes.outputs.maven == 'true'
         name: Approve
         uses: hmarr/auto-approve-action@v2.0.0
-          with:
-            github-token: "${{ secrets.GITHUB_TOKEN }}"
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
       - if: steps.changes.outputs.maven == 'true'
         name: Merge
         uses: pascalgn/automerge-action@v0.15.2
-          env:
-            GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-            MERGE_LABELS: "dependencies"
-            MERGE_METHOD: "squash"
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          MERGE_LABELS: "dependencies"
+          MERGE_METHOD: "squash"
 
   release:
     name: Create Github Release
