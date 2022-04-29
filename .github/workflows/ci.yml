@@ -40,26 +40,16 @@ jobs:
   merge-dependabot:
     name: Auto-merge Dependabot PRs
     needs: [ build ]
-    if: github.event.name == 'pull_request_target' && github.actor == 'dependabot[bot]'
+    if: "github.event.name == 'pull_request_target'
+      && github.actor == 'dependabot[bot]'
+      && contains( github.event.pull_request.labels.*.name, 'java')"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      # Filter dependency changes based on path.
-      - uses: dorny/paths-filter@v2
-        id: changes
-        with:
-          filters: |
-            maven:
-              - '**/pom.xml'
-
-      # Only auto-merge Maven changes.
-      - if: steps.changes.outputs.maven == 'true'
-        name: Approve
+      - name: Approve
         uses: hmarr/auto-approve-action@v2.0.0
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - if: steps.changes.outputs.maven == 'true'
-        name: Merge
+      - name: Merge
         uses: pascalgn/automerge-action@v0.15.2
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
