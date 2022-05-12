@@ -14,28 +14,28 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.util;
+package com.lishid.openinv;
 
 import com.lishid.openinv.internal.IAnySilentContainer;
 import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialInventory;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
+import com.lishid.openinv.util.InventoryAccess;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 
-public class InternalAccessor {
+class InternalAccessor {
 
-    private final Plugin plugin;
+    private final @NotNull Plugin plugin;
     private final String version;
     private boolean supported = false;
     private IPlayerDataManager playerDataManager;
     private IAnySilentContainer anySilentContainer;
 
-    public InternalAccessor(final Plugin plugin) {
+    InternalAccessor(@NotNull Plugin plugin) {
         this.plugin = plugin;
 
         String packageName = plugin.getServer().getClass().getPackage().getName();
@@ -51,58 +51,29 @@ public class InternalAccessor {
     }
 
     public String getReleasesLink() {
-        switch (version) {
-            case "1_4_5":
-            case "1_4_6":
-            case "v1_4_R1":
-            case "v1_5_R2":
-            case "v1_5_R3":
-            case "v1_6_R1":
-            case "v1_6_R2":
-            case "v1_6_R3":
-            case "v1_7_R1":
-            case "v1_7_R2":
-            case "v1_7_R3":
-            case "v1_7_R4":
-            case "v1_8_R1":
-            case "v1_8_R2":
-            case "v1_9_R1":
-            case "v1_9_R2":
-            case "v1_10_R1":
-            case "v1_11_R1":
-            case "v1_12_R1":
-                return "https://github.com/lishid/OpenInv/releases/tag/4.0.0 (OpenInv-legacy)";
-            case "v1_13_R1":
-                return "https://github.com/lishid/OpenInv/releases/tag/4.0.0";
-            case "v1_13_R2":
-                return "https://github.com/lishid/OpenInv/releases/tag/4.0.7";
-            case "v1_14_R1":
-                return "https://github.com/lishid/OpenInv/releases/tag/4.1.1";
-            case "v1_16_R1":
-                return "https://github.com/lishid/OpenInv/releases/tag/4.1.4";
-            case "v1_8_R3":
-            case "v1_15_R1":
-            case "v1_16_R2":
-                return "https://github.com/lishid/OpenInv/releases/tag/4.1.5";
-            case "v1_16_R3":
-                return "https://github.com/Jikoo/OpenInv/releases/tag/4.1.8";
-            case "v1_17_R1":
-            default:
-                return "https://github.com/Jikoo/OpenInv/releases";
-        }
+
+        return switch (version) {
+            case "1_4_5", "1_4_6", "v1_4_R1", "v1_5_R2", "v1_5_R3", "v1_6_R1", "v1_6_R2", "v1_6_R3",
+                    "v1_7_R1", "v1_7_R2", "v1_7_R3", "v1_7_R4", "v1_8_R1", "v1_8_R2",
+                    "v1_9_R1", "v1_9_R2", "v1_10_R1", "v1_11_R1", "v1_12_R1"
+                    -> "https://github.com/lishid/OpenInv/releases/tag/4.0.0 (OpenInv-legacy)";
+            case "v1_13_R1" -> "https://github.com/lishid/OpenInv/releases/tag/4.0.0";
+            case "v1_13_R2" -> "https://github.com/lishid/OpenInv/releases/tag/4.0.7";
+            case "v1_14_R1" -> "https://github.com/lishid/OpenInv/releases/tag/4.1.1";
+            case "v1_16_R1" -> "https://github.com/lishid/OpenInv/releases/tag/4.1.4";
+            case "v1_8_R3", "v1_15_R1", "v1_16_R2" -> "https://github.com/lishid/OpenInv/releases/tag/4.1.5";
+            case "v1_16_R3" -> "https://github.com/Jikoo/OpenInv/releases/tag/4.1.8";
+            default -> "https://github.com/Jikoo/OpenInv/releases";
+        };
     }
 
-    private <T> T createObject(final Class<? extends T> assignableClass, final String className,
-            final Object... params) throws ClassCastException, ClassNotFoundException,
-            InstantiationException, IllegalAccessException, IllegalArgumentException,
-            InvocationTargetException, NoSuchMethodException, SecurityException {
+    private @NotNull <T> T createObject(
+            @NotNull Class<? extends T> assignableClass,
+            @NotNull String className,
+            @NotNull Object @NotNull ... params)
+            throws ClassCastException, ReflectiveOperationException {
         // Fetch internal class if it exists.
         Class<?> internalClass = Class.forName("com.lishid.openinv.internal." + this.version + "." + className);
-        if (!assignableClass.isAssignableFrom(internalClass)) {
-            String message = String.format("Found class %s but cannot cast to %s!", internalClass.getName(), assignableClass.getName());
-            this.plugin.getLogger().warning(message);
-            throw new IllegalStateException(message);
-        }
 
         // Quick return: no parameters, no need to fiddle about finding the correct constructor.
         if (params.length == 0) {
@@ -133,10 +104,10 @@ public class InternalAccessor {
         String message = builder.append(']').toString();
         this.plugin.getLogger().warning(message);
 
-        throw new IllegalArgumentException(message);
+        throw new NoSuchMethodException(message);
     }
 
-    private <T extends ISpecialInventory> T createSpecialInventory(
+    private @NotNull <T extends ISpecialInventory> T createSpecialInventory(
             @NotNull Class<? extends T> assignableClass,
             @NotNull String className,
             @NotNull Player player,
@@ -159,7 +130,7 @@ public class InternalAccessor {
      * @return the IAnySilentContainer
      * @throws IllegalStateException if server version is unsupported
      */
-    public IAnySilentContainer getAnySilentContainer() {
+    public @NotNull IAnySilentContainer getAnySilentContainer() {
         if (!this.supported) {
             throw new IllegalStateException(String.format("Unsupported server version %s!", this.version));
         }
@@ -172,7 +143,7 @@ public class InternalAccessor {
      * @return the IPlayerDataManager
      * @throws IllegalStateException if server version is unsupported
      */
-    public IPlayerDataManager getPlayerDataManager() {
+    public @NotNull IPlayerDataManager getPlayerDataManager() {
         if (!this.supported) {
             throw new IllegalStateException(String.format("Unsupported server version %s!", this.version));
         }
@@ -180,13 +151,12 @@ public class InternalAccessor {
     }
 
     /**
-     * Gets the server implementation version. If not initialized, returns the string "null"
-     * instead.
+     * Gets the server implementation version.
      *
-     * @return the version, or "null"
+     * @return the version
      */
-    public String getVersion() {
-        return this.version != null ? this.version : "null";
+    public @NotNull String getVersion() {
+        return this.version;
     }
 
     /**

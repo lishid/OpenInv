@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2021 lishid. All rights reserved.
+ * Copyright (C) 2011-2022 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,9 +14,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.listeners;
+package com.lishid.openinv;
 
-import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import com.lishid.openinv.util.InventoryAccess;
 import com.lishid.openinv.util.Permissions;
@@ -45,21 +44,13 @@ import org.jetbrains.annotations.Nullable;
  *
  * @author Jikoo
  */
-public class InventoryListener implements Listener {
-
-    private final OpenInv plugin;
-
-    public InventoryListener(final OpenInv plugin) {
-        this.plugin = plugin;
-    }
+record InventoryListener(OpenInv plugin) implements Listener {
 
     @EventHandler
     public void onInventoryClose(@NotNull final InventoryCloseEvent event) {
-        if (!(event.getPlayer() instanceof Player)) {
+        if (!(event.getPlayer() instanceof Player player)) {
             return;
         }
-
-        Player player = (Player) event.getPlayer();
 
         if (this.plugin.getPlayerSilentChestStatus(player)) {
             this.plugin.getAnySilentContainer().deactivateContainer(player);

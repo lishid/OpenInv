@@ -14,9 +14,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.listeners;
+package com.lishid.openinv;
 
-import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.util.Permissions;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
@@ -28,32 +27,27 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.jetbrains.annotations.NotNull;
 
-public class PlayerListener implements Listener {
-
-    private final OpenInv plugin;
-
-    public PlayerListener(OpenInv plugin) {
-        this.plugin = plugin;
-    }
+record PlayerListener(OpenInv plugin) implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerJoin(final PlayerJoinEvent event) {
+    public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
         plugin.setPlayerOnline(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerQuit(PlayerQuitEvent event) {
+    public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
         plugin.setPlayerOffline(event.getPlayer());
     }
 
     @EventHandler
-    public void onWorldChange(PlayerChangedWorldEvent event) {
+    public void onWorldChange(@NotNull PlayerChangedWorldEvent event) {
         plugin.changeWorld(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerInteract(PlayerInteractEvent event) {
+    public void onPlayerInteract(@NotNull PlayerInteractEvent event) {
 
         // Do not cancel 3rd party plugins' custom events
         if (!PlayerInteractEvent.class.equals(event.getClass())) {
