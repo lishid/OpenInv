@@ -510,41 +510,6 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         this.saveConfig();
     }
 
-    /**
-     * Displays all applicable help for OpenInv commands.
-     *
-     * @param player the Player to help
-     */
-    public void showHelp(final Player player) {
-        // Get registered commands
-        for (String commandName : this.getDescription().getCommands().keySet()) {
-            PluginCommand command = this.getCommand(commandName);
-
-            // Ensure command is successfully registered and player can use it
-            if (command == null  || !command.testPermissionSilent(player)) {
-                continue;
-            }
-
-            // Send usage
-            player.sendMessage(command.getUsage().replace("<command>", commandName));
-
-            List<String> aliases = command.getAliases();
-            if (aliases.isEmpty()) {
-                continue;
-            }
-
-            // Assemble alias list
-            StringBuilder aliasBuilder = new StringBuilder("   (aliases: ");
-            for (String alias : aliases) {
-                aliasBuilder.append(alias).append(", ");
-            }
-            aliasBuilder.delete(aliasBuilder.length() - 2, aliasBuilder.length()).append(')');
-
-            // Send all aliases
-            player.sendMessage(aliasBuilder.toString());
-        }
-    }
-
     @Override
     public void unload(@NotNull final OfflinePlayer offline) {
         this.playerCache.invalidate(this.getPlayerID(offline));

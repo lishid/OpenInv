@@ -23,9 +23,11 @@ import com.lishid.openinv.util.TabCompleter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.StringJoiner;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -43,25 +45,24 @@ public class OpenInvCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(@NotNull final CommandSender sender, @NotNull final Command command, @NotNull final String label, @NotNull final String[] args) {
-        if (!(sender instanceof Player)) {
+        boolean openInv = command.getName().equals("openinv");
+
+        if (openInv && args.length > 0 && (args[0].equalsIgnoreCase("help") || args[0].equals("?"))) {
+            this.showHelp(sender);
+            return true;
+        }
+
+        if (!(sender instanceof Player player)) {
             plugin.sendMessage(sender, "messages.error.consoleUnsupported");
             return true;
         }
 
-        if (args.length > 0 && (args[0].equalsIgnoreCase("help") || args[0].equals("?"))) {
-            this.plugin.showHelp((Player) sender);
-            return true;
-        }
-
-        final Player player = (Player) sender;
-        final boolean openinv = command.getName().equals("openinv");
-
         // History management
-        String history = (openinv ? this.openInvHistory : this.openEnderHistory).get(player);
+        String history = (openInv ? this.openInvHistory : this.openEnderHistory).get(player);
 
         if (history == null || history.isEmpty()) {
             history = player.getName();
-            (openinv ? this.openInvHistory : this.openEnderHistory).put(player, history);
+            (openInv ? this.openInvHistory : this.openEnderHistory).put(player, history);
         }
 
         final String name;
@@ -89,7 +90,7 @@ public class OpenInvCommand implements TabExecutor {
                         if (!player.isOnline()) {
                             return;
                         }
-                        OpenInvCommand.this.openInventory(player, offlinePlayer, openinv);
+                        OpenInvCommand.this.openInventory(player, offlinePlayer, openInv);
                     }
                 }.runTask(OpenInvCommand.this.plugin);
 
@@ -97,6 +98,34 @@ public class OpenInvCommand implements TabExecutor {
         }.runTaskAsynchronously(this.plugin);
 
         return true;
+    }
+
+    private void showHelp(final CommandSender sender) {
+        // Get registered commands
+        for (String commandName : plugin.getDescription().getCommands().keySet()) {
+            PluginCommand command = plugin.getCommand(commandName);
+
+            // Ensure command is successfully registered and sender can use it
+            if (command == null  || !command.testPermissionSilent(sender)) {
+                continue;
+            }
+
+            // Send usage
+            sender.sendMessage(command.getUsage().replace("<command>", commandName));
+
+            List<String> aliases = command.getAliases();
+            if (!aliases.isEmpty()) {
+                // Assemble alias list
+                StringJoiner aliasJoiner = new StringJoiner(", ", "   (aliases: ", ")");
+                for (String alias : aliases) {
+                    aliasJoiner.add(alias);
+                }
+
+                // Send all aliases
+                sender.sendMessage(aliasJoiner.toString());
+            }
+
+        }
     }
 
     private void openInventory(final Player player, final OfflinePlayer target, boolean openinv) {
