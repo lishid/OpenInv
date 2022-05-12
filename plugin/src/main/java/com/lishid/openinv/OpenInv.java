@@ -112,6 +112,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
     private InternalAccessor accessor;
     private LanguageManager languageManager;
+    private boolean isSpigot = false;
 
     /**
      * Evicts all viewers lacking cross-world permissions from a Player's inventory.
@@ -355,8 +356,16 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
         this.languageManager = new LanguageManager(this, "en_us");
 
+        try {
+            Class.forName("org.bukkit.entity.Player$Spigot");
+            isSpigot = true;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            isSpigot = false;
+        }
+
         // Version check
-        if (this.accessor.isSupported()) {
+        if (isSpigot && this.accessor.isSupported()) {
             // Update existing configuration. May require internal access.
             new ConfigUpdater(this).checkForUpdates();
 
@@ -379,8 +388,16 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     }
 
     private void sendVersionError(Consumer<String> messageMethod) {
-        messageMethod.accept("Your server version (" + this.accessor.getVersion() + ") is not supported.");
-        messageMethod.accept("Please obtain an appropriate version here: " + accessor.getReleasesLink());
+        if (!this.accessor.isSupported()) {
+            messageMethod.accept("Your server version (" + this.accessor.getVersion() + ") is not supported.");
+            messageMethod.accept("Please obtain an appropriate version here: " + this.accessor.getReleasesLink());
+        }
+        if (!isSpigot) {
+            messageMethod.accept("OpenInv requires that you use Spigot or a Spigot fork. Per the 1.14 update thread");
+            messageMethod.accept("(https://www.spigotmc.org/threads/369724/ \"A Note on CraftBukkit\"), if you are");
+            messageMethod.accept("encountering an inconsistency with vanilla that prevents you from using Spigot,");
+            messageMethod.accept("that is considered a Spigot bug and should be reported as such.");
+        }
     }
 
     private void setCommandExecutor(CommandExecutor executor, String... commands) {
@@ -394,7 +411,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!this.accessor.isSupported()) {
+        if (!isSpigot || !this.accessor.isSupported()) {
             this.sendVersionError(sender::sendMessage);
             return true;
         }
