@@ -104,12 +104,6 @@ public class SpecialPlayerInventory extends Inventory implements ISpecialPlayerI
     }
 
     @Override
-    public boolean isInUse() {
-        List<HumanEntity> viewers = this.getViewers();
-        return viewers.size() > 1 || !viewers.isEmpty() && !viewers.get(0).getUniqueId().equals(this.player.getUUID());
-    }
-
-    @Override
     public @NotNull HumanEntity getPlayer() {
         return this.player.getBukkitEntity();
     }

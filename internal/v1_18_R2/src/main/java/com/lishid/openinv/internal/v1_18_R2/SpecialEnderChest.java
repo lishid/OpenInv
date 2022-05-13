@@ -61,11 +61,6 @@ public class SpecialEnderChest extends PlayerEnderChestContainer implements ISpe
     }
 
     @Override
-    public boolean isInUse() {
-        return !this.getViewers().isEmpty();
-    }
-
-    @Override
     public void setPlayerOffline() {
         this.playerOnline = false;
     }

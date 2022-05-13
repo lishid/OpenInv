@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2021 lishid. All rights reserved.
+ * Copyright (C) 2011-2022 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -58,11 +58,6 @@ public class SpecialEnderChest extends PlayerEnderChestContainer implements ISpe
     @Override
     public @NotNull CraftInventory getBukkitInventory() {
         return inventory;
-    }
-
-    @Override
-    public boolean isInUse() {
-        return !this.getViewers().isEmpty();
     }
 
     @Override
