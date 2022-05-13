@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (C) 2011-2021 lishid. All rights reserved.
+  ~ Copyright (C) 2011-2022 lishid. All rights reserved.
   ~
   ~ This program is free software: you can redistribute it and/or modify
   ~ it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
   <parent>
     <artifactId>openinvparent</artifactId>
     <groupId>com.lishid</groupId>
-    <version>4.1.11-SNAPSHOT</version>
+    <version>4.2.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>openinvplugincore</artifactId>
