@@ -16,6 +16,7 @@
 
 package com.lishid.openinv;
 
+import com.lishid.openinv.internal.ISpecialInventory;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
 import com.lishid.openinv.util.InventoryAccess;
 import com.lishid.openinv.util.Permissions;
@@ -47,7 +48,7 @@ import org.jetbrains.annotations.Nullable;
 record InventoryListener(OpenInv plugin) implements Listener {
 
     @EventHandler
-    public void onInventoryClose(@NotNull final InventoryCloseEvent event) {
+    private void onInventoryClose(@NotNull final InventoryCloseEvent event) {
         if (!(event.getPlayer() instanceof Player player)) {
             return;
         }
@@ -55,10 +56,20 @@ record InventoryListener(OpenInv plugin) implements Listener {
         if (this.plugin.getPlayerSilentChestStatus(player)) {
             this.plugin.getAnySilentContainer().deactivateContainer(player);
         }
+
+        ISpecialInventory specialInventory = InventoryAccess.getEnderChest(event.getInventory());
+        if (specialInventory != null) {
+            this.plugin.handleCloseInventory(event.getPlayer(), specialInventory);
+        } else {
+            specialInventory = InventoryAccess.getPlayerInventory(event.getInventory());
+            if (specialInventory != null) {
+                this.plugin.handleCloseInventory(event.getPlayer(), specialInventory);
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onInventoryClick(@NotNull final InventoryClickEvent event) {
+    private void onInventoryClick(@NotNull final InventoryClickEvent event) {
         if (handleInventoryInteract(event)) {
             return;
         }
@@ -92,7 +103,7 @@ record InventoryListener(OpenInv plugin) implements Listener {
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onInventoryDrag(@NotNull final InventoryDragEvent event) {
+    private void onInventoryDrag(@NotNull final InventoryDragEvent event) {
         if (handleInventoryInteract(event)) {
             return;
         }

@@ -1,4 +1,5 @@
-config-version: 4
+config-version: 5
 settings:
+  disable-offline-access: false
   disable-saving: false
   locale: 'en_us'

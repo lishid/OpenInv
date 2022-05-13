@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2021 lishid. All rights reserved.
+ * Copyright (C) 2011-2022 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,14 +42,22 @@ import org.jetbrains.annotations.Nullable;
 public interface IOpenInv {
 
     /**
-     * Check the configuration value for whether or not OpenInv saves player data when unloading
-     * players. This is exclusively for users who do not allow editing of inventories, only viewing,
-     * and wish to prevent any possibility of bugs such as lishid#40. If true, OpenInv will not ever
-     * save any edits made to players.
+     * Check the configuration value for whether OpenInv saves player data when unloading players. This is exclusively
+     * for users who do not allow editing of inventories, only viewing, and wish to prevent any possibility of bugs such
+     * as lishid#40. If true, OpenInv will not ever save any edits made to players.
      *
      * @return false unless configured otherwise
      */
     boolean disableSaving();
+
+    /**
+     * Check the configuration value for whether OpenInv allows offline access. This does not prevent other plugins from
+     * using existing loaded players while offline.
+     *
+     * @return false unless configured otherwise
+     * @since 4.2.0
+     */
+    boolean disableOfflineAccess();
 
     /**
      * Gets the active ISilentContainer implementation.
@@ -60,12 +68,9 @@ public interface IOpenInv {
     @NotNull IAnySilentContainer getAnySilentContainer();
 
     /**
-     * Gets the active IInventoryAccess implementation.
-     *
-     * @return the IInventoryAccess
-     * @throws IllegalStateException if the server version is unsupported
+     * @deprecated Use static {@link InventoryAccess} methods.
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     default @NotNull IInventoryAccess getInventoryAccess() {
         return new InventoryAccess();
     }
@@ -128,6 +133,15 @@ public interface IOpenInv {
      * @return true if the server version is supported
      */
     boolean isSupportedVersion();
+
+    /**
+     * Check if a {@link Player} is currently loaded by OpenInv.
+     *
+     * @param playerUuid the {@link UUID} of the {@code Player}
+     * @return whether the {@code Player} is loaded
+     * @since 4.2.0
+     */
+    boolean isPlayerLoaded(@NotNull UUID playerUuid);
 
     /**
      * Load a Player from an OfflinePlayer. May return null under some circumstances.
@@ -227,57 +241,51 @@ public interface IOpenInv {
      * @return true unless configured otherwise
      * @deprecated OpenInv uses action bar chat for notifications. Whether or not they show is based on language settings.
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     default boolean notifyAnyChest() {
         return true;
     }
 
     /**
-     * Check the configuration value for whether or not OpenInv displays a notification to the user
-     * when a container is activated with SilentChest.
-     *
-     * @return true unless configured otherwise
-     * @deprecated OpenInv uses action bar chat for notifications. Whether or not they show is based on language settings.
+     * @deprecated OpenInv uses action bar chat for notifications. Whether they show is based on language settings.
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     default boolean notifySilentChest() {
         return true;
     }
 
     /**
-     * Mark a Player as no longer in use by a Plugin to allow OpenInv to remove it from the cache
-     * when eligible.
-     *
-     * @param player the Player
-     * @param plugin the Plugin no longer holding a reference to the Player
-     * @throws IllegalStateException if the server version is unsupported
+     * @deprecated see {@link #retainPlayer(Player, Plugin)}
      */
-    void releasePlayer(@NotNull Player player, @NotNull Plugin plugin);
+    @Deprecated(forRemoval = true, since = "4.2.0")
+    default void releasePlayer(@NotNull Player player, @NotNull Plugin plugin) {}
 
     /**
-     * Mark a Player as in use by a Plugin to prevent it from being removed from the cache. Used to
-     * prevent issues with multiple copies of the same Player being loaded such as lishid#49.
-     * Changes made to loaded copies overwrite changes to the others when saved, leading to
-     * duplication bugs and more.
-     * <p>
-     * When finished with the Player object, be sure to call {@link #releasePlayer(Player, Plugin)}
-     * to prevent the cache from keeping it stored until the plugin is disabled.
-     * <p>
-     * When using a Player object from OpenInv, you must handle the Player coming online, replacing
-     * your Player reference with the Player from the PlayerJoinEvent. In addition, you must change
-     * any values in the Player to reflect any unsaved alterations to the existing Player which do
-     * not affect the inventory or ender chest contents.
-     * <p>
-     * OpenInv only saves player data when unloading a Player from the cache, and then only if
-     * {@link #disableSaving()} returns false. If you are making changes that OpenInv does not cause
-     * to persist when a Player logs in as noted above, it is suggested that you manually call
-     * {@link Player#saveData()} when releasing your reference to ensure your changes persist.
+     * @deprecated OpenInv no longer uses an internal cache beyond maintaining copies of currently open inventories.
+     * If you wish to use/modify a player, ensure either {@link IOpenInv#isPlayerLoaded(UUID)} is false or the player
+     * instance is the same memory address as the one in use by OpenInv.
+     * <pre>
+     *  public &#64;NotNull Player savePlayerData(&#64;NotNull Player player) {
+     *     IOpenInv openInv = ...
+     *     if (!openInv.disableSaving() && openInv.isPlayerLoaded(player.getUniqueId())) {
+     *         Player openInvLoadedPlayer = openInv.loadPlayer(myInUsePlayer);
+     *         if (openInvLoadedPlayer != player) {
+     *             // The copy loaded by OpenInv is not the same as our loaded copy. Push our changes.
+     *             copyPlayerModifications(player, openInvLoadedPlayer);
+     *         }
+     *         // OpenInv will handle saving data when the player is unloaded.
+     *         // Optionally, to be sure our changes will persist, save now.
+     *         // openInvLoadedPlayer.saveData();
+     *         return openInvLoadedPlayer;
+     *     }
      *
-     * @param player the Player
-     * @param plugin the Plugin holding the reference to the Player
-     * @throws IllegalStateException if the server version is unsupported
+     *     player.saveData();
+     *     return player;
+     * }
+     * </pre>
      */
-    void retainPlayer(@NotNull Player player, @NotNull Plugin plugin);
+    @Deprecated(forRemoval = true, since = "4.2.0")
+    default void retainPlayer(@NotNull Player player, @NotNull Plugin plugin) {}
 
     /**
      * Sets a player's AnyChest setting.

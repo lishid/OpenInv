@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2021 lishid. All rights reserved.
+ * Copyright (C) 2011-2022 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,13 +25,7 @@ import java.util.Set;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 
-public class ConfigUpdater {
-
-    private final OpenInv plugin;
-
-    public ConfigUpdater(OpenInv plugin) {
-        this.plugin = plugin;
-    }
+public record ConfigUpdater(OpenInv plugin) {
 
     public void checkForUpdates() {
         final int version = plugin.getConfig().getInt("config-version", 1);
@@ -60,11 +54,21 @@ public class ConfigUpdater {
             if (version < 4) {
                 updateConfig3To4();
             }
+            if (version < 5) {
+                updateConfig4To5();
+            }
 
             plugin.getServer().getScheduler().runTask(plugin, () -> {
                 plugin.saveConfig();
                 plugin.getLogger().info("Configuration update complete!");
             });
+        });
+    }
+
+    private void updateConfig4To5() {
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            plugin.getConfig().set("settings.disable-offline-access", false);
+            plugin.getConfig().set("config-version", 5);
         });
     }
 

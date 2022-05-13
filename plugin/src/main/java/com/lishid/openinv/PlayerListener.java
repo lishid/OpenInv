@@ -32,22 +32,22 @@ import org.jetbrains.annotations.NotNull;
 record PlayerListener(OpenInv plugin) implements Listener {
 
     @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
+    private void onPlayerJoin(@NotNull PlayerJoinEvent event) {
         plugin.setPlayerOnline(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
+    private void onPlayerQuit(@NotNull PlayerQuitEvent event) {
         plugin.setPlayerOffline(event.getPlayer());
     }
 
     @EventHandler
-    public void onWorldChange(@NotNull PlayerChangedWorldEvent event) {
+    private void onWorldChange(@NotNull PlayerChangedWorldEvent event) {
         plugin.changeWorld(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerInteract(@NotNull PlayerInteractEvent event) {
+    private void onPlayerInteract(@NotNull PlayerInteractEvent event) {
 
         // Do not cancel 3rd party plugins' custom events
         if (!PlayerInteractEvent.class.equals(event.getClass())) {

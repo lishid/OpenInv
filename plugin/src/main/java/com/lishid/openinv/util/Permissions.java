@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2021 lishid. All rights reserved.
+ * Copyright (C) 2011-2022 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 package com.lishid.openinv.util;
 
 import org.bukkit.permissions.Permissible;
+import org.jetbrains.annotations.NotNull;
 
 public enum Permissions {
 
@@ -50,7 +51,7 @@ public enum Permissions {
         this.uninheritable = uninheritable;
     }
 
-    public boolean hasPermission(Permissible permissible) {
+    public boolean hasPermission(@NotNull Permissible permissible) {
 
         boolean hasPermission = permissible.hasPermission(permission);
         if (uninheritable || hasPermission || permissible.isPermissionSet(permission)) {
