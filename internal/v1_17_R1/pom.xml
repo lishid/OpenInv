@@ -44,6 +44,11 @@
       <classifier>remapped-mojang</classifier>
     </dependency>
     <dependency>
+      <artifactId>openinvapi</artifactId>
+      <groupId>com.lishid</groupId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <artifactId>openinvplugincore</artifactId>
       <groupId>com.lishid</groupId>
     </dependency>
