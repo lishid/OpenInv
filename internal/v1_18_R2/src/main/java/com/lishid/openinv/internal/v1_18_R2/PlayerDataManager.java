@@ -130,6 +130,9 @@ public class PlayerDataManager implements IPlayerDataManager {
     public Player inject(@NotNull Player player) {
         try {
             ServerPlayer nmsPlayer = getHandle(player);
+            if (nmsPlayer.getBukkitEntity() instanceof OpenPlayer openPlayer) {
+                return openPlayer;
+            }
             injectPlayer(nmsPlayer);
             return nmsPlayer.getBukkitEntity();
         } catch (IllegalAccessException e) {

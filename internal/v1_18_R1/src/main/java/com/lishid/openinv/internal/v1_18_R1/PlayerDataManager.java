@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2021 lishid. All rights reserved.
+ * Copyright (C) 2011-2022 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -130,6 +130,9 @@ public class PlayerDataManager implements IPlayerDataManager {
     public Player inject(@NotNull Player player) {
         try {
             ServerPlayer nmsPlayer = getHandle(player);
+            if (nmsPlayer.getBukkitEntity() instanceof OpenPlayer openPlayer) {
+                return openPlayer;
+            }
             injectPlayer(nmsPlayer);
             return nmsPlayer.getBukkitEntity();
         } catch (IllegalAccessException e) {
