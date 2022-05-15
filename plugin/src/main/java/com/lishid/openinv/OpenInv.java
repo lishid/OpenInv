@@ -133,21 +133,21 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     }
 
     @Override
-    public boolean getPlayerAnyChestStatus(@NotNull final OfflinePlayer player) {
+    public boolean getAnyContainerStatus(@NotNull final OfflinePlayer offline) {
         boolean defaultState = false;
 
-        if (player.isOnline()) {
-            Player onlinePlayer = player.getPlayer();
+        if (offline.isOnline()) {
+            Player onlinePlayer = offline.getPlayer();
             if (onlinePlayer != null) {
                 defaultState = Permissions.ANY_DEFAULT.hasPermission(onlinePlayer);
             }
         }
 
-        return this.getConfig().getBoolean("toggles.any-chest." + this.getPlayerID(player), defaultState);
+        return this.getConfig().getBoolean("toggles.any-chest." + offline.getUniqueId(), defaultState);
     }
 
     @Override
-    public boolean getPlayerSilentChestStatus(@NotNull final OfflinePlayer offline) {
+    public boolean getSilentContainerStatus(@NotNull final OfflinePlayer offline) {
         boolean defaultState = false;
 
         if (offline.isOnline()) {
@@ -157,7 +157,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             }
         }
 
-        return this.getConfig().getBoolean("toggles.silent-chest." + this.getPlayerID(offline), defaultState);
+        return this.getConfig().getBoolean("toggles.silent-chest." + offline.getUniqueId(), defaultState);
     }
 
     @Override
@@ -401,8 +401,8 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     }
 
     @Override
-    public void setPlayerAnyChestStatus(@NotNull final OfflinePlayer offline, final boolean status) {
-        this.getConfig().set("toggles.any-chest." + this.getPlayerID(offline), status);
+    public void setAnyContainerStatus(@NotNull final OfflinePlayer offline, final boolean status) {
+        this.getConfig().set("toggles.any-chest." + offline.getUniqueId(), status);
         this.saveConfig();
     }
 
@@ -515,8 +515,8 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     }
 
     @Override
-    public void setPlayerSilentChestStatus(@NotNull final OfflinePlayer offline, final boolean status) {
-        this.getConfig().set("toggles.silent-chest." + this.getPlayerID(offline), status);
+    public void setSilentContainerStatus(@NotNull final OfflinePlayer offline, final boolean status) {
+        this.getConfig().set("toggles.silent-chest." + offline.getUniqueId(), status);
         this.saveConfig();
     }
 

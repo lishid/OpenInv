@@ -186,7 +186,7 @@ public class OpenInvCommand implements TabExecutor {
         }
 
         // Record the target
-        (openinv ? this.openInvHistory : this.openEnderHistory).put(player, this.plugin.getPlayerID(target));
+        (openinv ? this.openInvHistory : this.openEnderHistory).put(player, target.getUniqueId().toString());
 
         // Create the inventory
         final ISpecialInventory inv;

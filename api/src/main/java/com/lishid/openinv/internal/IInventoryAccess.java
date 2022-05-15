@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2021 lishid. All rights reserved.
+ * Copyright (C) 2011-2022 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,49 +16,47 @@
 
 package com.lishid.openinv.internal;
 
+import com.lishid.openinv.util.InventoryAccess;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@Deprecated
+/**
+ * @deprecated Use static {@link InventoryAccess} methods.
+ */
+@Deprecated(forRemoval = true)
 public interface IInventoryAccess {
 
     /**
-     * Gets an ISpecialEnderChest from an Inventory or null if the Inventory is not backed by an
-     * ISpecialEnderChest.
-     *
-     * @param inventory the Inventory
-     * @return the ISpecialEnderChest or null
+     * @deprecated Use static {@link InventoryAccess} methods.
      */
-    @Deprecated
-    @Nullable ISpecialEnderChest getSpecialEnderChest(@NotNull Inventory inventory);
+    @Deprecated(forRemoval = true)
+    default @Nullable ISpecialEnderChest getSpecialEnderChest(@NotNull Inventory inventory) {
+        return InventoryAccess.getEnderChest(inventory);
+    }
 
     /**
-     * Gets an ISpecialPlayerInventory from an Inventory or null if the Inventory is not backed by
-     * an ISpecialPlayerInventory.
-     *
-     * @param inventory the Inventory
-     * @return the ISpecialPlayerInventory or null
+     * @deprecated Use static {@link InventoryAccess} methods.
      */
-    @Deprecated
-    @Nullable ISpecialPlayerInventory getSpecialPlayerInventory(@NotNull Inventory inventory);
+    @Deprecated(forRemoval = true)
+    default @Nullable ISpecialPlayerInventory getSpecialPlayerInventory(@NotNull Inventory inventory) {
+        return InventoryAccess.getPlayerInventory(inventory);
+    }
 
     /**
-     * Check if an Inventory is an ISpecialEnderChest implementation.
-     *
-     * @param inventory the Inventory
-     * @return true if the Inventory is backed by an ISpecialEnderChest
+     * @deprecated Use static {@link InventoryAccess} methods.
      */
-    @Deprecated
-    boolean isSpecialEnderChest(@NotNull Inventory inventory);
+    @Deprecated(forRemoval = true)
+    default boolean isSpecialEnderChest(@NotNull Inventory inventory) {
+        return InventoryAccess.isEnderChest(inventory);
+    }
 
     /**
-     * Check if an Inventory is an ISpecialPlayerInventory implementation.
-     *
-     * @param inventory the Inventory
-     * @return true if the Inventory is backed by an ISpecialPlayerInventory
+     * @deprecated Use static {@link InventoryAccess} methods.
      */
-    @Deprecated
-    boolean isSpecialPlayerInventory(@NotNull Inventory inventory);
+    @Deprecated(forRemoval = true)
+    default boolean isSpecialPlayerInventory(@NotNull Inventory inventory) {
+        return InventoryAccess.isPlayerInventory(inventory);
+    }
 
 }

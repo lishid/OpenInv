@@ -86,8 +86,8 @@ public class AnySilentContainer implements IAnySilentContainer {
     }
 
     @Override
-    public boolean isShulkerBlocked(ShulkerBox box) {
-        org.bukkit.World bukkitWorld = box.getWorld();
+    public boolean isShulkerBlocked(@NotNull ShulkerBox shulkerBox) {
+        org.bukkit.World bukkitWorld = shulkerBox.getWorld();
         if (!(bukkitWorld instanceof CraftWorld)) {
             bukkitWorld = Bukkit.getWorld(bukkitWorld.getUID());
         }
@@ -99,7 +99,7 @@ public class AnySilentContainer implements IAnySilentContainer {
         }
 
         final ServerLevel world = craftWorld.getHandle();
-        final BlockPos blockPosition = new BlockPos(box.getX(), box.getY(), box.getZ());
+        final BlockPos blockPosition = new BlockPos(shulkerBox.getX(), shulkerBox.getY(), shulkerBox.getZ());
         final BlockEntity tile = world.getBlockEntity(blockPosition);
 
         if (!(tile instanceof ShulkerBoxBlockEntity shulkerBoxBlockEntity)

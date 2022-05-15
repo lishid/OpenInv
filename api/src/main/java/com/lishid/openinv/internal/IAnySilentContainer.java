@@ -33,39 +33,38 @@ import org.jetbrains.annotations.NotNull;
 public interface IAnySilentContainer {
 
     /**
-     * Opens the container at the given coordinates for the Player. If you do not want blocked
-     * containers to open, be sure to check {@link #isAnyContainerNeeded(Block)}
-     * first.
+     * Forcibly open the container at the given coordinates for the Player. This will open blocked containers! Be sure
+     * to check {@link #isAnyContainerNeeded(Block)} first if that is not desirable.
      *
-     * @param player    the Player opening the container
-     * @param silent    whether the container's noise is to be silenced
-     * @param block     the Block
+     * @param player the {@link Player} opening the container
+     * @param silent whether the container's noise is to be silenced
+     * @param block  the {@link Block} of the container
      * @return true if the container can be opened
      */
     boolean activateContainer(@NotNull Player player, boolean silent, @NotNull Block block);
 
     /**
-     * Closes the Player's currently open container silently, if necessary.
+     * Perform operations required to close the current container silently.
      *
-     * @param player the Player closing a container
+     * @param player the {@link Player} closing a container
      */
     void deactivateContainer(@NotNull Player player);
 
     /**
-     * @deprecated use {@link #isAnyContainerNeeded(Block)}
      * @param player the player opening the container
-     * @param block the block
+     * @param block  the {@link Block} of the container
      * @return true if the container is blocked
+     * @deprecated use {@link #isAnyContainerNeeded(Block)}
      */
-    @Deprecated
+    @Deprecated(forRemoval = true, since = "4.1.9")
     default boolean isAnyContainerNeeded(@NotNull Player player, @NotNull Block block) {
         return isAnyContainerNeeded(block);
     }
 
     /**
-     * Checks if the container at the given coordinates is blocked.
+     * Check if the container at the given coordinates is blocked.
      *
-     * @param block  the Block
+     * @param block the {@link Block} of the container
      * @return true if the container is blocked
      */
     default boolean isAnyContainerNeeded(@NotNull Block block) {
@@ -82,8 +81,8 @@ public interface IAnySilentContainer {
         }
 
         // Shulker boxes require 1/2 a block clear in the direction they open.
-        if (blockState instanceof ShulkerBox) {
-            if (isShulkerBlocked((ShulkerBox) blockState)) {
+        if (blockState instanceof ShulkerBox shulker) {
+            if (isShulkerBlocked(shulker)) {
                 return true;
             }
         }
@@ -97,11 +96,10 @@ public interface IAnySilentContainer {
         }
 
         BlockData blockData = block.getBlockData();
-        if (!(blockData instanceof Chest) || ((Chest) blockData).getType() == Chest.Type.SINGLE) {
+        if (!(blockData instanceof Chest chest) || ((Chest) blockData).getType() == Chest.Type.SINGLE) {
             return false;
         }
 
-        Chest chest = (Chest) blockData;
         int ordinal = (chest.getFacing().ordinal() + 4 + (chest.getType() == Chest.Type.RIGHT ? -1 : 1)) % 4;
         BlockFace relativeFace = BlockFace.values()[ordinal];
         org.bukkit.block.Block relative = block.getRelative(relativeFace);
@@ -111,11 +109,10 @@ public interface IAnySilentContainer {
         }
 
         BlockData relativeData = relative.getBlockData();
-        if (!(relativeData instanceof Chest)) {
+        if (!(relativeData instanceof Chest relativeChest)) {
             return false;
         }
 
-        Chest relativeChest = (Chest) relativeData;
         if (relativeChest.getFacing() != chest.getFacing()
                 || relativeChest.getType() != (chest.getType() == Chest.Type.RIGHT ? Chest.Type.LEFT : Chest.Type.RIGHT)) {
             return false;
@@ -124,25 +121,31 @@ public interface IAnySilentContainer {
         return isChestBlocked(relative);
     }
 
-    boolean isShulkerBlocked(ShulkerBox block);
+    /**
+     * Check if a {@link ShulkerBox} cannot be opened under ordinary circumstances.
+     *
+     * @param shulkerBox the shulker box container
+     * @return whether the container is blocked
+     */
+    boolean isShulkerBlocked(@NotNull ShulkerBox shulkerBox);
 
     /**
-     * Determine whether or not a chest is blocked.
+     * Check if a chest cannot be opened under ordinary circumstances.
      *
      * @param chest the chest block
-     * @return true if the chest block cannot be opened under ordinary circumstances
+     * @return whether the container is blocked
      */
-    default boolean isChestBlocked(Block chest) {
+    default boolean isChestBlocked(@NotNull Block chest) {
         org.bukkit.block.Block relative = chest.getRelative(0, 1, 0);
         return relative.getType().isOccluding()
                 || chest.getWorld().getNearbyEntities(BoundingBox.of(relative), entity -> entity instanceof Cat).size() > 0;
     }
 
     /**
-     * Checks if the given block is a container which can be unblocked or silenced.
+     * Check if the given {@link Block} is a container which can be unblocked or silenced.
      *
-     * @param block the BlockState
-     * @return true if the Block is a supported container
+     * @param block the potential container
+     * @return true if the type is a supported container
      */
     default boolean isAnySilentContainer(@NotNull Block block) {
         if (block.getType() == Material.ENDER_CHEST) {

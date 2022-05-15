@@ -128,7 +128,7 @@ public record ConfigUpdater(OpenInv plugin) {
         for (String playerName : keys) {
             OfflinePlayer player = plugin.matchPlayer(playerName);
             if (player != null) {
-                toggles.put(plugin.getPlayerID(player), section.getBoolean(playerName + ".toggle", false));
+                toggles.put(player.getUniqueId().toString(), section.getBoolean(playerName + ".toggle", false));
             }
         }
 

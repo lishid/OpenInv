@@ -36,10 +36,15 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * Interface defining behavior for the OpenInv plugin.
- *
- * @author Jikoo
  */
 public interface IOpenInv {
+
+    /**
+     * Check if the server version is supported by OpenInv.
+     *
+     * @return true if the server version is supported
+     */
+    boolean isSupportedVersion();
 
     /**
      * Check the configuration value for whether OpenInv saves player data when unloading players. This is exclusively
@@ -51,8 +56,9 @@ public interface IOpenInv {
     boolean disableSaving();
 
     /**
-     * Check the configuration value for whether OpenInv allows offline access. This does not prevent other plugins from
-     * using existing loaded players while offline.
+     * Check the configuration value for whether OpenInv allows offline access. If true, OpenInv will not load or allow
+     * modification of players while they are not online. This does not prevent other plugins from using existing loaded
+     * players who have gone offline.
      *
      * @return false unless configured otherwise
      * @since 4.2.0
@@ -60,9 +66,9 @@ public interface IOpenInv {
     boolean disableOfflineAccess();
 
     /**
-     * Gets the active ISilentContainer implementation.
+     * Get the active {@link IAnySilentContainer} implementation.
      *
-     * @return the ISilentContainer
+     * @return the active implementation for the server version
      * @throws IllegalStateException if the server version is unsupported
      */
     @NotNull IAnySilentContainer getAnySilentContainer();
@@ -76,18 +82,74 @@ public interface IOpenInv {
     }
 
     /**
-     * Gets the provided player's AnyChest setting.
-     *
-     * @param player the OfflinePlayer
-     * @return true if AnyChest is enabled
-     * @throws IllegalStateException if the server version is unsupported
+     * @deprecated Use {@link #getAnyContainerStatus(OfflinePlayer)}. Not all containers are chests.
      */
-    boolean getPlayerAnyChestStatus(@NotNull OfflinePlayer player);
+    @Deprecated(forRemoval = true, since = "4.2.0")
+    default boolean getPlayerAnyChestStatus(@NotNull OfflinePlayer offline) {
+        return getAnyContainerStatus(offline);
+    }
 
     /**
-     * Gets a unique identifier by which the OfflinePlayer can be referenced. Using the value
-     * returned to look up a Player will generally be much faster for later implementations.
+     * Get whether a user has AnyContainer mode enabled.
      *
+     * @param offline the user to obtain the state of
+     * @return true if AnyContainer mode is enabled
+     */
+    boolean getAnyContainerStatus(@NotNull OfflinePlayer offline);
+
+    /**
+     * @deprecated Use {@link #setAnyContainerStatus(OfflinePlayer, boolean)}. Not all containers are chests.
+     */
+    @Deprecated(forRemoval = true, since = "4.2.0")
+    default void setPlayerAnyChestStatus(@NotNull OfflinePlayer offline, boolean status) {
+        setAnyContainerStatus(offline, status);
+    }
+
+    /**
+     * Set whether a user has AnyContainer mode enabled.
+     *
+     * @param offline the user to set the state of
+     * @param status the state of the mode
+     */
+    void setAnyContainerStatus(@NotNull OfflinePlayer offline, boolean status);
+
+    /**
+     * @deprecated Use {@link #getSilentContainerStatus(OfflinePlayer)}. Not all containers are chests.
+     */
+    @Deprecated(forRemoval = true, since = "4.2.0")
+    default boolean getPlayerSilentChestStatus(@NotNull OfflinePlayer offline) {
+        return getSilentContainerStatus(offline);
+    }
+
+    /**
+     * Get whether a user has SilentContainer mode enabled.
+     *
+     * @param offline the user to obtain the state of
+     * @return true if SilentContainer mode is enabled
+     */
+    boolean getSilentContainerStatus(@NotNull OfflinePlayer offline);
+
+    /**
+     * @deprecated Use {@link #setSilentContainerStatus(OfflinePlayer, boolean)}. Not all containers are chests.
+     */
+    @Deprecated(forRemoval = true, since = "4.2.0")
+    default void setPlayerSilentChestStatus(@NotNull OfflinePlayer offline, boolean status) {
+        setSilentContainerStatus(offline, status);
+    }
+
+    /**
+     * Set whether a user has SilentContainer mode enabled.
+     *
+     * @param offline the user to set the state of
+     * @param status the state of the mode
+     */
+    void setSilentContainerStatus(@NotNull OfflinePlayer offline, boolean status);
+
+    /**
+     * Get a unique identifier by which the OfflinePlayer can be referenced.
+     *
+     * @deprecated Use {@link OfflinePlayer#getUniqueId()} and {@link UUID#toString()}. This was necessary for non-UUID
+     * versions of Minecraft, but support for them has been dropped for years.
      * @param offline the OfflinePlayer
      * @return the identifier
      * @throws IllegalStateException if the server version is unsupported
@@ -97,42 +159,35 @@ public interface IOpenInv {
     }
 
     /**
-     * Gets a player's SilentChest setting.
+     * Get an {@link ISpecialEnderChest} for a user.
      *
-     * @param offline the OfflinePlayer
-     * @return true if SilentChest is enabled
+     * @param player the {@link Player} owning the inventory
+     * @param online whether the owner is currently online
+     * @return the created inventory
      * @throws IllegalStateException if the server version is unsupported
-     */
-    boolean getPlayerSilentChestStatus(@NotNull OfflinePlayer offline);
-
-    /**
-     * Gets an ISpecialEnderChest for the given Player.
-     *
-     * @param player the Player
-     * @param online true if the Player is currently online
-     * @return the ISpecialEnderChest
-     * @throws IllegalStateException  if the server version is unsupported
-     * @throws InstantiationException if the ISpecialEnderChest could not be instantiated
+     * @throws InstantiationException if there was an issue creating the inventory
      */
     @NotNull ISpecialEnderChest getSpecialEnderChest(@NotNull Player player, boolean online) throws InstantiationException;
 
     /**
-     * Gets an ISpecialPlayerInventory for the given Player.
+     * Get an {@link ISpecialPlayerInventory} for a user.
      *
-     * @param player the Player
-     * @param online true if the Player is currently online
-     * @return the ISpecialPlayerInventory
-     * @throws IllegalStateException  if the server version is unsupported
-     * @throws InstantiationException if the ISpecialPlayerInventory could not be instantiated
+     * @param player the {@link Player} owning the inventory
+     * @param online whether the owner is currently online
+     * @return the created inventory
+     * @throws IllegalStateException if the server version is unsupported
+     * @throws InstantiationException if there was an issue creating the inventory
      */
     @NotNull ISpecialPlayerInventory getSpecialInventory(@NotNull Player player, boolean online) throws InstantiationException;
 
     /**
-     * Checks if the server version is supported by OpenInv.
+     * Open an {@link ISpecialInventory} for a {@link Player}.
      *
-     * @return true if the server version is supported
+     * @param player the viewer
+     * @param inventory the inventory to open
+     * @return the resulting {@link InventoryView}
      */
-    boolean isSupportedVersion();
+    @Nullable InventoryView openInventory(@NotNull Player player, @NotNull ISpecialInventory inventory);
 
     /**
      * Check if a {@link Player} is currently loaded by OpenInv.
@@ -144,23 +199,25 @@ public interface IOpenInv {
     boolean isPlayerLoaded(@NotNull UUID playerUuid);
 
     /**
-     * Load a Player from an OfflinePlayer. May return null under some circumstances.
+     * Load a {@link Player} from an {@link OfflinePlayer}. If the user has not played before or the default world for
+     * the server is not loaded, this will return {@code null}.
      *
-     * @param offline the OfflinePlayer to load a Player for
-     * @return the Player, or null
+     * @param offline the {@code OfflinePlayer} to load a {@code Player} for
+     * @return the loaded {@code Player}
      * @throws IllegalStateException if the server version is unsupported
      */
     @Nullable Player loadPlayer(@NotNull final OfflinePlayer offline);
 
     /**
-     * Get an OfflinePlayer by name.
-     * <p>
-     * Note: This method is potentially very heavily blocking. It should not ever be called on the
+     * Match an existing {@link OfflinePlayer}. If the name is a {@link UUID#toString() UUID string}, this will only
+     * return the user if they have actually played on the server before, unlike {@link Bukkit#getOfflinePlayer(UUID)}.
+     *
+     * <p>This method is potentially very heavily blocking. It should not ever be called on the
      * main thread, and if it is, a stack trace will be displayed alerting server owners to the
      * call.
      *
-     * @param name the name of the Player
-     * @return the OfflinePlayer with the closest matching name or null if no players have ever logged in
+     * @param name the string to match
+     * @return the user with the closest matching name
      */
     default @Nullable OfflinePlayer matchPlayer(@NotNull String name) {
 
@@ -168,7 +225,7 @@ public interface IOpenInv {
         if (Bukkit.getServer().isPrimaryThread()) {
             this.getLogger().warning("Call to OpenInv#matchPlayer made on the main thread!");
             this.getLogger().warning("This can cause the server to hang, potentially severely.");
-            this.getLogger().log(Level.WARNING, new Throwable("Current stack trace"), () -> "Current stack trace");
+            this.getLogger().log(Level.WARNING, "Current stack trace", new Throwable("Current stack trace"));
         }
 
         OfflinePlayer player;
@@ -176,32 +233,38 @@ public interface IOpenInv {
         try {
             UUID uuid = UUID.fromString(name);
             player = Bukkit.getOfflinePlayer(uuid);
-            // Ensure player is a real player, otherwise return null
+            // Ensure player is an existing player.
             if (player.hasPlayedBefore() || player.isOnline()) {
                 return player;
             }
+            // Return null otherwise.
+            return null;
         } catch (IllegalArgumentException ignored) {
             // Not a UUID
         }
 
+        // Exact online match first.
         player = Bukkit.getServer().getPlayerExact(name);
 
         if (player != null) {
             return player;
         }
 
+        // Exact offline match second - ensure offline access works when matchable users are online.
         player = Bukkit.getServer().getOfflinePlayer(name);
 
         if (player.hasPlayedBefore()) {
             return player;
         }
 
+        // Inexact online match.
         player = Bukkit.getServer().getPlayer(name);
 
         if (player != null) {
             return player;
         }
 
+        // Finally, inexact offline match.
         float bestMatch = 0;
         for (OfflinePlayer offline : Bukkit.getServer().getOfflinePlayers()) {
             if (offline.getName() == null) {
@@ -226,20 +289,7 @@ public interface IOpenInv {
     }
 
     /**
-     * Open an ISpecialInventory for a Player.
-     *
-     * @param player the Player
-     * @param inventory the ISpecialInventory
-     * @return the InventoryView for the opened ISpecialInventory
-     */
-    @Nullable InventoryView openInventory(@NotNull Player player, @NotNull ISpecialInventory inventory);
-
-    /**
-     * Check the configuration value for whether or not OpenInv displays a notification to the user
-     * when a container is activated with AnyChest.
-     *
-     * @return true unless configured otherwise
-     * @deprecated OpenInv uses action bar chat for notifications. Whether or not they show is based on language settings.
+     * @deprecated OpenInv uses action bar chat for notifications. Whether they show is based on language settings.
      */
     @Deprecated(forRemoval = true)
     default boolean notifyAnyChest() {
@@ -288,28 +338,9 @@ public interface IOpenInv {
     default void retainPlayer(@NotNull Player player, @NotNull Plugin plugin) {}
 
     /**
-     * Sets a player's AnyChest setting.
+     * Forcibly close inventories of and unload any cached data for a user.
      *
-     * @param offline the OfflinePlayer
-     * @param status the status
-     * @throws IllegalStateException if the server version is unsupported
-     */
-    void setPlayerAnyChestStatus(@NotNull OfflinePlayer offline, boolean status);
-
-    /**
-     * Sets a player's SilentChest setting.
-     *
-     * @param offline the OfflinePlayer
-     * @param status the status
-     * @throws IllegalStateException if the server version is unsupported
-     */
-    void setPlayerSilentChestStatus(@NotNull OfflinePlayer offline, boolean status);
-
-    /**
-     * Forcibly unload a cached Player's data.
-     *
-     * @param offline the OfflinePlayer to unload
-     * @throws IllegalStateException if the server version is unsupported
+     * @param offline the {@link OfflinePlayer} to unload
      */
     void unload(@NotNull OfflinePlayer offline);
 

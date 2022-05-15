@@ -53,7 +53,7 @@ record InventoryListener(OpenInv plugin) implements Listener {
             return;
         }
 
-        if (this.plugin.getPlayerSilentChestStatus(player)) {
+        if (this.plugin.getSilentContainerStatus(player)) {
             this.plugin.getAnySilentContainer().deactivateContainer(player);
         }
 

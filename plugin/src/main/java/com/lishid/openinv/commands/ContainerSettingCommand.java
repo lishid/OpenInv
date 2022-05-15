@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2021 lishid. All rights reserved.
+ * Copyright (C) 2011-2022 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,15 +39,14 @@ public class ContainerSettingCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player player)) {
             plugin.sendMessage(sender, "messages.error.consoleUnsupported");
             return true;
         }
 
-        Player player = (Player) sender;
         boolean any = command.getName().startsWith("any");
-        Predicate<Player> getSetting = any ? plugin::getPlayerAnyChestStatus : plugin::getPlayerSilentChestStatus;
-        BiConsumer<OfflinePlayer, Boolean> setSetting = any ? plugin::setPlayerAnyChestStatus : plugin::setPlayerSilentChestStatus;
+        Predicate<Player> getSetting = any ? plugin::getAnyContainerStatus : plugin::getSilentContainerStatus;
+        BiConsumer<OfflinePlayer, Boolean> setSetting = any ? plugin::setAnyContainerStatus : plugin::setSilentContainerStatus;
 
         if (args.length > 0) {
             args[0] = args[0].toLowerCase();

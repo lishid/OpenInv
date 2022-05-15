@@ -21,40 +21,43 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Interface defining behavior for special inventories backed by other inventories' content listings.
+ */
 public interface ISpecialInventory {
 
     /**
-     * Gets the Inventory associated with this ISpecialInventory.
+     * Get the {@link Inventory} associated with this {@code ISpecialInventory}.
      *
-     * @return the Inventory
+     * @return the Bukkit inventory
      */
     @NotNull Inventory getBukkitInventory();
 
     /**
-     * Sets the Player associated with this ISpecialInventory online.
+     * Set the owning {@link Player} instance to a newly-joined user.
      *
-     * @param player the Player coming online
+     * @param player the user coming online
      */
     void setPlayerOnline(@NotNull Player player);
 
     /**
-     * Sets the Player associated with this ISpecialInventory offline.
+     * Mark the owner of the inventory offline.
      */
     void setPlayerOffline();
 
     /**
-     * Gets whether this ISpecialInventory is in use.
+     * Get whether the inventory is being viewed by any users.
      *
-     * @return true if the ISpecialInventory is in use
+     * @return true if the inventory is being viewed
      */
     default boolean isInUse() {
         return !getBukkitInventory().getViewers().isEmpty();
     }
 
     /**
-     * Gets the Player associated with this ISpecialInventory.
+     * Get the {@link Player} who owns the inventory.
      *
-     * @return the HumanEntity
+     * @return the {@link HumanEntity} who owns the inventory
      */
     @NotNull HumanEntity getPlayer();
 

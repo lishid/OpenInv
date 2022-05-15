@@ -21,7 +21,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.Inventory;
 
 /**
- * Interface defining behavior specific to a player inventory.
+ * An {@link ISpecialInventory} representing a player inventory.
  */
 public interface ISpecialPlayerInventory extends ISpecialInventory {
 
