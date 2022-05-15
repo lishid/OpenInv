@@ -522,6 +522,11 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
     static void ejectViewers(@NotNull ISpecialInventory inventory, @NotNull Predicate<@NotNull HumanEntity> predicate) {
         Inventory bukkitInventory = inventory.getBukkitInventory();
         for (HumanEntity viewer : new ArrayList<>(bukkitInventory.getViewers())) {
+            if (viewer.getUniqueId().equals(inventory.getPlayer().getUniqueId())
+                    && !viewer.getOpenInventory().getTopInventory().equals(bukkitInventory)) {
+                // Skip owner with other inventory open. They aren't actually a viewer.
+                continue;
+            }
             if (predicate.test(viewer)) {
                 viewer.closeInventory();
             }
