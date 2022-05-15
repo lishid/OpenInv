@@ -338,7 +338,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
                 inventory,
                 viewer ->
                         !Permissions.CROSSWORLD.hasPermission(viewer)
-                                && Objects.equals(viewer.getWorld(), player.getWorld()));
+                                && !Objects.equals(viewer.getWorld(), player.getWorld()));
     }
 
     /**
