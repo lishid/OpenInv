@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2021 lishid. All rights reserved.
+ * Copyright (C) 2011-2022 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ public class SearchContainerCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (!(sender instanceof Player)) {
+        if (!(sender instanceof Player senderPlayer)) {
             plugin.sendMessage(sender, "messages.error.consoleUnsupported");
             return true;
         }
@@ -72,7 +72,6 @@ public class SearchContainerCommand implements TabExecutor {
             }
         }
 
-        Player senderPlayer = (Player) sender;
         World world = senderPlayer.getWorld();
         Chunk centerChunk = senderPlayer.getLocation().getChunk();
         StringBuilder locations = new StringBuilder();
@@ -84,10 +83,9 @@ public class SearchContainerCommand implements TabExecutor {
                 }
                 Chunk chunk = world.getChunkAt(centerChunk.getX() + dX, centerChunk.getZ() + dZ);
                 for (BlockState tileEntity : chunk.getTileEntities()) {
-                    if (!(tileEntity instanceof InventoryHolder)) {
+                    if (!(tileEntity instanceof InventoryHolder holder)) {
                         continue;
                     }
-                    InventoryHolder holder = (InventoryHolder) tileEntity;
                     if (!holder.getInventory().contains(material)) {
                         continue;
                     }

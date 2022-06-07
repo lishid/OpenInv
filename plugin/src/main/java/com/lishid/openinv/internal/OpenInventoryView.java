@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2021 lishid. All rights reserved.
+ * Copyright (C) 2011-2022 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 package com.lishid.openinv.internal;
 
 import com.lishid.openinv.OpenInv;
+import java.util.Objects;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
@@ -70,11 +71,7 @@ public class OpenInventoryView extends InventoryView {
                             titleKey,
                             "%player%",
                             owner.getName());
-            if (localTitle != null) {
-                title = localTitle;
-            } else  {
-                title = owner.getName() + titleDefaultSuffix;
-            }
+            title = Objects.requireNonNullElseGet(localTitle, () -> owner.getName() + titleDefaultSuffix);
         }
 
         return title;

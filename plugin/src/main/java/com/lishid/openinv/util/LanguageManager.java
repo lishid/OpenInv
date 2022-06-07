@@ -50,7 +50,7 @@ public class LanguageManager {
         getOrLoadLocale(defaultLocale);
     }
 
-    private YamlConfiguration getOrLoadLocale(@NotNull String locale) {
+    private @NotNull YamlConfiguration getOrLoadLocale(@NotNull String locale) {
         YamlConfiguration loaded = locales.get(locale);
         if (loaded != null) {
             return loaded;
@@ -136,8 +136,7 @@ public class LanguageManager {
         return localeConfig;
     }
 
-    @Nullable
-    public String getValue(@NotNull String key, @Nullable String locale) {
+    public @Nullable String getValue(@NotNull String key, @Nullable String locale) {
         String value = getOrLoadLocale(locale == null ? defaultLocale : locale.toLowerCase()).getString(key);
         if (value == null || value.isEmpty()) {
             return null;
@@ -148,8 +147,7 @@ public class LanguageManager {
         return value;
     }
 
-    @Nullable
-    public String getValue(@NotNull String key, @Nullable String locale, @NotNull String... replacements) {
+    public @Nullable String getValue(@NotNull String key, @Nullable String locale, String @NotNull ... replacements) {
         if (replacements.length % 2 != 0) {
             plugin.getLogger().log(Level.WARNING, "[LanguageManager] Replacement data is uneven", new Exception());
         }
