@@ -39,9 +39,8 @@
       <modules>
         <module>api</module>
         <module>plugin</module>
-        <module>internal/v1_17_R1</module>
-        <module>internal/v1_18_R1</module>
         <module>internal/v1_18_R2</module>
+        <module>internal/v1_19_R1</module>
         <module>assembly</module>
       </modules>
     </profile>

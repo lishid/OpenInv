@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_17_R1;
+package com.lishid.openinv.internal.v1_19_R1;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IAnySilentContainer;
@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
@@ -53,7 +53,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.block.ShulkerBox;
-import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_19_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
@@ -140,14 +140,14 @@ public class AnySilentContainer implements IAnySilentContainer {
         }
 
         if (blockEntity instanceof EnderChestBlockEntity enderChestTile) {
-            // Anychest ender chest. See net.minecraft.world.level.block.BlockEnderChest
+            // Anychest ender chest. See net.minecraft.world.level.block.EnderChestBlock
             PlayerEnderChestContainer enderChest = player.getEnderChestInventory();
             enderChest.setActiveChest(enderChestTile);
             player.openMenu(new SimpleMenuProvider((containerCounter, playerInventory, ignored) -> {
                 MenuType<?> containers = PlayerDataManager.getContainers(enderChest.getContainerSize());
                 int rows = enderChest.getContainerSize() / 9;
                 return new ChestMenu(containers, containerCounter, playerInventory, enderChest, rows);
-            }, new TranslatableComponent("container.enderchest")));
+            }, Component.translatable(("container.enderchest"))));
             bukkitPlayer.incrementStatistic(Statistic.ENDERCHEST_OPENED);
             return true;
         }

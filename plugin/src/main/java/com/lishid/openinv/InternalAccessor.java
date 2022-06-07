@@ -63,6 +63,7 @@ class InternalAccessor {
             case "v1_16_R1" -> "https://github.com/lishid/OpenInv/releases/tag/4.1.4";
             case "v1_8_R3", "v1_15_R1", "v1_16_R2" -> "https://github.com/lishid/OpenInv/releases/tag/4.1.5";
             case "v1_16_R3" -> "https://github.com/Jikoo/OpenInv/releases/tag/4.1.8";
+            case "v1_17_R1", "v1_18_R1" -> "https://github.com/Jikoo/OpenInv/releases/tag/4.1.10";
             default -> "https://github.com/Jikoo/OpenInv/releases";
         };
     }

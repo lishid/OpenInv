@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_18_R1;
+package com.lishid.openinv.internal.v1_19_R1;
 
 import com.google.common.collect.ImmutableList;
 import com.lishid.openinv.internal.ISpecialPlayerInventory;
@@ -33,7 +33,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.damagesource.DamageSource;
@@ -46,8 +46,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
@@ -138,7 +138,7 @@ public class SpecialPlayerInventory extends Inventory implements ISpecialPlayerI
         }
     }
 
-    private static record IndexedCompartment(@Nullable NonNullList<ItemStack> compartment, int index) {}
+    private record IndexedCompartment(@Nullable NonNullList<ItemStack> compartment, int index) {}
 
     private @NotNull SpecialPlayerInventory.IndexedCompartment getIndexedContent(int index) {
         if (index < items.size()) {
@@ -743,8 +743,9 @@ public class SpecialPlayerInventory extends Inventory implements ISpecialPlayerI
     }
 
     @Override
-    public boolean contains(Tag<Item> tag) {
-        return contains(itemStack -> !itemStack.isEmpty() && itemStack.is(tag));
+    public boolean contains(TagKey<Item> tagKey) {
+
+        return contains(itemStack -> !itemStack.isEmpty() && itemStack.is(tagKey));
     }
 
     @Override

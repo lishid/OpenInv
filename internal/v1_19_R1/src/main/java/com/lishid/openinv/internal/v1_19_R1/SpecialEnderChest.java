@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_17_R1;
+package com.lishid.openinv.internal.v1_19_R1;
 
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import java.util.List;
@@ -33,8 +33,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.EnderChestBlockEntity;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
@@ -317,7 +317,7 @@ public class SpecialEnderChest extends PlayerEnderChestContainer implements ISpe
 
     @Override
     public String toString() {
-        return this.items.stream().filter((itemStack) -> !itemStack.isEmpty()).collect(Collectors.toList()).toString();
+        return this.items.stream().filter((itemStack) -> !itemStack.isEmpty()).toList().toString();
     }
 
     @Override

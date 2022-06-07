@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_18_R1;
+package com.lishid.openinv.internal.v1_19_R1;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IPlayerDataManager;
@@ -23,7 +23,7 @@ import com.lishid.openinv.internal.OpenInventoryView;
 import com.mojang.authlib.GameProfile;
 import java.lang.reflect.Field;
 import java.util.logging.Logger;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -35,10 +35,10 @@ import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
-import org.bukkit.craftbukkit.v1_18_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_18_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_18_R1.event.CraftEventFactory;
-import org.bukkit.craftbukkit.v1_18_R1.inventory.CraftContainer;
+import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R1.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftContainer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
@@ -87,7 +87,8 @@ public class PlayerDataManager implements IPlayerDataManager {
         }
 
         // Create a profile and entity to load the player data
-        // See net.minecraft.server.PlayerList#attemptLogin
+        // See net.minecraft.server.players.PlayerList#canPlayerLogin
+        // and net.minecraft.server.network.ServerLoginPacketListenerImpl#handleHello
         GameProfile profile = new GameProfile(offline.getUniqueId(),
                 offline.getName() != null ? offline.getName() : offline.getUniqueId().toString());
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
@@ -97,7 +98,7 @@ public class PlayerDataManager implements IPlayerDataManager {
             return null;
         }
 
-        ServerPlayer entity = new ServerPlayer(server, worldServer, profile);
+        ServerPlayer entity = new ServerPlayer(server, worldServer, profile, null);
 
         try {
             injectPlayer(entity);
@@ -164,7 +165,7 @@ public class PlayerDataManager implements IPlayerDataManager {
             }
         };
 
-        container.setTitle(new TextComponent(view.getTitle()));
+        container.setTitle(Component.literal(view.getTitle()));
         container = CraftEventFactory.callInventoryOpenEvent(nmsPlayer, container);
 
         if (container == null) {
@@ -172,7 +173,7 @@ public class PlayerDataManager implements IPlayerDataManager {
         }
 
         nmsPlayer.connection.send(new ClientboundOpenScreenPacket(container.containerId, container.getType(),
-                new TextComponent(container.getBukkitView().getTitle())));
+                Component.literal(container.getBukkitView().getTitle())));
         nmsPlayer.containerMenu = container;
         nmsPlayer.initMenu(container);
 
