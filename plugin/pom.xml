@@ -21,7 +21,7 @@
   <parent>
     <artifactId>openinvparent</artifactId>
     <groupId>com.lishid</groupId>
-    <version>4.2.1-SNAPSHOT</version>
+    <version>4.2.1</version>
   </parent>
 
   <artifactId>openinvplugincore</artifactId>
