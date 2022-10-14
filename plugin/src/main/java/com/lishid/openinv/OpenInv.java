@@ -476,8 +476,9 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
 
             if (!disableSaving()
                     && current != null
-                    && current.getPlayer() instanceof Player player && !player.isOnline()) {
-                this.accessor.getPlayerDataManager().inject(player).saveData();
+                    && current.getPlayer() instanceof Player player
+                    && !player.isOnline()) {
+                    this.accessor.getPlayerDataManager().inject(player).saveData();
             }
         });
     }
