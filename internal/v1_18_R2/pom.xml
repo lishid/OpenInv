@@ -23,7 +23,7 @@
     <artifactId>openinvparent</artifactId>
     <groupId>com.lishid</groupId>
     <relativePath>../../pom.xml</relativePath>
-    <version>4.3.0</version>
+    <version>4.3.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>openinvadapter1_18_R2</artifactId>
