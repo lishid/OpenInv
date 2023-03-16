@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2022 lishid. All rights reserved.
+ * Copyright (C) 2011-2023 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_19_R1;
+package com.lishid.openinv.internal.v1_19_R3;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IPlayerDataManager;
@@ -23,6 +23,7 @@ import com.lishid.openinv.internal.OpenInventoryView;
 import com.mojang.authlib.GameProfile;
 import java.lang.reflect.Field;
 import java.util.logging.Logger;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
 import net.minecraft.server.MinecraftServer;
@@ -35,10 +36,10 @@ import net.minecraft.world.level.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
-import org.bukkit.craftbukkit.v1_19_R1.CraftServer;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R1.event.CraftEventFactory;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftContainer;
+import org.bukkit.craftbukkit.v1_19_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R3.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftContainer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
@@ -98,7 +99,7 @@ public class PlayerDataManager implements IPlayerDataManager {
             return null;
         }
 
-        ServerPlayer entity = new ServerPlayer(server, worldServer, profile, null);
+        ServerPlayer entity = new ServerPlayer(server, worldServer, profile);
 
         // Stop listening for advancement progression - if this is not cleaned up, loading causes a memory leak.
         entity.getAdvancements().stopListening();
@@ -109,14 +110,25 @@ public class PlayerDataManager implements IPlayerDataManager {
             e.printStackTrace();
         }
 
-        // Get the bukkit entity
-        Player target = entity.getBukkitEntity();
-        if (target != null) {
-            // Load data
-            target.loadData();
+        // Load data. This also reads basic data into the player.
+        // See CraftPlayer#loadData
+        CompoundTag loadedData = server.getPlayerList().playerIo.load(entity);
+
+        if (loadedData == null) {
+            // Exceptions with loading are logged by Mojang.
+            return null;
         }
-        // Return the entity
-        return target;
+
+        // Also read "extra" data.
+        entity.readAdditionalSaveData(loadedData);
+
+        if (entity.level == null) {
+            // Paper: Move player to spawn
+            entity.spawnIn(null);
+        }
+
+        // Return the Bukkit entity.
+        return entity.getBukkitEntity();
     }
 
     void injectPlayer(ServerPlayer player) throws IllegalAccessException {
