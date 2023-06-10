@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_19_R2;
+package com.lishid.openinv.internal.v1_20_R1;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IPlayerDataManager;
@@ -33,15 +33,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
-import org.bukkit.craftbukkit.v1_19_R2.CraftServer;
-import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R2.event.CraftEventFactory;
-import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftContainer;
+import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.event.CraftEventFactory;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftContainer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
@@ -124,22 +122,9 @@ public class PlayerDataManager implements IPlayerDataManager {
         // Also read "extra" data.
         entity.readAdditionalSaveData(loadedData);
 
-        if (entity.level == null) {
+        if (entity.level() == null) {
             // Paper: Move player to spawn
-            ServerLevel level = null;
-            Vec3 position = null;
-            if (entity.getRespawnDimension() != null) {
-                level = entity.server.getLevel(entity.getRespawnDimension());
-                if (level != null && entity.getRespawnPosition() != null) {
-                    position = net.minecraft.world.entity.player.Player.findRespawnPositionAndUseSpawnBlock(level, entity.getRespawnPosition(), entity.getRespawnAngle(), false, false).orElse(null);
-                }
-            }
-            if (level == null || position == null) {
-                level = ((CraftWorld) server.server.getWorlds().get(0)).getHandle();
-                position = Vec3.atCenterOf(level.getSharedSpawnPos());
-            }
-            entity.level = level;
-            entity.setPos(position);
+            entity.spawnIn(null);
         }
 
         // Return the Bukkit entity.

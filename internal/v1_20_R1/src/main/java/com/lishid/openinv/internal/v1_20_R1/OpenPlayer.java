@@ -14,17 +14,17 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_18_R2;
+package com.lishid.openinv.internal.v1_20_R1;
 
+import com.mojang.logging.LogUtils;
 import java.io.File;
 import net.minecraft.Util;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.PlayerDataStorage;
-import org.apache.logging.log4j.LogManager;
-import org.bukkit.craftbukkit.v1_18_R2.CraftServer;
-import org.bukkit.craftbukkit.v1_18_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.CraftServer;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
 
 public class OpenPlayer extends CraftPlayer {
 
@@ -49,6 +49,7 @@ public class OpenPlayer extends CraftPlayer {
             PlayerDataStorage worldNBTStorage = player.server.getPlayerList().playerIo;
 
             CompoundTag playerData = player.saveWithoutId(new CompoundTag());
+            setExtraData(playerData);
 
             if (!isOnline()) {
                 // Special case: save old vehicle data
@@ -66,7 +67,7 @@ public class OpenPlayer extends CraftPlayer {
             File file2 = new File(worldNBTStorage.getPlayerDir(), player.getStringUUID() + ".dat_old");
             Util.safeReplaceFile(file1, file, file2);
         } catch (Exception e) {
-            LogManager.getLogger().warn("Failed to save player data for {}: {}", player.getScoreboardName(), e);
+            LogUtils.getLogger().warn("Failed to save player data for {}: {}", player.getScoreboardName(), e);
         }
     }
 

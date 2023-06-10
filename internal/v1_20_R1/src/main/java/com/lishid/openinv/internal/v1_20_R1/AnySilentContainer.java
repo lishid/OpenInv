@@ -14,21 +14,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_19_R2;
+package com.lishid.openinv.internal.v1_20_R1;
 
 import com.lishid.openinv.OpenInv;
 import com.lishid.openinv.internal.IAnySilentContainer;
 import com.lishid.openinv.util.ReflectionHelper;
 import java.lang.reflect.Field;
-import java.util.Optional;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
-import net.minecraft.world.CompoundContainer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.monster.Shulker;
@@ -39,11 +36,9 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.BarrelBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ChestBlock;
-import net.minecraft.world.level.block.DoubleBlockCombiner;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.level.block.TrappedChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.entity.EnderChestBlockEntity;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
@@ -54,7 +49,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.block.ShulkerBox;
-import org.bukkit.craftbukkit.v1_19_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,19 +60,21 @@ public class AnySilentContainer implements IAnySilentContainer {
 
     public AnySilentContainer() {
         try {
-            this.serverPlayerGameModeGameType = ServerPlayerGameMode.class.getDeclaredField("b");
-            this.serverPlayerGameModeGameType.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            Logger logger = OpenInv.getPlugin(OpenInv.class).getLogger();
-            logger.warning("ServerPlayerGameMode#gameModeForPlayer's obfuscated name has changed!");
-            logger.warning("Please report this at https://github.com/Jikoo/OpenInv/issues");
-            logger.warning("Attempting to fall through using reflection. Please verify that SilentContainer does not fail.");
-            // N.B. gameModeForPlayer is (for now) declared before previousGameModeForPlayer so silent shouldn't break.
-            this.serverPlayerGameModeGameType = ReflectionHelper.grabFieldByType(ServerPlayerGameMode.class, GameType.class);
+            try {
+                this.serverPlayerGameModeGameType = ServerPlayerGameMode.class.getDeclaredField("b");
+                this.serverPlayerGameModeGameType.setAccessible(true);
+            } catch (NoSuchFieldException e) {
+                Logger logger = OpenInv.getPlugin(OpenInv.class).getLogger();
+                logger.warning("ServerPlayerGameMode#gameModeForPlayer's obfuscated name has changed!");
+                logger.warning("Please report this at https://github.com/Jikoo/OpenInv/issues");
+                logger.warning("Attempting to fall through using reflection. Please verify that SilentContainer does not fail.");
+                // N.B. gameModeForPlayer is (for now) declared before previousGameModeForPlayer so silent shouldn't break.
+                this.serverPlayerGameModeGameType = ReflectionHelper.grabFieldByType(ServerPlayerGameMode.class, GameType.class);
+            }
         } catch (SecurityException e) {
             Logger logger = OpenInv.getPlugin(OpenInv.class).getLogger();
             logger.warning("Unable to directly write player game mode! SilentContainer will fail.");
-            logger.log(Level.WARNING, "Error obtaining GameType field", e);
+            logger.log(java.util.logging.Level.WARNING, "Error obtaining GameType field", e);
         }
     }
 
@@ -90,7 +87,7 @@ public class AnySilentContainer implements IAnySilentContainer {
 
         if (!(bukkitWorld instanceof CraftWorld craftWorld)) {
             Exception exception = new IllegalStateException("AnySilentContainer access attempted on an unknown world!");
-            OpenInv.getPlugin(OpenInv.class).getLogger().log(Level.WARNING, exception.getMessage(), exception);
+            OpenInv.getPlugin(OpenInv.class).getLogger().log(java.util.logging.Level.WARNING, exception.getMessage(), exception);
             return false;
         }
 
@@ -127,7 +124,7 @@ public class AnySilentContainer implements IAnySilentContainer {
 
         ServerPlayer player = PlayerDataManager.getHandle(bukkitPlayer);
 
-        final ServerLevel level = player.getLevel();
+        final net.minecraft.world.level.Level level = player.level();
         final BlockPos blockPos = new BlockPos(bukkitBlock.getX(), bukkitBlock.getY(), bukkitBlock.getZ());
         final BlockEntity blockEntity = level.getBlockEntity(blockPos);
 
@@ -158,32 +155,12 @@ public class AnySilentContainer implements IAnySilentContainer {
         if (block instanceof ChestBlock chestBlock) {
 
             // boolean flag: do not check if chest is blocked
-            Optional<MenuProvider> menuOptional = chestBlock.combine(blockState, level, blockPos, true).apply(
-                    // Combiner is a copy of private ChestBlock.MENU_PROVIDER_COMBINER
-                    new DoubleBlockCombiner.Combiner<ChestBlockEntity, Optional<MenuProvider>>() {
-                        @Override
-                        public Optional<MenuProvider> acceptDouble(ChestBlockEntity localChest1, ChestBlockEntity localChest2) {
-                            CompoundContainer doubleChest = new CompoundContainer(localChest1, localChest2);
-                            return Optional.of(new ChestBlock.DoubleInventory(localChest1, localChest2, doubleChest));
-                        }
+            menuProvider = chestBlock.getMenuProvider(blockState, level, blockPos, true);
 
-                        @Override
-                        public Optional<MenuProvider> acceptSingle(ChestBlockEntity localChest) {
-                            return Optional.of(localChest);
-                        }
-
-                        @Override
-                        public Optional<MenuProvider> acceptNone() {
-                            return Optional.empty();
-                        }
-                    });
-
-            if (menuOptional.isEmpty()) {
+            if (menuProvider == null) {
                 OpenInv.getPlugin(OpenInv.class).sendSystemMessage(bukkitPlayer, "messages.error.lootNotGenerated");
                 return false;
             }
-
-            menuProvider = menuOptional.get();
 
             if (block instanceof TrappedChestBlock) {
                 bukkitPlayer.incrementStatistic(Statistic.TRAPPED_CHEST_TRIGGERED);

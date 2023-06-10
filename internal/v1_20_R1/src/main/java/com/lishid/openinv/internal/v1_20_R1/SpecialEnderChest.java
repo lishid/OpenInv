@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2022 lishid. All rights reserved.
+ * Copyright (C) 2011-2023 lishid. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.lishid.openinv.internal.v1_19_R2;
+package com.lishid.openinv.internal.v1_20_R1;
 
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import java.util.List;
@@ -33,8 +33,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.EnderChestBlockEntity;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_19_R2.entity.CraftHumanEntity;
-import org.bukkit.craftbukkit.v1_19_R2.inventory.CraftInventory;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftHumanEntity;
+import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftInventory;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.InventoryHolder;
 import org.jetbrains.annotations.NotNull;
@@ -67,18 +67,29 @@ public class SpecialEnderChest extends PlayerEnderChestContainer implements ISpe
 
     @Override
     public void setPlayerOnline(@NotNull final org.bukkit.entity.Player player) {
-        if (!this.playerOnline) {
-            try {
-                this.owner = PlayerDataManager.getHandle(player);
-                PlayerEnderChestContainer enderChest = owner.getEnderChestInventory();
-                for (int i = 0; i < enderChest.getContainerSize(); ++i) {
-                    enderChest.setItem(i, this.items.get(i));
-                }
-                this.items = enderChest.items;
-                enderChest.transaction.addAll(this.transaction);
-            } catch (Exception ignored) {}
-            this.playerOnline = true;
+        if (this.playerOnline) {
+            return;
         }
+
+        ServerPlayer offlinePlayer = this.owner;
+        ServerPlayer onlinePlayer = PlayerDataManager.getHandle(player);
+
+        // Set owner to new player.
+        this.owner = onlinePlayer;
+
+        // Set player's ender chest contents to our modified contents.
+        PlayerEnderChestContainer onlineEnderChest = onlinePlayer.getEnderChestInventory();
+        for (int i = 0; i < onlineEnderChest.getContainerSize(); ++i) {
+            onlineEnderChest.setItem(i, this.items.get(i));
+        }
+
+        // Set our item array to the new inventory's array.
+        this.items = onlineEnderChest.items;
+
+        // Add viewers to new inventory.
+        onlineEnderChest.transaction.addAll(offlinePlayer.getEnderChestInventory().transaction);
+
+        this.playerOnline = true;
     }
 
     @Override
