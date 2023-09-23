@@ -21,15 +21,15 @@ import com.lishid.openinv.internal.IPlayerDataManager;
 import com.lishid.openinv.internal.ISpecialInventory;
 import com.lishid.openinv.internal.OpenInventoryView;
 import com.mojang.authlib.GameProfile;
-import java.lang.reflect.Field;
-import java.util.logging.Logger;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundOpenScreenPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.ChatVisiblity;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.Level;
@@ -44,6 +44,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.InventoryView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.lang.reflect.Field;
+import java.util.logging.Logger;
 
 public class PlayerDataManager implements IPlayerDataManager {
 
@@ -99,7 +102,18 @@ public class PlayerDataManager implements IPlayerDataManager {
             return null;
         }
 
-        ServerPlayer entity = new ServerPlayer(server, worldServer, profile, null);
+        ClientInformation dummyInfo = new ClientInformation(
+            "en_us",
+            1, // Reduce distance just in case.
+            ChatVisiblity.HIDDEN, // Don't accept chat.
+            false,
+            ServerPlayer.DEFAULT_MODEL_CUSTOMIZATION,
+            ServerPlayer.DEFAULT_MAIN_HAND,
+            true,
+            false // Don't list in player list (not that this player is in the list anyway).
+        );
+
+        ServerPlayer entity = new ServerPlayer(server, worldServer, profile, dummyInfo);
 
         // Stop listening for advancement progression - if this is not cleaned up, loading causes a memory leak.
         entity.getAdvancements().stopListening();
