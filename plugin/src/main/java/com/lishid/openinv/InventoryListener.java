@@ -63,11 +63,11 @@ record InventoryListener(OpenInv plugin) implements Listener {
 
         ISpecialInventory specialInventory = InventoryAccess.getEnderChest(event.getInventory());
         if (specialInventory != null) {
-            this.plugin.handleCloseInventory(event.getPlayer(), specialInventory);
+            this.plugin.handleCloseInventory(specialInventory);
         } else {
             specialInventory = InventoryAccess.getPlayerInventory(event.getInventory());
             if (specialInventory != null) {
-                this.plugin.handleCloseInventory(event.getPlayer(), specialInventory);
+                this.plugin.handleCloseInventory(specialInventory);
             }
         }
     }

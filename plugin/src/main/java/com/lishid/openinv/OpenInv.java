@@ -23,6 +23,7 @@ import com.lishid.openinv.commands.OpenInvCommand;
 import com.lishid.openinv.commands.SearchContainerCommand;
 import com.lishid.openinv.commands.SearchEnchantCommand;
 import com.lishid.openinv.commands.SearchInvCommand;
+import com.lishid.openinv.event.OpenPlayerSaveEvent;
 import com.lishid.openinv.internal.IAnySilentContainer;
 import com.lishid.openinv.internal.ISpecialEnderChest;
 import com.lishid.openinv.internal.ISpecialInventory;
@@ -544,7 +545,7 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
         }
     }
 
-    void handleCloseInventory(@NotNull HumanEntity exViewer, @NotNull ISpecialInventory inventory) {
+    void handleCloseInventory(@NotNull ISpecialInventory inventory) {
         Map<UUID, ? extends ISpecialInventory> map = inventory instanceof ISpecialPlayerInventory ? inventories : enderChests;
         UUID key = inventory.getPlayer().getUniqueId();
         @Nullable ISpecialInventory loaded = map.get(key);
@@ -576,11 +577,18 @@ public class OpenInv extends JavaPlugin implements IOpenInv {
             // Re-fetch from map - prevents duplicate saves on multi-close.
             ISpecialInventory current = map.remove(key);
 
-            if (!disableSaving()
-                    && current != null
-                    && current.getPlayer() instanceof Player player
-                    && !player.isOnline()) {
-                    this.accessor.getPlayerDataManager().inject(player).saveData();
+            if (disableSaving()
+                || current == null
+                || !(current.getPlayer() instanceof Player player)
+                || player.isOnline()) {
+                return;
+            }
+
+            OpenPlayerSaveEvent event = new OpenPlayerSaveEvent(player, current);
+            getServer().getPluginManager().callEvent(event);
+
+            if (!event.isCancelled()) {
+                this.accessor.getPlayerDataManager().inject(player).saveData();
             }
         });
     }
